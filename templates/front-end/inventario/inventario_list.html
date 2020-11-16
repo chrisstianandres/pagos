@@ -1,0 +1,38 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block elements %}
+    <br>
+    <div class="row">
+        <div class="col-lg-4">
+            <label for="fecha"><strong>Rango de Fechas:</strong></label>
+            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm">
+        </div>
+    </div>
+    <br>
+{% endblock %}
+{% block table %}
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Fecha de compra</th>
+        <th>Fecha de venta</th>
+        <th>Producto</th>
+        <th>Categoria</th>
+        <th>Presentacion</th>
+        <th>N° Serie</th>
+        <th>Estado</th>
+        <th style="min-width: 41px" class="text-center"><em class="fa fa-cog"></em></th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+{% endblock %}
+{% block botones %}
+    <a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
+        <i class="fas fa-sync-alt"></i> Actualizar
+    </a>
+{% endblock %}
+
+{% block extra %}
+    <script src="{% static 'apps/inventario/inventario_list.js' %}"></script>
+{% endblock %}

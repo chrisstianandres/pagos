@@ -1,0 +1,67 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block elements %}
+    <br>
+    <div class="row">
+        <div class="col-lg-4">
+            <label for="fecha"><strong>Rango de Fechas:</strong></label>
+            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm">
+        </div>
+    </div>
+    <br>
+{% endblock %}
+{% block table %}
+    <thead>
+    <tr>
+        <th>Fecha</th>
+        <th>Proveedor</th>
+        <th>Empleado</th>
+        <th>Total</th>
+        <th>N° Comprobante</th>
+        <th>Estado</th>
+        <th class="text-center" scope="col" style="width: 10%"><em class="fa fa-cog"></em></th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+{% endblock %}
+{% block modal %}
+    <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle"><i class="fas fa-cart-arrow-down"></i> Detalle de
+                        Productos </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="tbldetalle_insumos">
+                        <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoria</th>
+                            <th>Presentacion</th>
+                            <th>Cantidad</th>
+                            <th>Pvp</th>
+                            <th>Subtotal</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra %}
+    <script src="{% static 'apps/compra/compra_list.js' %}"></script>
+    <script src="{% static 'apps/funtions.js' %}"></script>
+{% endblock %}
+{% block javascript %}
+
+{% endblock %}

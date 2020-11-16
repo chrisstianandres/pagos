@@ -1,0 +1,42 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block table %}
+    <thead>
+    <tr>
+        <th>Producto</th>
+        <th>Fecha de compra</th>
+        <th>Fecha de venta</th>
+        <th># SERIE</th>
+    </tr>
+    </thead>
+    <tbody>
+    {#    {% for dato in list %}#}
+    {#        <tr>#}
+    {#            <td>{{ dato.producto.nombre }}</td>#}
+    {#            <td>{{ dato.fecha_compra }}</td>#}
+    {#            <td> {{ dato.fecha_venta }}  </td>#}
+    {#            <td> {{ dato.serie }} </td>#}
+    {#        </tr>#}
+    {#    {% endfor %}#}
+
+    </tbody>
+{% endblock %}
+{% block botones %}
+    <br>
+    <div class="panel-footer">
+        <a type="button" class="btn btn-primary btn-sm" id="save" style="color: white">
+            <i class="fa fa-plus" aria-hidden="true"></i> {{ boton }}
+        </a>
+{#        <a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">#}
+{#            <i class="fas fa-sync-alt"></i> Actualizar#}
+{#        </a>#}
+    </div>
+{% endblock %}
+{% block script %}
+
+    <script src="{% static 'apps/inventario/inventario.js' %}"></script>
+    <script>
+        inventario.items.prod = {{ list|safe }};
+        inventario.list();
+    </script>
+{% endblock %}

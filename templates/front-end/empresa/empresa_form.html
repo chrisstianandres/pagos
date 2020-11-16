@@ -1,0 +1,81 @@
+{% extends 'front-end/base.html' %}
+{% load static %}
+{% block head %}
+    <!--script for this page-->
+    <link rel="stylesheet" href="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.css' %}"/>
+
+    {% block form_head %}
+
+    {% endblock %}
+{% endblock %}
+{% block content %}
+    <!-- BASIC FORM ELELEMNTS -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-folder-plus"></i> Configuracion de la empresa</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form">
+                        <form class="cmxform form-horizontal style-form" id="signupForm" method="POST"
+                              action="{{ crud }}">
+                            <input type="hidden" id="action" name="action" value="{{ action }}">
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="form-group">
+                                            <span class="label label-danger">{{ error }}</span>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                            {% for field in form.visible_fields %}
+                                <div class="form-group">
+                                    <label style="font-size: 13px;"
+                                           class="col-lg-2 control-label">{{ field.label }}:</label>
+                                    <div class="col-lg-10">
+                                        {% csrf_token %}
+                                        {{ form.media }}
+                                        {{ field }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div class="form-group">
+                                <div class="col-lg-offset-2 col-lg-10">
+                                    <button type="submit" class="btn btn-success has-ripple" style="display: none"
+                                            id="guardar"><i
+                                            class="fa fa-save"></i> Guardar<span class="ripple ripple-animate"
+                                                                                 style="height: 115px; width: 115px; animation-duration: 0.7s;
+                                                                            animation-timing-function: linear; background: rgb(255, 255, 255);
+                                                                            opacity: 0.4; top: -47.875px; left: -23.5px;"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-primary has-ripple" id="editar"><i
+                                            class="fa fa-edit"></i> {{ boton }}<span
+                                            class="ripple ripple-animate"
+                                            style="height: 115px; width: 115px; animation-duration: 0.7s; animation-timing-function: linear; background: rgb(255, 255, 255); opacity: 0.4; top: -47.875px; left: -23.5px;"></span>
+                                    </button>
+                                    <button type="button" onclick=" window.history.back();"
+                                            class="btn btn-danger has-ripple"><i
+                                            class="fa fa-times"></i>Cancelar<span class="ripple ripple-animate"
+                                                                                  style="height: 111px; width: 111px; animation-duration: 0.7s; animation-timing-function: linear; background: rgb(255, 255, 255); opacity: 0.4; top: -34.875px; left: -14.5px;"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /form-panel -->
+        </div>
+        <!-- /col-lg-12 -->
+    </div>
+    <!-- /row -->
+{% endblock %}
+{% block script %}
+    <script src="{% static 'apps/empresa/empresa.js' %}"></script>
+{% endblock %}

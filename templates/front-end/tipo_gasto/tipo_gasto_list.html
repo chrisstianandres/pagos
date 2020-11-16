@@ -1,0 +1,31 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block table %}
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Nombres</th>
+        <th class="text-center"><em class="fa fa-cog"></em></th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for dato in object_list %}
+        <tr>
+            <td>{{ dato.id }}</td>
+            <td>{{ dato.nombre }}</td>
+            <td><a type="button" class="btn btn-success btn-sm" data-toggle="tooltip"
+                   title="Editar Datos"
+                   href="{% url 'tipo_gasto:editar' dato.id %}"><i class="fa fa-edit"></i></a>
+                <a type="button" class="btn btn-danger btn-sm" style="color: white"
+                   data-toggle="tooltip"
+                   title="Eliminar" rel="del">
+                    <i class="fa fa-trash"></i></a></td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'apps/tipo_gasto/tipo_gasto_list.js' %}"></script>
+{% endblock %}

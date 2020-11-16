@@ -1,0 +1,36 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block elements %}
+    <br>
+    <div class="row">
+        <div class="col-lg-4">
+            <label for="fecha"><strong>Rango de Fechas:</strong></label>
+            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm"></div>
+    </div>
+    <br>
+{% endblock %}
+{% block table %}
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Fecha</th>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Documento</th>
+        <th>Correo</th>
+        <th>Direccion</th>
+        <th>Telefono</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+{% endblock %}
+{% block botones %}
+    <a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
+        <i class="fas fa-sync-alt"></i> Actualizar
+    </a>
+{% endblock %}
+
+{% block extra %}
+    <script src="{% static 'apps/proveedor/proveedor_report.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block elements %}
+    <br>
+        <div class="row">
+        <div class="col-lg-4">
+            <label for="fecha"><strong>Rango de Fechas:</strong></label>
+            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm"></div>
+        </div>
+    <br>
+{% endblock %}
+{% block table %}
+    <thead>
+    <tr>
+        <th>Fecha</th>
+        <th>Proveedor</th>
+        <th>Empleado</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    <tfoot>
+    <tr>
+        <th></th>
+        <th></th>
+        <th style="text-align:center"><strong>Total: Esta pagina (Total filtrado)</strong></th>
+        <th></th>
+
+    </tr>
+    </tfoot>
+{% endblock %}
+
+{% block extra %}
+    <script src="{% static 'apps/compra/compra_report_total.js' %}"></script>
+    <script src="{% static 'apps/funtions.js' %}"></script>
+{% endblock %}
+{% block javascript %}
+
+{% endblock %}

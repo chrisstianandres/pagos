@@ -1,0 +1,46 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block elements %}
+    <br>
+    <div class="row">
+        <div class="col-lg-4">
+            <label for="fecha"><strong>Rango de Fechas:</strong></label>
+            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm">
+        </div>
+    </div>
+    <br>
+{% endblock %}
+{% block table %}
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Fecha</th>
+        <th>Nombre</th>
+        <th>Valor</th>
+        <th>Detalle</th>
+        <th class="text-center"><em class="fa fa-cog"></em></th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for dato in object_list %}
+            <tr>
+                <td>{{ dato.id }}</td>
+                <td>{{ dato.fecha }}</td>
+                <td>{{ dato.tipo_gasto.nombre }}</td>
+                <td>{{ dato.valor }}</td>
+                <td>{{ dato.detalle }}</td>
+                 <td><a type="button" class="btn btn-success btn-sm" data-toggle="tooltip"
+                   title="Editar Datos"
+                   href="{% url 'gasto:editar' dato.id %}"><i class="fa fa-edit"></i></a>
+                <a type="button" class="btn btn-danger btn-sm" style="color: white"
+                        data-toggle="tooltip"
+                        title="Eliminar" rel="del">
+                    <i class="fa fa-trash"></i></a></td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+{% endblock %}
+{% block extra %}
+   <script src="{% static 'apps/gasto/gasto_list.js' %}"></script>
+{% endblock %}

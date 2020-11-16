@@ -1,0 +1,137 @@
+{% extends 'front-end/base.html' %}
+{% load static %}
+
+{% block content %}
+{#    <br><br>#}
+{#    <div class="row">#}
+{#        <div class="col-xl-4 col-md-6">#}
+{#            <div class="card bg-primary text-white mb-4">#}
+{#                <div class="card-header"> Ventas realizadas en el Año</div>#}
+{#                <div class="card-body"> <div class="text-center"><h1 id="venta_tarjet"> &nbsp;</h1></div></div>#}
+{#                <div class="card-footer d-flex align-items-center justify-content-between">#}
+{#                    <a class="small text-white stretched-link" href="{% url 'venta:lista' %}">Ver más</a>#}
+{#                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="col-xl-4 col-md-6">#}
+{#            <div class="card bg-warning text-white mb-4">#}
+{#                <div class="card-header"> Compras realizadas en el Año</div>#}
+{#                <div class="card-body"><div class="text-center"><h1 id="compra_tarjet"></h1></div></div>#}
+{#                <div class="card-footer d-flex align-items-center justify-content-between">#}
+{#                    <a class="small text-white stretched-link" href="{% url 'compra:lista' %}">Ver más</a>#}
+{#                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="col-xl-4 col-md-6">#}
+{#            <div class="card bg-success text-white mb-4">#}
+{#                <div class="card-header"> Productos en Inventario</div>#}
+{#                <div class="card-body"><div class="text-center"><h1 id="inv_tarjet"></h1></div></div>#}
+{#                <div class="card-footer d-flex align-items-center justify-content-between">#}
+{#                    <a class="small text-white stretched-link" href="{% url 'producto:lista' %}">Ver más</a>#}
+{#                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="row">#}
+{#        <div class="col-lg-12">#}
+{#            <div class="card mb-4">#}
+{#                <div class="card-header">#}
+{#                    <i class="fas fa-chart-line"></i> Compras y ventas del año#}
+{#                </div>#}
+{#                <div class="card-body">#}
+{#                    <figure class="highcharts-figure">#}
+{#                        <div id="container3"></div>#}
+{#                    </figure>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="row">#}
+{#        <div class="col-lg-6">#}
+{#            <div class="card">#}
+{#                <div class="card-header">#}
+{#                    <i class="fas fa-chart-bar"></i> Ventas del año#}
+{#                </div>#}
+{#                <div class="card-body">#}
+{#                    <figure class="highcharts-figure">#}
+{#                        <div id="container2"></div>#}
+{#                    </figure>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="col-lg-6">#}
+{#            <div class="card">#}
+{#                <div class="card-header">#}
+{#                    <i class="fas fa-chart-pie"></i> Ventas del mes#}
+{#                </div>#}
+{#                <div class="card-body">#}
+{#                    <figure class="highcharts-figure">#}
+{#                        <div id="grapie"></div>#}
+{#                    </figure>#}
+{#                </div>#}
+{##}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <br>#}
+{#    <div class="row">#}
+{#        <div class="col-lg-6">#}
+{#            <div class="card">#}
+{#                <div class="card-header">#}
+{#                    <h5><i class="fas fa-exclamation-circle"></i>&nbsp;Prodcutos por agotarse</h5>#}
+{#                </div>#}
+{#                <div class="card-body">#}
+{#                    <table class="table" id="datatable">#}
+{#                        <thead>#}
+{#                        <tr>#}
+{#                            <th>Id</th>#}
+{#                            <th>Producto</th>#}
+{#                            <th>Categoria</th>#}
+{#                            <th>Presentacion</th>#}
+{#                            <th>Stock</th>#}
+{#                        </tr>#}
+{#                        </thead>#}
+{#                        <tbody>#}
+{#                        </tbody>#}
+{#                    </table>#}
+{##}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#        <div class="col-lg-6">#}
+{#            <div class="card">#}
+{#                <div class="card-header">#}
+{#                    <h5><i class="fas fa-shopping-basket"></i> Compras de la semana</h5>#}
+{#                </div>#}
+{##}
+{#                <div class="card-body">#}
+{#                    <table class="table" id="datatable2">#}
+{#                        <thead>#}
+{#                        <tr>#}
+{#                            <th>Fecha</th>#}
+{#                            <th>Producto</th>#}
+{#                            <th>Presentacion</th>#}
+{#                            <th>Cantidad</th>#}
+{#                            <th>Total</th>#}
+{#                        </tr>#}
+{#                        </thead>#}
+{#                        <tbody>#}
+{#                        </tbody>#}
+{#                    </table>#}
+{##}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{% endblock %}
+{% block script %}
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+{#    <script src="{% static 'apps/dashboard.js' %}"></script>#}
+{% endblock %}
