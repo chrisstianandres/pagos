@@ -257,6 +257,7 @@ function save_with_ajax2(title, url, content, parametros, callback) {
 }
 
 function reset() {
+    $("#form")[0].reset();
     var validator = $("#form").validate();
     validator.resetForm();
     $('.is-valid').removeClass('is-valid');

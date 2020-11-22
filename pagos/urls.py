@@ -23,7 +23,6 @@ from pagos import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('admin/', admin.site.urls),
     path('', login_required(backEnd.menu), name='menu'),
     path('login/', backEnd.logeo, name='login'),
     path('logout/', backEnd.disconnect, name='logout'),

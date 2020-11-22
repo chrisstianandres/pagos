@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 from apps.cliente.views import *
 from django.contrib.auth.decorators import login_required
+
 app_name = 'Clientes'
 
 urlpatterns = [
@@ -12,7 +13,8 @@ urlpatterns = [
     # path('nuevo', login_required(views.nuevo), name='nuevo'),
     # path('crear', login_required(views.crear), name='crear'),
     path('crearcli', login_required(views.crearcli), name='crearcli'),
-    path('editar/<int:id>', login_required(views.editar), name='editar'),
+    # path('editar/<int:id>', login_required(views.editar), name='editar'),
+    path('editar/<int:pk>/', UpdateView.as_view(), name='editar'),
     path('eliminar', login_required(views.eliminar), name='eliminar'),
     path('report', login_required(report.as_view()), name='report'),
     path('data_report', login_required(views.data_report), name='data_report'),

@@ -16,7 +16,6 @@ from django.db.models import Q
 from apps.user.models import User
 from apps.proveedor.models import Proveedor
 
-
 opc_icono = 'fa fa-user'
 opc_entidad = 'Clientes'
 crud = '/cliente/nuevo'
@@ -67,50 +66,9 @@ class lista(ListView):
         return data
 
 
-# def nuevo(request):
-#     data = {
-#         'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa': empresa,
-#         'boton': 'Guardar Cliente', 'action': 'add', 'titulo': 'Nuevo Registro de un Cliente',
-#     }
-#     if request.method == 'GET':
-#         data['form'] = ClienteForm()
-#     return render(request, 'front-end/cliente/cliente_form.html', data)
-#
-#
-# def crear(request):
-#     f = ClienteForm(request.POST)
-#     data = {
-#         'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa': empresa,
-#         'boton': 'Guardar Cliente', 'action': 'add', 'titulo': 'Nuevo Registro de un Cliente'
-#     }
-#     action = request.POST['action']
-#     data['action'] = action
-#     if request.method == 'POST' and 'action' in request.POST:
-#         if action == 'add':
-#             f = ClienteForm(request.POST)
-#             if f.is_valid():
-#                 f.save(commit=False)
-#                 if Proveedor.objects.filter(documento=0, numero_documento=f.data['cedula']):
-#                     data['error'] = 'Numero de Cedula ya exitente en los Proveedores'
-#                     data['form'] = f
-#                 elif User.objects.filter(cedula=f.data['cedula']):
-#                     data['error'] = 'Numero de Cedula ya exitente en los Usuarios'
-#                     data['form'] = f
-#                 elif verificar(f.data['cedula']):
-#                     f.save()
-#                     return HttpResponseRedirect('/cliente/lista')
-#                 else:
-#                     data['error'] = 'Numero de Cedula no valido para Ecuador'
-#                     data['form'] = f
-#             else:
-#                 data['form'] = f
-#             return render(request, 'front-end/cliente/cliente_form.html', data)
-
-
-class CreateView(CreateView):
-    template_name = 'front-end/cliente/cliente_form.html'
+class CreateView(TemplateView):
     form_class = ClienteForm
-    success_url = reverse_lazy('cliente:lista')
+    template_name = 'front-end/cliente/cliente_form.html'
     permission_required = 'cliente:add_cliente'
 
     @method_decorator(csrf_exempt)
@@ -120,133 +78,88 @@ class CreateView(CreateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
+        pk = int(request.POST['id'])
         try:
             if action == 'add':
                 f = ClienteForm(request.POST)
-                if f.is_valid():
-                    f.save(commit=False)
-                    if Proveedor.objects.filter(documento=0, numero_documento=f.data['cedula']):
-                        f.add_error("cedula", "Numero de Cedula ya exitente en los Proveedores")
-                        data['error'] = f.errors
-                    elif User.objects.filter(cedula=f.data['cedula']):
-                        f.add_error("cedula", "Numero de Cedula ya exitente en los Clientes")
-                        data['error'] = f.errors
-                    elif verificar(f.data['cedula']):
-                        f.save()
-                        data['resp'] = True
-                    else:
-                        f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
-                        data['error'] = f.errors
-                else:
-                    data['error'] = f.errors
+                data = self.save_data(f)
+            elif action == 'edit':
+                cliente = Cliente.objects.get(pk=pk)
+                f = ClienteForm(request.POST, instance=cliente)
+                data = self.save_data(f)
+            elif action == 'delete':
+               cli = Cliente.objects.get(pk=pk)
+               cli.delete()
+               data['resp'] = True
+
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
-            print(data)
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-
-@csrf_exempt
-def crearcli(request):
-    data = {}
-    f = ClienteForm(request.POST)
-    try:
-        if request.method == 'POST':
-            if Proveedor.objects.filter(documento=0, numero_documento=request.POST['cedula']):
+    def save_data(self, f):
+        data = {}
+        if f.is_valid():
+            f.save(commit=False)
+            if Proveedor.objects.filter(documento=0, numero_documento=f.data['cedula']):
                 f.add_error("cedula", "Numero de Cedula ya exitente en los Proveedores")
                 data['error'] = f.errors
-            elif User.objects.filter(cedula=request.POST['cedula']):
-                f.add_error("cedula", "Numero de Cedula ya exitente en los Usuarios")
+            elif User.objects.filter(cedula=f.data['cedula']):
+                f.add_error("cedula", "Numero de Cedula ya exitente en los Clientes")
                 data['error'] = f.errors
-            elif verificar(request.POST['cedula']):
-                with transaction.atomic():
-                    if f.is_valid():
-                        var = f.save()
-                        data['resp'] = True
-                        data['cliente'] = var.toJSON()
-                        return JsonResponse(data)
-                    else:
-                        data['error'] = f.errors
+            elif verificar(f.data['cedula']):
+                f.save()
+                data['resp'] = True
             else:
                 f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
                 data['error'] = f.errors
-    except Exception as e:
-        data['error'] = str(e)
-    return JsonResponse(data)
-
-
-def editar(request, id):
-    cargo = Cliente.objects.get(id=id)
-    crud = '/cliente/editar/' + str(id)
-    data = {
-        'icono': opc_icono, 'crud': crud, 'entidad': opc_entidad, 'empresa': empresa,
-        'boton': 'Guardar Edicion', 'titulo': 'Editar Registro de un Cliente',
-        'option': 'editar'
-    }
-    if request.method == 'GET':
-        form = ClienteForm(instance=cargo)
-        data['form'] = form
-    else:
-        form = ClienteForm(request.POST, instance=cargo)
-        if form.is_valid():
-            form.save()
         else:
-            data['form'] = form
-        return HttpResponseRedirect('/cliente/lista')
-    return render(request, 'front-end/cliente/cliente_form.html', data)
+            data['error'] = f.errors
+        return data
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['form'] = ClienteForm(instance=Cliente.objects.get(pk=1))
+        return data
 
 
 @csrf_exempt
-def eliminar(request):
-    data = {}
-    try:
-        id = request.POST['id']
-        if id:
-            ps = Cliente.objects.get(pk=id)
-            ps.delete()
-            data['resp'] = True
-        else:
-            data['error'] = 'Ha ocurrido un error'
-    except Exception as e:
-        data['error'] = 'No se puede eliminar este cliente porque esta referenciado en otros procesos'
-        data['content'] = 'Intenta con otro cliente'
-    return JsonResponse(data)
-
-
-@csrf_exempt
-def data_report(request):
-    data = []
-    start_date = request.POST.get('start_date', '')
-    end_date = request.POST.get('end_date', '')
-    try:
-        if start_date == '' and end_date == '':
-            query = Cliente.objects.all()
-        else:
-            query = Cliente.objects.filter(fecha__range=[start_date, end_date])
-
-        for p in query:
-            data.append([
-                p.id,
-                p.fecha.strftime("%d/%m/%Y"),
-                p.nombres + " " + p.apellidos ,
-                p.cedula,
-                p.correo,
-                p.get_sexo_display(),
-                p.direccion,
-                p.telefono
-            ])
-    except:
-        pass
-    return JsonResponse(data, safe=False)
-
-
 class report(ListView):
     model = Cliente
     template_name = 'front-end/cliente/cliente_report.html'
 
     def get_queryset(self):
         return Cliente.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        if action == 'report':
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            try:
+                if start_date == '' and end_date == '':
+                    query = Cliente.objects.all()
+                else:
+                    query = Cliente.objects.filter(fecha__range=[start_date, end_date])
+
+                for p in query:
+                    data.append([
+                        p.id,
+                        p.fecha.strftime("%d/%m/%Y"),
+                        p.nombres + " " + p.apellidos,
+                        p.cedula,
+                        p.correo,
+                        p.get_sexo_display(),
+                        p.direccion,
+                        p.telefono
+                    ])
+            except:
+                pass
+            return JsonResponse(data, safe=False)
+
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
