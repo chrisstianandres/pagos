@@ -13,32 +13,39 @@ toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
 $(function () {
     var datatable = $("#datatable").DataTable({
         responsive: true,
+        autoWidth: false,
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
-            searchPanes: {
-                clearMessage: 'Limpiar Filtros',
-                collapse: {
-                    0: 'Filtros de Busqueda',
-                    _: 'Filtros seleccionados (%d)'
-                },
-                title: {
-                    _: 'Filtros seleccionados - %d',
-                    0: 'Ningun Filtro seleccionados',
-                },
-                activeMessage: 'Filtros activos (%d)',
-                emptyPanes: 'No existen suficientes datos para generar filtros :('
-
-            }
         },
-        dom: 'l<"toolbar">' + "<br>" + 'Bfrtip ',
-        buttons: [
-            {
-                className: 'btn-default my_class', extend: 'searchPanes', config: {
-                    cascadePanes: true,
-                    viewTotal: true,
-                    layout: 'columns-4'
+        ajax: {
+            url: window.location.pathname,
+            type: 'POST',
+            data: {'action': 'list'},
+            dataSrc: ""
+        },
+        columns: [
+            {"data": "id"},
+            {"data": "nombre"},
+            {"data": "tipo"},
+            {"data": "categoria.nombre"},
+            {"data": "presentacion.nombre"},
+            {"data": "stock"},
+            {"data": "descripcion"},
+            {"data": "pcp"},
+            {"data": "pvp"},
+            {"data": "id"}
+        ],
+        buttons: {
+             dom: {
+                button: {
+                    className: '',
+
+                },
+                container: {
+                    className: 'buttons-container float-md-right'
                 }
             },
+             buttons: [
             {
                 text: '<i class="fa fa-file-pdf"></i> Reporte PDF',
                 className: 'btn btn-danger my_class',
@@ -127,9 +134,16 @@ $(function () {
                 extend: 'excel'
             }
         ],
+        },
+
+        dom: "<'row'<'col-sm-12 col-md-12'B>>" +
+
+            "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         columnDefs: [
             {
-                targets: [4],
+                targets: [-5],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -141,72 +155,39 @@ $(function () {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    return '$ ' + parseFloat(data).toFixed(2);
+                    return '<span>$ ' + parseFloat(data).toFixed(2)+'</span>';
                 }
             },
             {
-                targets: [3, -1],
+                targets: '__all',
                 class: 'text-center'
             },
             {
-                searchPanes: {
-                    show: true,
-                },
-                targets: [0, 1, 2, 3, 5, 6]
-            },
-            {
-                searchPanes: {
-                    show: true,
-                    options: [
-                        {
-                            label: 'Menos de 20',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] < 20;
-                            }
-                        },
-                        {
-                            label: '20 a 30',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 30 && rowData[4] >= 20;
-                            }
-                        },
-                        {
-                            label: '30 a 40',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 40 && rowData[4] >= 30;
-                            }
-                        },
-                        {
-                            label: '40 a 50',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 50 && rowData[4] >= 40;
-                            }
-                        },
-                        {
-                            label: '50 a 60',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 60 && rowData[4] >= 50;
-                            }
-                        },
-                        {
-                            label: 'Mas de 60',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] > 60;
-                            }
-                        },
-                    ]
-                },
-                targets: [4],
+                targets: [-1],
+                class: 'text-center',
+                width: '10%',
+                orderable: false,
+                render: function (data, type, row) {
+                    var edit = '<a style="color: white" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
+                        'data-toggle="tooltip" href="/producto/editar/'+ data +'" title="Editar Datos"><i class="fa fa-edit"></i></a>' + ' ';
+                    var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
+                        'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
+                    return edit + del
+
+                }
             },
         ],
         createdRow: function (row, data, dataIndex) {
-            if (data[4] >= 51) {
-                $('td', row).eq(4).find('span').addClass('badge bg-success').attr("style", "color: white");
-            } else if (data[4] >= 10) {
-                $('td', row).eq(4).find('span').addClass('badge bg-warning').attr("style", "color: white");
-            } else if (data[4] <= 9) {
-                $('td', row).eq(4).find('span').addClass('badge bg-danger').attr("style", "color: white");
+            if (data.stock >= 51) {
+                $('td', row).eq(5).find('span').addClass('badge badge-success').attr("style", "color: white");
+            } else if (data.stock >= 10) {
+                $('td', row).eq(5).find('span').addClass('badge badge-warning').attr("style", "color: white");
+            } else if (data.stock <= 9) {
+                $('td', row).eq(5).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
+
+            if (data.tipo === 'Producto'){ $('td', row).eq(6).html('<span class="badge badge-success"> Sin precio compra </span>');}
+            else {$('td', row).eq(7).html('<span class="badge badge-success"> Sin precio venta </span>');}
 
         }
 
@@ -214,12 +195,12 @@ $(function () {
     $('#datatable tbody').on('click', 'a[rel="del"]', function () {
         var tr = datatable.cell($(this).closest('td, li')).index();
         var data = datatable.row(tr.row).data();
-        var parametros = {'id': data['0']};
+        var parametros = {'id': data.id};
         save_estado('Alerta',
             '/producto/eliminar', 'Esta seguro que desea eliminar este producto?', parametros,
             function () {
                 menssaje_ok('Exito!', 'Exito al eliminar el producto!', 'far fa-smile-wink', function () {
-                    location.reload();
+                    datatable.ajax.reload(null, false);
                 })
             });
     });

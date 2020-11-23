@@ -102,6 +102,53 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         data['empresa'] = empresa
         return data
 
+
+class Updateview(ValidatePermissionRequiredMixin, UpdateView):
+    model = Producto
+    form_class = ProductoForm
+    success_url = 'producto:lista'
+    template_name = 'front-end/producto/producto_form.html'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        try:
+            producto = Producto.objects.get(pk = self.kwargs['pk'])
+            if action == 'edit':
+                f = ProductoForm(request.POST, instance= producto)
+                data = self.save_data(f)
+                return HttpResponseRedirect('/producto/lista')
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def save_data(self, f):
+        data = {}
+        if f.is_valid():
+            f.save()
+            data['resp'] = True
+        else:
+            data['error'] = f.errors
+        return data
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Guardar Edicion'
+        data['titulo'] = 'Edicion del Registro de un Producto'
+        data['action'] = 'edit'
+        data['crud'] = '/producto/editar/' + str(self.kwargs['pk'])
+        data['form_cat'] = CategoriaForm
+        data['form_pres'] = PresentacionForm
+        data['empresa'] = empresa
+        return data
 # def nuevo(request):
 #     data = {
 #         'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa': empresa,

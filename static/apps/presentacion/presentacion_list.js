@@ -22,14 +22,11 @@ $(function () {
                 url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
             },
         columnDefs: [
+
             {
                 targets: [-1],
                 class: 'text-center',
-                width: '10%'
-            },
-             {
-                targets: [-1],
-                class: 'text-center',
+                width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
                     var edit = '<a style="color: white" type="button" class="btn btn-warning btn-sm" rel="edit" ' +
