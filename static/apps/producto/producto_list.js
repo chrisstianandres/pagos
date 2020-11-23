@@ -186,8 +186,8 @@ $(function () {
                 $('td', row).eq(5).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
 
-            if (data.tipo === 'Producto'){ $('td', row).eq(6).html('<span class="badge badge-success"> Sin precio compra </span>');}
-            else {$('td', row).eq(7).html('<span class="badge badge-success"> Sin precio venta </span>');}
+            if (data.tipo === 'Producto'){ $('td', row).eq(7).html('<span class="badge badge-success"> Sin precio compra </span>');}
+            else {$('td', row).eq(8).html('<span class="badge badge-success"> Sin precio venta </span>');}
 
         }
 
