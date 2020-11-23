@@ -1,9 +1,13 @@
-from django.http import HttpResponseRedirect, JsonResponse
+import json
+
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
+from apps.mixins import ValidatePermissionRequiredMixin
 from apps.presentacion.forms import PresentacionForm
 from apps.presentacion.models import Presentacion
 
@@ -16,6 +20,25 @@ empresa = nombre_empresa()
 class lista(ListView):
     model = Presentacion
     template_name = 'front-end/presentacion/presentacion_list.html'
+    permission_required = 'presentacion.view_presentacion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'list':
+                data = []
+                for c in Presentacion.objects.all():
+                    data.append(c.toJSON())
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -25,68 +48,48 @@ class lista(ListView):
         data['titulo'] = 'Listado de Presentaciones'
         data['nuevo'] = '/presentacion/nuevo'
         data['empresa'] = empresa
+        data['form'] = PresentacionForm
         return data
 
 
-def nuevo(request):
-    data = {
-        'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa' : empresa,
-        'boton': 'Guardar Presentacion', 'action': 'add', 'titulo': 'Nuevo Registro de una Presentacion',
-    }
-    if request.method == 'GET':
-        data['form'] = PresentacionForm()
-    return render(request, 'front-end/presentacion/presentacion_form.html', data)
+class CrudView(ValidatePermissionRequiredMixin, TemplateView):
+    form_class = PresentacionForm
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-def crear(request):
-    f = PresentacionForm(request.POST)
-    data = {
-        'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa': empresa,
-        'boton': 'Guardar Presentacion', 'action': 'add', 'titulo': 'Nuevo Registro de una Presentacion'
-    }
-    if request.method == 'POST':
-        f = PresentacionForm(request.POST)
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        pk = request.POST['id']
+        try:
+            if action == 'add':
+                f = PresentacionForm(request.POST)
+                data = self.save_data(f)
+            elif action == 'edit':
+                cat = Presentacion.objects.get(pk=int(pk))
+                f = PresentacionForm(request.POST, instance=cat)
+                data = self.save_data(f)
+            elif action == 'delete':
+                cat = Presentacion.objects.get(pk=pk)
+                cat.delete()
+                data['resp'] = True
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def save_data(self, f):
+        data = {}
         if f.is_valid():
-            f.save()
-        else:
-            data['form'] = f
-            return render(request, 'front-end/presentacion/presentacion_form.html', data)
-        return HttpResponseRedirect('/presentacion/lista')
-
-
-def editar(request, id):
-    presentacion = Presentacion.objects.get(id=id)
-    crud = '/presentacion/editar/' + str(id)
-    data = {
-        'icono': opc_icono, 'crud': crud, 'entidad': opc_entidad, 'empresa' : empresa,
-        'boton': 'Guardar Edicion', 'titulo': 'Editar Registro de una Presentacion',
-    }
-    if request.method == 'GET':
-        form = PresentacionForm(instance=presentacion)
-        data['form'] = form
-    else:
-        form = PresentacionForm(request.POST, instance=presentacion)
-        if form.is_valid():
-            form.save()
-        else:
-            data['form'] = form
-        return redirect('/presentacion/lista')
-    return render(request, 'front-end/presentacion/presentacion_form.html', data)
-
-
-@csrf_exempt
-def eliminar(request):
-    data = {}
-    try:
-        id = request.POST['id']
-        if id:
-            ps = Presentacion.objects.get(pk=id)
-            ps.delete()
+            var = f.save()
+            data['resp'] = True
+            data['presentacion'] = var.toJSON()
             data['resp'] = True
         else:
-            data['error'] = 'Ha ocurrido un error'
-    except Exception as e:
-        data['error'] = "!No se puede eliminar esta presentacion porque esta referenciado en otros procesos!!"
-        data['content'] = "Intenta con otra presentacion"
-    return JsonResponse(data)
+            data['error'] = f.errors
+        return data
+
 

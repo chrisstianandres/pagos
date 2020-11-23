@@ -47,6 +47,34 @@ $(document).ready(function () {
             },
         },
     });
+    $("#form_cat").validate({
+        rules: {
+            nombre: {
+                required: true,
+                minlength: 3,
+                maxlength: 50,
+                lettersonly: true,
+            },
+            descripcion: {
+                required: true,
+                minlength: 5,
+                maxlength: 50
+            }
+        },
+        messages: {
+            nombre: {
+                required: "Porfavor ingresa el nombre de la categoria",
+                minlength: "Debe ingresar al menos 3 letras",
+                lettersonly: "Debe ingresar unicamente letras y espacios",
+                maxlength: "La descripcion debe tener maximo 50 caracteres",
+            },
+            descripcion: {
+                required: "Porfavor ingresa una descripcion",
+                minlength: "Ingresa al menos 5 letras",
+                maxlength: "La descripcion debe tener maximo 50 caracteres",
+            },
+        },
+    });
 
     $('#id_nombre').keyup(function () {
         var pal = $(this).val();

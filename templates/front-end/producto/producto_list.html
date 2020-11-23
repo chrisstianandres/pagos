@@ -16,26 +16,6 @@
     </thead>
     <tbody>
 
-        {% for dato in object_list %}
-            <tr>
-                <td>{{ dato.id }}</td>
-                <td>{{ dato.nombre }}</td>
-                <td>{{ dato.categoria.nombre }}</td>
-                <td>{{ dato.presentacion.nombre }}</td>
-                <td>{{ dato.stock }}</td>
-                <td> {{ dato.descripcion }}  </td>
-                <td> {{ dato.p_compra|stringformat:"f"}}  </td>
-                <td> {{ dato.pvp|stringformat:"f" }}  </td>
-                <td><a type="button" class="btn btn-success btn-sm" data-toggle="tooltip"
-                   title="Editar Datos"
-                   href="{% url 'producto:editar' dato.id %}"><i class="fa fa-edit"></i></a>
-                <a type="button" class="btn btn-danger btn-sm" style="color: white"
-                        data-toggle="tooltip"
-                        title="Eliminar" rel="del">
-                    <i class="fa fa-trash"></i></a></td>
-            </tr>
-        {% endfor %}
-
     </tbody>
 {% endblock %}
 {% block extra %}

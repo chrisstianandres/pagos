@@ -1,6 +1,7 @@
 $(document).ready(function () {
-    $('input[name="pvp"]').attr('readonly', true);
-    $('input[name="p_compra"]').TouchSpin({
+    var action = '';
+    var pk = '';
+    $('input[name="pvp"]').TouchSpin({
         min: 0.05,
         max: 1000000,
         step: 0.01,
@@ -11,12 +12,12 @@ $(document).ready(function () {
         prefix: '$'
     });
     $('.select2').select2({
-        "language": {
+        language: {
             "noResults": function () {
                 return "Sin resultados";
             }
         },
-        allowClear: true
+        theme: "classic"
     });
     $.validator.setDefaults({
         errorClass: 'invalid-feedback',
@@ -83,16 +84,52 @@ $(document).ready(function () {
         $(this).val(changue);
     });
 
-    $('input[name="p_compra"]').on('change', function () {
-        indice_ganancia();
+    $('#id_new_categoria').on('click', function () {
+        $('#Modal').modal('show');
+        action = 'add';
+        pk = '';
+    });
+    $('#id_new_presentacion').on('click', function () {
+        $('#Modal2').modal('show');
+        action = 'add';
+        pk = '';
     });
 
-    function indice_ganancia() {
-        var indice = $('#indice').val();
-        var pc = $('input[name="p_compra"]').val();
-        var iva = $('#iva').val();
-        var tind = parseFloat(pc * (1 + (indice / 100)) * (1 + (iva / 100))).toFixed(2);
-        $('input[name="pvp"]').val(tind);
-    }
+    $('#form_cat').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', action);
+        parametros.append('id', pk);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/categoria/nuevo', 'Esta seguro que desea guardar esta categoria?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar esta categoria!', 'far fa-smile-wink', function () {
+                        $('#Modal').modal('hide');
+                        var newOption = new Option(response.categoria['nombre'], response.categoria['id'], false, true);
+                        $('#id_categoria').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
+    $('#form_pre').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', action);
+        parametros.append('id', pk);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/presentacion/nuevo', 'Esta seguro que desea guardar esta presentacion?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar esta presentacion!', 'far fa-smile-wink', function () {
+                        $('#Modal2').modal('hide');
+                        var newOption = new Option(response.presentacion['full'], response.presentacion['id'], false, true);
+                        $('#id_presentacion').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
 
 });

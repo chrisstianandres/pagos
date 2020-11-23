@@ -1,5 +1,166 @@
-{% extends 'front-end/form.html' %}
+{% extends 'front-end/base.html' %}
 {% load static %}
+{% block head %}
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.css' %}"/>
+{% endblock %}
+{% block content %}
+    <!-- BASIC FORM ELELEMNTS -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-folder-plus"></i> {{ titulo }}</h5>
+
+                </div>
+                <div class="card-body">
+                    <div class="form">
+                        <form class="cmxform form-horizontal style-form" id="form" method="POST" action="{{ crud }}">
+                            {% csrf_token %}
+                            {{ form.media }}
+                            <input type="hidden" id="action" name="action" value="{{ action }}">
+                            <input type="hidden" id="indice" name="indice" value="{{ empresa.indice }}">
+                            <input type="hidden" id="iva" name="iva" value="{{ empresa.iva }}">
+                            <input type="hidden" name="option" value="{{ option }}">
+                            <div class="form-group col-lg-12">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>{{ form.nombre.label_tag }}</strong></label>
+                                <div class="col-lg-10">
+                                    {{ form.nombre }}
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>{{ form.descripcion.label_tag }}</strong></label>
+                                <div class="col-lg-10">
+                                    {{ form.descripcion }}
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label for="id_categoria">{{ form.categoria.label_tag }}</label>
+                                <div class="input-group form-group-lg col-lg-10">
+                                    {{ form.categoria }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-xs" id="id_new_categoria" type="button"><i
+                                                class="fas fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label for="id_presentacion">{{ form.presentacion.label_tag }}</label>
+                                <div class="input-group form-group-lg col-lg-10">
+                                    {{ form.presentacion }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-xs" id="id_new_presentacion" type="button"><i
+                                                class="fas fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>{{ form.pvp.label_tag }}</strong></label>
+                                <div class="col-lg-10">
+                                    {{ form.pvp }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-lg-12">
+                                    <button class="btn btn-success btn-sm" type="submit"><i
+                                            class="fa fa-save"></i> {{ boton }}
+                                    </button>
+                                    <a type="button" class="btn btn-danger btn-sm" style="color:white;" id="reload"
+                                       onclick=" window.history.back();">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /form-panel -->
+        </div>
+        <!-- /col-lg-12 -->
+    </div>
+    <!-- /row -->
+
+        <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form method="post" id="form_cat" enctype="multipart/form-data" action=".">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus"></i>&nbsp;Nuevo registro de una Cetegoria</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="form-group">
+                                {{ form_cat.as_p }}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <a type="button" class="btn btn-danger" data-dismiss="modal"  onclick=" reset();"
+                           style="color: white"><i class="fas fa-times" ></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+     <div class="modal fade" id="Modal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form method="post" id="form_pre" enctype="multipart/form-data" action=".">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus"></i>&nbsp;Nuevo registro de una Presentacion</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="form-group">
+                                {{ form_pres.as_p }}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <a type="button" class="btn btn-danger" data-dismiss="modal"  onclick=" reset();"
+                           style="color: white"><i class="fas fa-times" ></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+{% endblock %}
 {% block extra %}
     <script src="{% static 'apps/producto/producto.js' %}"></script>
+    <script src="{% static 'apps/categoria/categoria.js' %}"></script>
+    <script src="{% static 'apps/presentacion/presentacion.js' %}"></script>
 {% endblock %}

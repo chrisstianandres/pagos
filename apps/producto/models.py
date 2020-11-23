@@ -17,8 +17,6 @@ class Producto(models.Model):
     stock = models.IntegerField(default=0)
     descripcion = models.CharField(max_length=50)
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
-    p_compra = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
-    instalacion = models.IntegerField(choices=RESP, default=0)
 
     def __str__(self):
         return '%s' % self.nombre

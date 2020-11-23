@@ -11,7 +11,6 @@ toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
     logotipo = dataUrl;
 });
 $(function () {
-    $('body').addClass('sb-sidenav-toggled');
     var datatable = $("#datatable").DataTable({
         responsive: true,
         language: {
@@ -224,4 +223,9 @@ $(function () {
                 })
             });
     });
+
+    $('#nuevo').on('click', function () {
+        window.location.replace('/producto/nuevo')
+
+    })
 });

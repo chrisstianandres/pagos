@@ -12,6 +12,7 @@ class Presentacion(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
+        item['full'] = self.__str__()
         return item
 
     class Meta:
