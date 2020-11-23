@@ -163,9 +163,6 @@ $(function () {
                 }
             },
         ],
-        createdRow: function (row, data, dataIndex) {
-
-        }
 
     });
     $('#datatable tbody')
@@ -183,6 +180,7 @@ $(function () {
                     })
                 })})
         .on('click', 'a[rel="edit"]', function () {
+            $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
             $('input[name="nombres"]').val(data.nombres);
@@ -198,6 +196,7 @@ $(function () {
         });
     //boton agregar cliente
     $('#nuevo').on('click', function () {
+        $('#exampleModalLabel').html('<i class="fas fa-plus"></i>&nbsp;Nuevo registro de un Cliente ');
         $('input[name="cedula"]').attr('readonly', false);
         $('#Modal').modal('show');
         action = 'add';

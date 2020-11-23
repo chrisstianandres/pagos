@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-
     jQuery.validator.addMethod("lettersonly", function (value, element) {
         return this.optional(element) || /^[a-zA-z\s\ñ\Ñ," "]+$/i.test(value);
     }, "Letters and spaces only please");

@@ -13,7 +13,7 @@ class GastoForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-            self.fields['fecha'].widget.attrs = {
+            self.fields['fecha_pago'].widget.attrs = {
                 'readonly': True,
                 'class': 'form-control'
             }
@@ -23,7 +23,6 @@ class GastoForm(forms.ModelForm):
             }
             self.fields['empresa'].widget.attrs = {
                 'class': 'form-control select2',
-                'data-live-search': "true",
                 'hidden': 'hidden'
             }
             self.fields["empresa"].initial = Empresa.objects.first()
@@ -40,16 +39,17 @@ class GastoForm(forms.ModelForm):
     class Meta:
         model = Gasto
         fields = [
-            'fecha',
+            'fecha_pago',
             'tipo_gasto',
             'empresa',
             'valor',
             'detalle'
         ]
         labels = {
-            'fecha': 'Fecha de Pago',
+            'fecha_pago': 'Fecha de Pago',
             'tipo_gasto': 'Tipo de Gasto',
             'valor': 'Valor',
+            'empresa': '',
             'detalle': 'Detalle'
         }
         widgets = {

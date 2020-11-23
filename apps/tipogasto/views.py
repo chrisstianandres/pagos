@@ -1,10 +1,14 @@
-from django.http import HttpResponseRedirect
+import json
+
+from django.http import HttpResponseRedirect, HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
+from apps.mixins import ValidatePermissionRequiredMixin
 from apps.tipogasto.forms import TipogastoForm
 from apps.tipogasto.models import Tipo_gasto
 
@@ -14,9 +18,28 @@ crud = '/tipo_gasto/crear'
 empresa = nombre_empresa()
 
 
-class lista(ListView):
+class lista(ValidatePermissionRequiredMixin, ListView):
     model = Tipo_gasto
     template_name = 'front-end/tipo_gasto/tipo_gasto_list.html'
+    permission_required = 'tipo_gasto.view_tipo_gasto'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'list':
+                data = []
+                for c in Tipo_gasto.objects.all():
+                    data.append(c.toJSON())
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -26,67 +49,44 @@ class lista(ListView):
         data['titulo'] = 'Listado de Tipos de Gastos'
         data['nuevo'] = '/tipo_gasto/nuevo'
         data['empresa'] = empresa
+        data['form'] = TipogastoForm
         return data
 
 
-def nuevo(request):
-    data = {
-        'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa': empresa,
-        'boton': 'Guardar Tipo de gasto', 'action': 'add', 'titulo': 'Nuevo Registro de un Tipo de gasto',
-    }
-    if request.method == 'GET':
-        data['form'] = TipogastoForm()
-    return render(request, 'front-end/tipo_gasto/tipo_gasto_form.html', data)
+class CrudView(ValidatePermissionRequiredMixin, TemplateView):
+    form_class = TipogastoForm
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-def crear(request):
-    f = TipogastoForm(request.POST)
-    data = {
-        'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa': empresa,
-        'boton': 'Guardar Tipo de gasto', 'action': 'add', 'titulo': 'Nuevo Registro de un Tipo de gasto',
-    }
-    if request.method == 'POST':
-        f = TipogastoForm(request.POST)
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        pk = request.POST['id']
+        try:
+            if action == 'add':
+                f = TipogastoForm(request.POST)
+                data = self.save_data(f)
+            elif action == 'edit':
+                tpg = Tipo_gasto.objects.get(pk=int(pk))
+                f = TipogastoForm(request.POST, instance=tpg)
+                data = self.save_data(f)
+            elif action == 'delete':
+                cat = Tipo_gasto.objects.get(pk=pk)
+                cat.delete()
+                data['resp'] = True
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def save_data(self, f):
+        data = {}
         if f.is_valid():
             f.save()
-        else:
-            data['form'] = f
-            return render(request, 'front-end/tipo_gasto/tipo_gasto_form.html', data)
-        return HttpResponseRedirect('/tipo_gasto/lista')
-
-
-def editar(request, id):
-    tipo = Tipo_gasto.objects.get(id=id)
-    crud = '/tipo_gasto/editar/' + str(id)
-    data = {
-        'icono': opc_icono, 'crud': crud, 'entidad': opc_entidad, 'empresa': empresa,
-        'boton': 'Guardar Edicion', 'titulo': 'Editar Registro de un Tipo de Gasto',
-    }
-    if request.method == 'GET':
-        form = TipogastoForm(instance=tipo)
-        data['form'] = form
-    else:
-        form = TipogastoForm(request.POST, instance=tipo)
-        if form.is_valid():
-            form.save()
-        else:
-            data['form'] = form
-        return redirect('/tipo_gasto/lista')
-    return render(request, 'front-end/tipo_gasto/tipo_gasto_form.html', data)
-
-
-@csrf_exempt
-def eliminar(request):
-    data = {}
-    try:
-        id = request.POST['id']
-        if id:
-            ps = Tipo_gasto.objects.get(pk=id)
-            ps.delete()
             data['resp'] = True
         else:
-            data['error'] = 'Ha ocurrido un error'
-    except Exception as e:
-        data['error'] = "!No se puede eliminar este Tipo de Gasto porque esta referenciado en otros procesos!!"
-        data['content'] = "Intenta con otro Tipo de Gasto"
-    return JsonResponse(data)
+            data['error'] = f.errors
+        return data

@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 import json
 from django.db.models import Q
 
+from apps.mixins import ValidatePermissionRequiredMixin
 from apps.user.models import User
 from apps.proveedor.models import Proveedor
 
@@ -22,9 +23,10 @@ crud = '/cliente/nuevo'
 empresa = nombre_empresa()
 
 
-class lista(ListView):
+class lista(ValidatePermissionRequiredMixin, ListView):
     model = Cliente
     template_name = "front-end/cliente/cliente_list.html"
+    permission_required = 'cliente.view_cliente'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -59,17 +61,15 @@ class lista(ListView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Nuevo Cliente'
         data['titulo'] = 'Listado de Clientes'
-        data['titulo_new'] = 'Nuevo registro de un Cliente'
         data['form'] = ClienteForm
         data['nuevo'] = '/cliente/nuevo'
         data['empresa'] = empresa
         return data
 
 
-class CreateView(TemplateView):
+class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = ClienteForm
     template_name = 'front-end/cliente/cliente_form.html'
-    permission_required = 'cliente:add_cliente'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -78,13 +78,13 @@ class CreateView(TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = int(request.POST['id'])
+        pk = request.POST['id']
         try:
             if action == 'add':
                 f = ClienteForm(request.POST)
                 data = self.save_data(f)
             elif action == 'edit':
-                cliente = Cliente.objects.get(pk=pk)
+                cliente = Cliente.objects.get(pk=int(pk))
                 f = ClienteForm(request.POST, instance=cliente)
                 data = self.save_data(f)
             elif action == 'delete':
@@ -116,11 +116,6 @@ class CreateView(TemplateView):
                 data['error'] = f.errors
         else:
             data['error'] = f.errors
-        return data
-
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        data['form'] = ClienteForm(instance=Cliente.objects.get(pk=1))
         return data
 
 
@@ -159,7 +154,6 @@ class report(ListView):
             except:
                 pass
             return JsonResponse(data, safe=False)
-
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
