@@ -28,16 +28,16 @@ $(document).ready(function () {
     });
     $("#form").validate({
         rules: {
-            nombres: {
+            nombre: {
                 required: true,
-                minlength: 10,
+                minlength: 5,
                 maxlength: 50,
                 lettersonly: true,
             },
-            documento: {
+            tipo: {
                 required: true
             },
-            numero_documento: {
+            num_doc: {
                 required: true,
                 minlength: 10,
                 maxlength: 13,
@@ -61,12 +61,12 @@ $(document).ready(function () {
 
         },
         messages: {
-            nombres: {
+            nombre: {
                 required: "Porfavor ingresa tus nombres y apellidos",
                 minlength: "Debe ingresar al menos un nombre y un apellido",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
-            numero_documento: {
+            num_doc: {
                 required: "Porfavor ingresa tu numero de documento",
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",

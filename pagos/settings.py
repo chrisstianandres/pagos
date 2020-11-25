@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'apps.proveedor',
     'apps.tipogasto',
     'apps.user',
+    'apps.maquina',
+    'apps.reparacion',
 ]
 
 MIDDLEWARE = [

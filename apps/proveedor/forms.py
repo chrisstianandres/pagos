@@ -16,11 +16,9 @@ class ProveedorForm(forms.ModelForm):
                 'class': 'form-control'
             })
 
-            self.fields['nombres'].widget = TextInput(
+            self.fields['nombre'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese sus dos nombres', 'class': 'form-control form-rounded'})
-            #self.fields['documento'].widget = TextInput(
-             #   attrs={'placeholder': 'Ingrese sus dos Apellidos', 'class': 'form-control form-rounded'})
-            self.fields['numero_documento'].widget = TextInput(
+            self.fields['num_doc'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese numero de docuemnto', 'class': 'form-control form-rounded'})
             self.fields['correo'].widget = EmailInput(
                 attrs={'placeholder': 'abc@correo.com', 'class': 'form-control form-rounded'})
@@ -35,26 +33,26 @@ class ProveedorForm(forms.ModelForm):
 
     class Meta:
         model = Proveedor
-        fields = ['nombres',
-                  'documento',
-                  'numero_documento',
+        fields = ['nombre',
+                  'tipo',
+                  'num_doc',
                   'correo',
                   'telefono',
                   'direccion'
                   ]
         labels = {
-            'nombres': 'Nombres',
-            'documento': 'Documrnto',
-            'numero_documento': 'N° de docuemnto',
+            'nombres': 'Nombre',
+            'tipo': 'Tipo de Documento',
+            'num_doc': 'N° de Documento',
             'correo': 'Correo',
             'telefono': 'Telefono',
             'direccion': 'Direccion'
 
         }
         widgets = {
-            'nombres': forms.TextInput(),
-            'documento': forms.Select(attrs={'class': 'selectpicker', 'data-width': 'fit'}),
-            'numero_documento': forms.TextInput(),
+            'nombre': forms.TextInput(),
+            'tipo': forms.Select(attrs={'class': 'selectpicker', 'data-width': 'fit'}),
+            'num_doc': forms.TextInput(),
             'correo': forms.EmailInput(),
             'telefono': forms.TextInput(),
             'direccion': forms.Textarea()

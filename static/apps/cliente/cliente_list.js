@@ -36,8 +36,8 @@ $(function () {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
         },
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
-
-            "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+            "<'row'<'col-sm-12 col-md-3'l>>" +
+            "<'row'<'col-sm-12 col-md-12'f>>"+
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         buttons: {

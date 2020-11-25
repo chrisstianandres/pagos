@@ -80,7 +80,7 @@ def crear(request):
 
             if f.is_valid():
                 f.save(commit=False)
-                if Proveedor.objects.filter(documento=0, numero_documento=f.data['cedula']):
+                if Proveedor.objects.filter(tipo=0, num_doc=f.data['cedula']):
                     data['error'] = 'Numero de Cedula ya exitente en los Proveedores'
                     data['form'] = f
                 elif Cliente.objects.filter(cedula=f.data['cedula']):

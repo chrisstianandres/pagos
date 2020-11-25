@@ -25,14 +25,11 @@ $(function () {
         },
         columns: [
             {"data": "id"},
-            {"data": "nombre"},
-            {"data": "tipo"},
-            {"data": "categoria.nombre"},
-            {"data": "presentacion.nombre"},
-            {"data": "stock"},
-            {"data": "descripcion"},
-            {"data": "pcp"},
-            {"data": "pvp"},
+            {"data": "fecha_ingreso"},
+            {"data": "fecha_entrega"},
+            {"data": "Subtotal"},
+            {"data": "iva"},
+            {"data": "total"},
             {"data": "id"}
         ],
         buttons: {
@@ -143,15 +140,7 @@ $(function () {
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         columnDefs: [
             {
-                targets: [-5],
-                class: 'text-center',
-                orderable: false,
-                render: function (data, type, row) {
-                    return '<span>' + data + '</span>';
-                }
-            },
-            {
-                targets: [-2, -3],
+                targets: [-2, -3. -4],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -168,31 +157,18 @@ $(function () {
                 width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
-                        'data-toggle="tooltip" href="/producto/editar/'+ data +'" title="Editar Datos"><i class="fa fa-edit"></i></a>' + ' ';
-                    var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
-                        'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
-                    return edit + del
+                    var det = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="det" ' +
+                        'data-toggle="tooltip"'+ data +'" title="Detalle"><i class="fa fa-search"></i></a>' + ' ';
+                    var pag = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="pag" ' +
+                        'data-toggle="tooltip" title="Pagar"><i class="fas fa-hand-holding-usd"></i></a>' + ' ';
+                    return det + pag
 
                 }
             },
         ],
-        createdRow: function (row, data, dataIndex) {
-            if (data.stock >= 51) {
-                $('td', row).eq(5).find('span').addClass('badge badge-success').attr("style", "color: white");
-            } else if (data.stock >= 10) {
-                $('td', row).eq(5).find('span').addClass('badge badge-warning').attr("style", "color: white");
-            } else if (data.stock <= 9) {
-                $('td', row).eq(5).find('span').addClass('badge badge-danger').attr("style", "color: white");
-            }
-
-            if (data.tipo === 'Producto'){ $('td', row).eq(7).html('<span class="badge badge-success"> Sin precio compra </span>');}
-            else {$('td', row).eq(8).html('<span class="badge badge-success"> Sin precio venta </span>');}
-
-        }
 
     });
-    $('#datatable tbody').on('click', 'a[rel="del"]', function () {
+    $('#datatable tbody').on('click', 'a[rel="det"]', function () {
         var tr = datatable.cell($(this).closest('td, li')).index();
         var data = datatable.row(tr.row).data();
         var parametros = {'id': data.id};
