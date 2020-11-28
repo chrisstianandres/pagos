@@ -14,7 +14,8 @@ toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
 var datos = {
     fechas: {
         'start_date': '',
-        'end_date': ''
+        'end_date': '',
+        'action': 'venta',
     },
     add: function (data) {
         if (data.key === 1) {
@@ -24,9 +25,8 @@ var datos = {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
         }
-
         $.ajax({
-            url: '/venta/data',
+            url: '/transaccion/lista',
             type: 'POST',
             data: this.fechas,
             success: function (data) {
@@ -45,41 +45,17 @@ $(function () {
         scrollX: true,
         autoWidth: false,
         ajax: {
-            url: '/venta/data',
+            url: '/transaccion/lista',
             type: 'POST',
             data: datos.fechas,
             dataSrc: ""
         },
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
-            searchPanes: {
-                clearMessage: 'Limpiar Filtros',
-                collapse: {
-                    0: 'Filtros de Busqueda',
-                    _: 'Filtros seleccionados (%d)'
-                },
-                title: {
-                    _: 'Filtros seleccionados - %d',
-                    0: 'Ningun Filtro seleccionado',
-                },
-                activeMessage: 'Filtros activos (%d)',
-                emptyPanes: 'There are no panes to display. :/',
-                sZeroRecords: "No se encontraron resultados",
-
-            }
         },
         order: [[0, "desc"]],
         dom: 'l<"toolbar">' + "<br>" + 'Bfrtip ',
         buttons: [
-            {
-                className: 'btn-default my_class',
-                extend: 'searchPanes',
-                config: {
-                    cascadePanes: true,
-                    viewTotal: true,
-                    layout: 'columns-5'
-                }
-            },
             {
                 text: '<i class="fa fa-file-pdf"> </i> Reporte PDF',
                 className: 'btn btn-danger my_class',
@@ -169,94 +145,6 @@ $(function () {
             }
         ],
         columnDefs: [
-            {
-                searchPanes: {
-                    show: false,
-                },
-                targets: [0],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                },
-                targets: [1, 2, 4],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                    options: [
-                        {
-                            label: 'FINALIZADA',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] === 'FINALIZADA';
-                            }
-                        },
-                        {
-                            label: 'DEVUELTA',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] === 'DEVUELTA';
-                            }
-                        },
-                    ]
-                },
-                targets: [5],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                    options: [
-                        {
-                            label: 'Menos de $ 10',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] < 10;
-                            }
-                        },
-                        {
-                            label: '$ 10 a $ 50',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 50 && rowData[3] >= 10;
-                            }
-                        },
-                        {
-                            label: '$ 50 a $ 100',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 100 && rowData[3] >= 50;
-                            }
-                        },
-                        {
-                            label: '$ 100 a $ 200',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 200 && rowData[3] >= 100;
-                            }
-                        },
-                        {
-                            label: '$ 200 a $ 300',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 300 && rowData[3] >= 200;
-                            }
-                        },
-                        {
-                            label: '$ 300 a $ 400',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 400 && rowData[3] >= 300;
-                            }
-                        },
-                        {
-                            label: '$ 400 a $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[2] <= 500 && rowData[2] >= 400;
-                            }
-                        },
-                        {
-                            label: 'Mas de $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] > 500;
-                            }
-                        },
-                    ]
-                },
-                targets: [3],
-            },
             {
                 targets: '_all',
                 class: 'text-center',

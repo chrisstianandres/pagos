@@ -1,5 +1,6 @@
 import json
 
+from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -10,6 +11,7 @@ from django.views.generic import *
 # from apps.Mixins import SuperUserRequiredMixin
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
+from apps.empresa.models import Empresa
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.presentacion.forms import PresentacionForm
 from apps.producto.forms import ProductoForm
@@ -38,6 +40,36 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for c in Producto.objects.all():
                     data.append(c.toJSON())
+            elif action == 'search':
+                data = []
+                term = request.POST['term']
+                if request.POST['key'] == 'material':
+                    query = Producto.objects.filter(Q(nombre__icontains=term), tipo=0)[0:10]
+                else:
+                    query = Producto.objects.filter(Q(nombre__icontains=term), tipo=1)[0:10]
+                for a in query:
+                    result = {'id': int(a.id), 'text': str(a.nombre)}
+                    data.append(result)
+            elif action == 'get':
+                id = request.POST['id']
+                if request.POST['key'] == 'material':
+                    producto = ''
+                    if id:
+                        producto = Producto.objects.filter(pk=id, tipo=0)
+                    else:
+                        data['error'] = 'No ha selecionado ningun Material'
+                else:
+                    producto = Producto.objects.filter(pk=id, tipo=1)
+                data = []
+                for i in producto:
+                    print(i)
+                    item = i.toJSON()
+                    item['cantidad'] = 1
+                    item['subtotal'] = 0.00
+                    item['iva_emp'] = 12
+                    cal = float((i.pcp*100)/112)
+                    item['p_compra'] = cal
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:

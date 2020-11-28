@@ -11,53 +11,15 @@
     <input type="hidden" id="action" name="action" value="{{ action }}">
     <input type="hidden" name="crud" value="{{ crud }}">
     <input type="hidden" name="key" value="{{ key }}">
-    <div class="card">
+    <div class="card card-secondary">
         <div class="card-header">
             <h4> &nbsp;<i class="{{ icono }}"></i> {{ titulo }}</h4>
         </div>
         <div class="card-body">
             <div class="container col-lg-12">
                 <div class="row">
-                    <div class="col-lg-8 col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3><i class="fab fa-amazon"></i> Detalle de Productos</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="panel-group">
-                                    <div class="form-group">
-                                        <label> Buscar Productos:</label>
-                                        {{ form2.producto }}
-                                    </div>
-                                    <br>
-                                    <button type="button" class="btn btn-danger btn-sm btn-flat btnRemoveall">
-                                        <i class="far fa-trash-alt"></i> Eliminar todos los Productos
-                                    </button>
-                                    <br><br>
-                                    <div class="table-responsive">
-                                        <table class="table" id="tblinsumos">
-                                            <thead>
-                                            <tr>
-                                                <th><em class="fas fa-trash-alt"></em></th>
-                                                <th>Producto</th>
-                                                <th>Catg</th>
-                                                <th>Prst</th>
-                                                <th>Cant</th>
-                                                <th>P. Compra</th>
-                                                <th>Subtotal</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-lg-4 col-md-12">
-                        <div class="card">
+                        <div class="card card-primary">
                             <div class="card-header">
                                 <h4>&nbsp;<i class="fa fa-book-open"></i> Datos de la compra</h4>
                             </div>
@@ -75,8 +37,8 @@
                                     <label for="id_proveedor">{{ form.proveedor.label_tag }}</label>
                                     <div class="input-group form-group-lg">
                                         {{ form.proveedor }}
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary btn-sm" id="id_new_proveedor" type="button">
+                                         <div class="input-group-append">
+                                            <button class="btn btn-primary btn-xs" id="id_new_proveedor" type="button">
                                                 <i class="fas fa-user-plus"></i></button>
                                         </div>
                                     </div>
@@ -114,6 +76,44 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-8 col-md-12">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3><i class="fab fa-amazon"></i> Detalle de Productos</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="panel-group">
+                                    <div class="form-group">
+                                        <label> Buscar Productos:</label>
+                                        {{ form2.producto }}
+                                    </div>
+                                    <br>
+                                    <button type="button" class="btn btn-danger btn-sm btn-flat btnRemoveall">
+                                        <i class="far fa-trash-alt"></i> Eliminar todos los Productos
+                                    </button>
+                                    <br><br>
+                                    <div class="table-responsive">
+                                        <table class="table" id="tblinsumos">
+                                            <thead>
+                                            <tr>
+                                                <th><em class="fas fa-trash-alt"></em></th>
+                                                <th>Producto</th>
+                                                <th>Catg</th>
+                                                <th>Prst</th>
+                                                <th>Cant</th>
+                                                <th>P. Compra</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,7 +142,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body" met>
+                    <div class="modal-body">
                         <div class="container-fluid">
                             <div class="form-group">
                                 {{ formp.as_p }}

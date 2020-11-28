@@ -18,7 +18,7 @@ var compras = {
             iva_emp = dict.iva_emp;
         });
         this.items.subtotal = subtotal;
-        this.items.iva = this.items.subtotal * (iva_emp/100);
+        this.items.iva = this.items.subtotal * (iva_emp / 100);
         this.items.total = this.items.subtotal + this.items.iva;
         $('input[name="subtotal"]').val(this.items.subtotal.toFixed(2));
         $('input[name="iva"]').val(this.items.iva.toFixed(2));
@@ -26,7 +26,9 @@ var compras = {
     },
     add: function (data) {
         this.items.productos.push(data);
+        this.items.productos = this.exclude_duplicados(this.items.productos);
         this.list();
+
     },
     list: function () {
         this.calculate();
@@ -83,7 +85,16 @@ var compras = {
                 });
             }
         });
+    },
+
+    exclude_duplicados: function (array) {
+        this.items.productos = [];
+        let hash = {};
+        result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
+        return result;
+
     }
+
 };
 $(function () {
     //texto de los selects
@@ -98,12 +109,13 @@ $(function () {
     //seleccionar producto del select producto
     $('#id_producto').on('select2:select', function (e) {
         var crud = $('input[name="crud"]').val();
-
         $.ajax({
             type: "POST",
-            url: crud,
+            url: '/producto/lista',
             data: {
                 "id": $('#id_producto option:selected').val(),
+                "action": 'get',
+                "key": 'material',
             },
             dataType: 'json',
             success: function (data) {
@@ -142,7 +154,7 @@ $(function () {
             'Esta seguro que desea eliminar todos los productos seleccionados?', function () {
                 compras.items.productos = [];
                 menssaje_ok('Confirmacion!', 'Productos eliminados', 'far fa-smile-wink', function () {
-                    location.reload();
+                    compras.list();
                 });
             });
     });
@@ -161,17 +173,20 @@ $(function () {
         compras.items.fecha_compra = $('input[name="fecha_compra"]').val();
         compras.items.proveedor = $('#id_proveedor option:selected').val();
         parametros = {'compras': JSON.stringify(compras.items)};
+        parametros['action']='add';
+        parametros['id']='';
         save_with_ajax('Alerta',
-            '/compra/crear', 'Esta seguro que desea guardar esta compra?', parametros, function (response) {
-                var ok = {'productos':response['productos']};
+            window.location.pathname, 'Esta seguro que desea guardar esta compra?', parametros, function (response) {
+                var ok = {'productos': response['productos']};
                 $('[name="datos"]').attr('value', JSON.stringify(response['productos']));
-                printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
-                    window.open('/compra/printpdf/' + response['id'], '_blank');
-                    $('#form_in').submit();
-                }, function () {
-                    $('#form_in').submit();
-
-                });
+                window.location.replace('/compra/lista')
+                // printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+                //     window.open('/compra/printpdf/' + response['id'], '_blank');
+                //     // $('#form_in').submit();
+                // }, function () {
+                //     // $('#form_in').submit();
+                //
+                // });
             });
     });
 
@@ -181,14 +196,15 @@ $(function () {
     $('#form').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
+        parametros.append('action', 'add');
+        parametros.append('id', '');
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
-                '/proveedor/crearpro', 'Esta seguro que desea guardar este proveedor?', parametros,
+                '/proveedor/nuevo', 'Esta seguro que desea guardar este proveedor?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este proveedor!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
-                        console.log(response);
                         var newOption = new Option(response.proveedor['full_name'], response.proveedor['id'], false, true);
                         $('#id_proveedor').append(newOption).trigger('change');
                     });
@@ -214,10 +230,11 @@ $(function () {
         ajax: {
             delay: 250,
             type: 'POST',
-            url: '/proveedor/data',
+            url: '/proveedor/lista',
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
+                    'action': 'search'
                 };
                 return queryParameters;
             },
@@ -230,6 +247,44 @@ $(function () {
 
         },
         placeholder: 'Busca un proveedor',
+        minimumInputLength: 1,
+    });
+
+    $('#id_producto').select2({
+        theme: "classic",
+        language: {
+            inputTooShort: function () {
+                return "Ingresa al menos un caracter...";
+            },
+            "noResults": function () {
+                return "Sin resultados";
+            },
+            "searching": function () {
+                return "Buscando...";
+            }
+        },
+        allowClear: true,
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: '/producto/lista',
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    'action': 'search',
+                    'key': 'material'
+                };
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+
+            },
+
+        },
+        placeholder: 'Busca un material',
         minimumInputLength: 1,
     });
 

@@ -39,7 +39,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for c in Proveedor.objects.all():
                     data.append(c.toJSON())
-            elif action == data:
+            elif action == 'search':
                 data = []
                 term = request.POST['term']
                 query = Proveedor.objects.filter(
@@ -82,6 +82,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             if action == 'add':
                 f = ProveedorForm(request.POST)
                 data = self.save_data(f)
+                print(data)
             elif action == 'edit':
                 proveedor = Proveedor.objects.get(pk=int(pk))
                 f = ProveedorForm(request.POST, instance=proveedor)
@@ -108,15 +109,17 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     f.add_error("num_doc", "Numero de Documento ya exitente en los Clientes")
                     data['error'] = f.errors
                 elif verificar(f.data['num_doc']):
-                    f.save()
+                    prod = f.save()
                     data['resp'] = True
+                    data['proveedor'] = prod.toJSON()
                 else:
                     f.add_error("num_doc", "Numero de Cedula no valido para Ecuador")
                     data['error'] = f.errors
             else:
                 if verificar(f.data['num_doc']):
-                    f.save()
+                    prod = f.save()
                     data['resp'] = True
+                    data['proveedor'] = prod.toJSON()
                 else:
                     f.add_error("num_doc", "Numero de Cedula no valido para Ecuador")
                     data['error'] = f.errors

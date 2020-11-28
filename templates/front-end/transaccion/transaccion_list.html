@@ -14,15 +14,17 @@
     <thead>
     <tr>
         <th>Fecha</th>
-        <th>Proveedor</th>
+        <th>Cliente</th>
         <th>Empleado</th>
         <th>Total</th>
-        <th>N° Comprobante</th>
+        <th>N° Factura</th>
         <th>Estado</th>
         <th class="text-center" scope="col" style="width: 10%"><em class="fa fa-cog"></em></th>
     </tr>
     </thead>
     <tbody>
+
+
     </tbody>
 {% endblock %}
 {% block modal %}
@@ -32,26 +34,35 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle"><i class="fas fa-cart-arrow-down"></i> Detalle de
-                        Materiales </h5>
+                        Productos </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table" id="tbldetalle_insumos">
-                        <thead>
-                        <tr>
-                            <th>Material</th>
-                            <th>Categoria</th>
-                            <th>Presentacion</th>
-                            <th>Cantidad</th>
-                            <th>Pvp</th>
-                            <th>Subtotal</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fab fa-amazon"></i>
+                                &nbsp;<strong>Productos</strong></h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table" id="tbldetalle_productos">
+                                <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Categoria</th>
+                                    <th>Presentacion</th>
+                                    <th>Cantidad</th>
+                                    <th>Pvp</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -59,8 +70,7 @@
 {% endblock %}
 
 {% block extra %}
-    <script src="{% static 'apps/compra/compra_list.js' %}"></script>
-    <script src="{% static 'apps/funtions.js' %}"></script>
+    <script src="{% static 'apps/venta/venta_list.js' %}"></script>
 {% endblock %}
 {% block javascript %}
 

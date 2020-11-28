@@ -17,8 +17,8 @@ from apps.cliente.forms import ClienteForm
 # from apps.delvoluciones_venta.models import Devolucion
 # from apps.inventario.models import Inventario
 # from apps.servicio.models import Servicio
-from apps.reparacion.forms import ReparacionForm, Detalle_reparacionform
-from apps.reparacion.models import Reparacion, Detalle_reparacion
+# from apps.venta.forms import VentaForm, Detalle_VentaForm
+from apps.venta.models import Venta, Detalle_venta
 from apps.empresa.models import Empresa
 from apps.producto.models import Producto
 
@@ -28,18 +28,16 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
 
-from apps.transaccion.models import Transaccion
-
-opc_icono = 'fas fa-tools'
-opc_entidad = 'Reparaciones'
-crud = '/reparacion/crear'
+opc_icono = 'fa fa-shopping-basket '
+opc_entidad = 'Ventas'
+crud = '/venta/crear'
 empresa = nombre_empresa()
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
-    model = Producto
-    template_name = 'front-end/reparacion/reparacion_list.html'
-    permission_required = 'reparacion.view_reparacion'
+    model = Venta
+    template_name = 'front-end/transaccion/transaccion_list.html'
+    permission_required = 'venta.view_venta'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -51,12 +49,13 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             start = request.POST['start_date']
             end = request.POST['end_date']
-            if action == 'reparacion':
+            if action == 'venta':
+                query = ''
                 data = []
                 if start == '' and end == '':
-                    query = Transaccion.objects.filter(tipo=1)
+                    query = Venta.objects.filter(transaccion__tipo=0)
                 else:
-                    query = Transaccion.objects.filter(tipo=1, fecha_trans__range=[start, end])
+                    query = Venta.objects.filter(transaccion__tipo=0, fecha_trans__range=[start, end])
                 for c in query:
                     data.append(c.toJSON())
             else:
@@ -69,9 +68,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nueva Reparacion'
-        data['titulo'] = 'Listado de Reparaciones'
-        data['nuevo'] = '/Reparacion/nuevo'
+        data['boton'] = 'Nueva Venta'
+        data['titulo'] = 'Listado de Ventas'
+        data['nuevo'] = '/transsacion/nuevo'
         data['empresa'] = empresa
         return data
 
