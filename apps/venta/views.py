@@ -1,6 +1,6 @@
 from django.utils.decorators import method_decorator
 
-from apps.inventario.models import Inventario
+from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
 from datetime import datetime
@@ -111,27 +111,26 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v = Venta()
                         v.transaccion = c.id
                         v.save()
-                        if datos['productos']:
-                            for i in datos['productos']:
-                                dv = Detalle_venta()
-                                dv.venta_id = v.id
-                                dv.producto_id = i['producto']['id']
-                                dv.cantidadp = int(i['cantidad'])
-                                dv.subtotalp = float(i['subtotal'])
-                                x = Producto.objects.get(pk=i['producto']['id'])
-                                dv.pvp_actual = float(x.pvp)
-                                x.stock = x.stock - int(i['cantidad'])
-                                x.save()
-                                inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[
-                                      :i['cantidad']]
-                                for itr in inv:
-                                    x = Inventario.objects.get(pk=itr.id)
-                                    x.estado = 0
-                                    x.venta_id = c.id
-                                    x.save()
-                                dv.save()
-                            data['id'] = c.id
-                            data['resp'] = True
+                        # if datos['productos']:
+                        #     for i in datos['productos']:
+                        #         dv = Detalle_venta()
+                        #         dv.venta_id = v.id
+                        #         dv.inventario_id = i['producto']['id']
+                        #         dv.cantidad = int(i['cantidad'])
+                        #         x = Producto.objects.get(pk=i['producto']['id'])
+                        #         dv.pvp_actual = float(x.pvp)
+                        #         x.stock = x.stock - int(i['cantidad'])
+                        #         x.save()
+                        #         inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[
+                        #               :i['cantidad']]
+                        #         for itr in inv:
+                        #             x = Inventario.objects.get(pk=itr.id)
+                        #             x.estado = 0
+                        #             x.venta_id = c.id
+                        #             x.save()
+                        #         dv.save()
+                        #     data['id'] = c.id
+                        #     data['resp'] = True
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"

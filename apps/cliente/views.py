@@ -79,6 +79,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data = {}
         action = request.POST['action']
         pk = request.POST['id']
+        print(request.POST)
         try:
             if action == 'add':
                 f = ClienteForm(request.POST)

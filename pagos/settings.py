@@ -55,11 +55,13 @@ INSTALLED_APPS = [
     'apps.transaccion',
     'apps.venta',
     'apps.compra',
-    'apps.inventario',
+    'apps.inventario_productos',
+    'apps.inventario_material',
     'apps.confeccion',
     'apps.alquiler',
     'apps.material',
     'apps.asignar_recursos',
+    'apps.producto_base',
 ]
 
 MIDDLEWARE = [

@@ -2,6 +2,7 @@ from django.db import models
 from django.forms import model_to_dict
 
 from apps.cliente.models import Cliente
+from apps.inventario_productos.models import Inventario_producto
 from apps.transaccion.models import Transaccion
 from apps.producto.models import Producto
 from apps.empresa.models import Empresa
@@ -33,7 +34,7 @@ class Venta(models.Model):
 
 class Detalle_venta(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.PROTECT)
-    producto = models.ForeignKey(Producto, on_delete=models.PROTECT, null=True, blank=True, default=None)
+    inventario = models.ForeignKey(Inventario_producto, on_delete=models.PROTECT, null=True, blank=True, default=None)
     pvp_actual = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, blank=True, null=True)
     cantidad = models.IntegerField(default=0)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
@@ -45,7 +46,7 @@ class Detalle_venta(models.Model):
         empresa = Empresa.objects.first()
         item = model_to_dict(self)
         item['venta'] = self.venta.toJSON()
-        item['producto'] = self.producto.toJSON()
+        item['producto'] = self.inventario.toJSON()
         return item
 
     class Meta:

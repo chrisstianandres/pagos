@@ -1,11 +1,8 @@
 from django import forms
 from datetime import *
 from .models import Transaccion
-from tempus_dominus.widgets import DatePicker
 
 from ..cliente.models import Cliente
-from ..inventario.models import Inventario
-from ..producto.models import Producto
 
 
 class TransaccionForm(forms.ModelForm):

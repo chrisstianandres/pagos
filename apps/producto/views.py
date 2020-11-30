@@ -3,19 +3,17 @@ import json
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
-# from apps.Mixins import SuperUserRequiredMixin
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
-from apps.empresa.models import Empresa
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.presentacion.forms import PresentacionForm
-from apps.producto.forms import ProductoForm
+from apps.producto.forms import ProductoForm, Producto_baseForm
 from apps.producto.models import Producto
+from apps.producto_base.models import Producto_base
 
 opc_icono = 'fab fa-amazon'
 opc_entidad = 'Productos'
@@ -62,7 +60,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     producto = Producto.objects.filter(pk=id, tipo=1)
                 data = []
                 for i in producto:
-                    print(i)
                     item = i.toJSON()
                     item['cantidad'] = 1
                     item['subtotal'] = 0.00
@@ -88,8 +85,10 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
 
 class Createview(ValidatePermissionRequiredMixin, CreateView):
-    model = Producto
-    form_class = ProductoForm
+    model = Producto_base
+    second_model = Producto
+    form_class = Producto_baseForm
+    second_form_class = ProductoForm
     success_url = 'producto:lista'
     template_name = 'front-end/producto/producto_form.html'
 
@@ -102,19 +101,29 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         action = request.POST['action']
         try:
             if action == 'add':
-                f = ProductoForm(request.POST)
-                data = self.save_data(f)
+                self.object = self.get_object
+                f = self.form_class(request.POST)
+                f2 = self.second_form_class(request.POST)
+                data = self.save_data(f, f2)
                 return HttpResponseRedirect('/producto/lista')
+            elif action == 'delete':
+                pk = request.POST['id']
+                f = Producto.objects.get(pk=pk)
+                f2 = Producto_base.objects.get(id=f.producto_base_id)
+                f.delete()
+                f2.delete()
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-    def save_data(self, f):
+    def save_data(self, f, f2):
         data = {}
-        if f.is_valid():
-            f.save()
+        if f.is_valid() and f2.is_valid():
+            base = f2.save(commit=False)
+            base.producto_base = f.save()
+            base.save()
             data['resp'] = True
         else:
             data['error'] = f.errors
@@ -122,6 +131,10 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
+        if 'form' not in data:
+            data['form'] = self.form_class(self.request.GET)
+        if 'form2' not in data:
+            data['form2'] = self.second_form_class(self.request.GET)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Producto'
@@ -136,10 +149,13 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
 
 
 class Updateview(ValidatePermissionRequiredMixin, UpdateView):
-    model = Producto
-    form_class = ProductoForm
+    model = Producto_base
+    form_class = Producto_baseForm
+    second_model = Producto
+    second_form_class = ProductoForm
     success_url = 'producto:lista'
     template_name = 'front-end/producto/producto_form.html'
+    permission_required = 'producto.change_producto'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -149,10 +165,13 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
         data = {}
         action = request.POST['action']
         try:
-            producto = Producto.objects.get(pk = self.kwargs['pk'])
+            pk = self.kwargs.get('pk', 0)
+            producto = self.second_model.objects.get(id=pk)
+            producto_base = self.model.objects.get(id=producto.producto_base_id)
             if action == 'edit':
-                f = ProductoForm(request.POST, instance= producto)
-                data = self.save_data(f)
+                f = self.form_class(request.POST, instance=producto_base)
+                f2 = self.second_form_class(request.POST, instance=producto)
+                data = self.save_data(f, f2)
                 return HttpResponseRedirect('/producto/lista')
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
@@ -160,10 +179,11 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-    def save_data(self, f):
+    def save_data(self, f, f2):
         data = {}
-        if f.is_valid():
+        if f.is_valid() and f2.is_valid():
             f.save()
+            f2.save()
             data['resp'] = True
         else:
             data['error'] = f.errors
@@ -171,6 +191,13 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
+        pk = self.kwargs.get('pk', 0)
+        producto = self.second_model.objects.get(id=pk)
+        producto_base = self.model.objects.get(id=producto.producto_base_id)
+        if 'form' not in data:
+            data['form'] = self.form_class(instance=producto_base)
+        if 'form2' not in data:
+            data['form2'] = self.second_form_class(instance=producto)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Edicion'
@@ -244,7 +271,6 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
 #         data['error'] = "!No se puede eliminar este producto porque esta referenciado en otros procesos!!"
 #         data['content'] = "Intenta con otro producto"
 #     return JsonResponse(data)
-
 
 @csrf_exempt
 def index(request):

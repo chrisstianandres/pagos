@@ -7,7 +7,7 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.readAsDataURL(blob)
     }));
 
-toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
+toDataURL('/media/imagen.PNG').then(dataUrl => {
     logotipo = dataUrl;
 });
 $(function () {
@@ -25,13 +25,11 @@ $(function () {
         },
         columns: [
             {"data": "id"},
-            {"data": "nombre"},
-            {"data": "tipo"},
-            {"data": "categoria.nombre"},
-            {"data": "presentacion.nombre"},
-            {"data": "stock"},
-            {"data": "descripcion"},
-            {"data": "pcp"},
+            {"data": "producto_base.nombre"},
+            {"data": "producto_base.categoria.nombre"},
+            {"data": "producto_base.presentacion.nombre"},
+            {"data": "producto_base.stock"},
+            {"data": "producto_base.descripcion"},
             {"data": "pvp"},
             {"data": "id"}
         ],
@@ -55,7 +53,7 @@ $(function () {
                 pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                 download: 'open',
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7],
+                    columns: [1, 2, 3, 4, 5, 6],
                     search: 'applied',
                     order: 'applied'
                 },
@@ -124,7 +122,7 @@ $(function () {
                         return 4;
                     };
                     doc.content[0].layout = objLayout;
-                    doc.content[1].table.widths = [150, '*', 90, 70, 180, 70, 70];
+                    doc.content[1].table.widths = [150, '*', 90, 70, 180, 70];
                     doc.styles.tableBodyEven.alignment = 'center';
                     doc.styles.tableBodyOdd.alignment = 'center';
                 }
@@ -143,7 +141,7 @@ $(function () {
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         columnDefs: [
             {
-                targets: [-5],
+                targets: [-4],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -151,7 +149,7 @@ $(function () {
                 }
             },
             {
-                targets: [-2, -3],
+                targets: [-2],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -178,12 +176,12 @@ $(function () {
             },
         ],
         createdRow: function (row, data, dataIndex) {
-            if (data.stock >= 51) {
-                $('td', row).eq(5).find('span').addClass('badge badge-success').attr("style", "color: white");
-            } else if (data.stock >= 10) {
-                $('td', row).eq(5).find('span').addClass('badge badge-warning').attr("style", "color: white");
-            } else if (data.stock <= 9) {
-                $('td', row).eq(5).find('span').addClass('badge badge-danger').attr("style", "color: white");
+            if (data.producto_base.stock >= 51) {
+                $('td', row).eq(4).find('span').addClass('badge badge-success').attr("style", "color: white");
+            } else if (data.producto_base.stock >= 10) {
+                $('td', row).eq(4).find('span').addClass('badge badge-warning').attr("style", "color: white");
+            } else if (data.producto_base.stock <= 9) {
+                $('td', row).eq(4).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
 
             if (data.tipo === 'Producto'){ $('td', row).eq(7).html('<span class="badge badge-success"> Sin precio compra </span>');}
@@ -195,9 +193,9 @@ $(function () {
     $('#datatable tbody').on('click', 'a[rel="del"]', function () {
         var tr = datatable.cell($(this).closest('td, li')).index();
         var data = datatable.row(tr.row).data();
-        var parametros = {'id': data.id};
+        var parametros = {'id': data.id, 'action': 'delete'};
         save_estado('Alerta',
-            '/producto/eliminar', 'Esta seguro que desea eliminar este producto?', parametros,
+            '/producto/nuevo', 'Esta seguro que desea eliminar este producto?', parametros,
             function () {
                 menssaje_ok('Exito!', 'Exito al eliminar el producto!', 'far fa-smile-wink', function () {
                     datatable.ajax.reload(null, false);

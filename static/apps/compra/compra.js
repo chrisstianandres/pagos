@@ -43,9 +43,9 @@ var compras = {
             data: this.items.productos,
             columns: [
                 {data: 'id'},
-                {data: "nombre"},
-                {data: "categoria.nombre"},
-                {data: "presentacion.nombre"},
+                {data: "producto_base.nombre"},
+                {data: "producto_base.categoria.nombre"},
+                {data: "producto_base.presentacion.nombre"},
                 {data: "cantidad"},
                 {data: "p_compra"},
                 {data: "subtotal"}
@@ -107,20 +107,18 @@ $(function () {
         allowClear: true
     });
     //seleccionar producto del select producto
-    $('#id_producto').on('select2:select', function (e) {
-        var crud = $('input[name="crud"]').val();
+    $('#id_material').on('select2:select', function (e) {
         $.ajax({
             type: "POST",
-            url: '/producto/lista',
+            url: '/material/lista',
             data: {
-                "id": $('#id_producto option:selected').val(),
-                "action": 'get',
-                "key": 'material',
+                "id": $('#id_material option:selected').val(),
+                "action": 'get'
             },
             dataType: 'json',
             success: function (data) {
-                compras.add(data['0']);
-                $('#id_producto option:selected').remove();
+                compras.add(data[0]);
+                $('#id_material option:selected').remove();
             },
             error: function (xhr, status, data) {
                 alert(data['0']);
@@ -135,7 +133,7 @@ $(function () {
             'Esta seguro que desea eliminar este producto de tu detalle?', function () {
                 var p = compras.items.productos[tr.row];
                 compras.items.productos.splice(tr.row, 1);
-                $('#id_producto').append('<option value="' + p.id + '">' + p.nombre + '</option>');
+                $('#id_material').append('<option value="' + p.id + '">' + p.nombre + '</option>');
                 menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
                     compras.list();
                 });
@@ -250,7 +248,7 @@ $(function () {
         minimumInputLength: 1,
     });
 
-    $('#id_producto').select2({
+    $('#id_material').select2({
         theme: "classic",
         language: {
             inputTooShort: function () {
@@ -267,12 +265,11 @@ $(function () {
         ajax: {
             delay: 250,
             type: 'POST',
-            url: '/producto/lista',
+            url: '/material/lista',
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
-                    'action': 'search',
-                    'key': 'material'
+                    'action': 'search'
                 };
                 return queryParameters;
             },

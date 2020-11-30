@@ -50,7 +50,7 @@ class Detalle_compra(models.Model):
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
     def __str__(self):
-        return '%s %s' % (self.compra, self.material.nombre)
+        return '%s %s' % (self.compra, self.material.producto_base.nombre)
 
     def toJSON(self):
         item = model_to_dict(self)

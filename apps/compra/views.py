@@ -15,7 +15,8 @@ from apps.backEnd import nombre_empresa
 from apps.compra.forms import CompraForm, Detalle_CompraForm
 from apps.compra.models import Compra, Detalle_compra
 from apps.empresa.models import Empresa
-from apps.inventario.models import Inventario
+from apps.inventario_material.models import Inventario_material
+from apps.material.models import Material
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.producto.models import Producto
 from datetime import date
@@ -25,6 +26,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
 
+from apps.producto_base.models import Producto_base
 from apps.proveedor.forms import ProveedorForm
 
 opc_icono = 'fa fa-shopping-bag'
@@ -56,10 +58,10 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    for p in Detalle_compra.objects.filter(compra_id=id):
+                    for p in Detalle_compra.objects.all():
                         item = p.toJSON()
-                        item['p_compra'] = float((p.p_compra_actual * 100) / (100 + empresa.iva))
-                        item['subtotal'] = float(p.compra.subtotal)
+                        item['p_compra'] = float((p.p_compra_actual * 100) / (100 + 12))
+                        item['subtotal'] = float(p.subtotal)
                         data.append(item)
                 else:
                     data['error'] = 'Ha ocurrido un error'
@@ -109,22 +111,19 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         for i in datos['productos']:
                             dv = Detalle_compra()
                             dv.compra_id = c.id
-                            dv.producto_id = i['id']
+                            dv.material_id = i['id']
                             dv.cantidad = int(i['cantidad'])
                             dv.subtotal = float(i['subtotal'])
-                            x = Producto.objects.get(pk=i['id'])
-                            x.stock = x.stock + int(i['cantidad'])
-                            dv.p_compra_actual = float(x.pcp)
+                            x = Material.objects.get(pk=i['id'])
+                            x.producto_base.stock = x.producto_base.stock + int(i['cantidad'])
+                            dv.p_compra_actual = float(x.p_compra)
                             x.save()
                             dv.save()
-                            # for p in range(0, i['cantidad']):
-                            #     item = c.toJSON()
-                            #     item['producto'] = x.toJSON()
-                            #     item['serie'] = 0
-                            #     item['fecha_salida'] = ''
-                            #     item['estado'] = 1
-                            #     pr.append(item)
-                        # data['productos'] = pr
+                            for p in range(0, i['cantidad']):
+                                inv = Inventario_material()
+                                inv.compra_id = c.id
+                                inv.material_id = x.id
+                                inv.save()
                         data['id'] = c.id
                         data['resp'] = True
                 else:

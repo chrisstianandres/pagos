@@ -197,18 +197,7 @@ $(function () {
             dataType: 'json',
             success: function (data) {
                 ventas.add(data['0']);
-                $('#id_producto').val(null).trigger('change');
-                if (data[0]['producto'].instalacion === 1) {
-                    printpdf('Confirmacion!', 'El producto que acaba de agregar requiere instalacion <br> ¿Desear agregar ese servicio a la venta?',
-                        function () {
-                            aggservicio(1, data[0]['id']);
-                            menssaje_ok('Exito!', 'Servicio agregado a la venta <br> ' +
-                                'Porfavor revisa el detalle de servicios', 'fas fa-tags', function () {
-                            })
-                        },
-                        function () {
-                        });
-                }
+                $('#id_inventario').val(null).trigger('change');
             },
             error: function (xhr, status, data) {
                 alert(data['0']);
@@ -271,44 +260,6 @@ $(function () {
                 });
             });
     });
-    $('.btnRemoveallserv').on('click', function () {
-        if (ventas.items.servicios.length === 0) return false;
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar todos los servicios seleccionados? <br>' +
-            '<strong>CONTINUAR?</strong>', function () {
-                menssaje_ok('Confirmacion!', 'Productos y servicios eliminados', 'far fa-smile-wink', function () {
-                    ventas.items.servicios = [];
-                    ventas.listserv();
-                });
-            });
-    });
-    //remover servicio del detalle
-    $('#tblservicios tbody').on('click', 'a[rel="remove"]', function () {
-        var tr = tblservicios.cell($(this).closest('td, li')).index();
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar este servicio de tu detalle?', function () {
-                var p = ventas.items.servicios[tr.row];
-                ventas.items.servicios.splice(tr.row, 1);
-                $('#id_servicio').append('<option value="' + p.id + '">' + p.nombre + '</option>');
-                // $('#id_producto').selectpicker('refresh');
-
-                menssaje_ok('Confirmacion!', 'Servicio eliminado', 'far fa-smile-wink', function () {
-                    ventas.listserv();
-                });
-            })
-    }).on('change keyup', 'input[name="pvp"]', function () {
-        var pvp = parseInt($(this).val());
-        var tr = tblservicios.cell($(this).closest('td, li')).index();
-        ventas.items.servicios[tr.row].pvp = pvp;
-        ventas.calculate();
-        $('td:eq(4)', tblservicios.row(tr.row).node()).html('$' + ventas.items.servicios[tr.row].subtotal.toFixed(2));
-    }).on('change keyup', 'input[name="cantidad"]', function () {
-        var cantidad = parseInt($(this).val());
-        var tr = tblservicios.cell($(this).closest('td, li')).index();
-        ventas.items.servicios[tr.row].cantidad = cantidad;
-        ventas.calculate();
-        $('td:eq(4)', tblservicios.row(tr.row).node()).html('$' + ventas.items.servicios[tr.row].subtotal.toFixed(2));
-    });
     //boton guardar
     $('#save').on('click', function () {
         if ($('select[name="cliente"]').val() === "") {
@@ -345,6 +296,7 @@ $(function () {
     //enviar formulario de nuevo cliente
     $('#form').on('submit', function (e) {
         e.preventDefault();
+        action='add';
         var parametros = new FormData(this);
          parametros.append('action', action);
         parametros.append('id', pk);
@@ -405,7 +357,7 @@ $(function () {
         $('#form').trigger("reset");
     });
     //buscar produto del select producto
-    $('#id_producto').select2({
+    $('#id_inventario').select2({
         theme: "classic",
         language: {
             inputTooShort: function () {
@@ -422,10 +374,12 @@ $(function () {
         ajax: {
             delay: 250,
             type: 'POST',
-            url: '/inventario/data_select',
+            url: '/inventario/lista',
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
+                    'action': 'search',
+                    'id': ''
                 };
                 return queryParameters;
             },

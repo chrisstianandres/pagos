@@ -1,0 +1,22 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block table %}
+    <thead>
+    <tr>
+        <th style="width: 3%">Id</th>
+        <th style="width: 18%">Nombre</th>
+        <th style="width: 10%">Categoria</th>
+        <th style="width: 10%;">Presentacion</th>
+        <th style="width: 8%">Stock</th>
+        <th style="width: 13%">Descripcion</th>
+        <th style="width: 8%">P. Compra</th>
+        <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+{% endblock %}
+{% block extra %}
+    <script src="{% static 'apps/material/material_list.js' %}"></script>
+{% endblock %}

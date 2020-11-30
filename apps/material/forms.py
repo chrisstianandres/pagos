@@ -1,8 +1,8 @@
 from django import forms
-from datetime import *
-from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput
+from django.forms import TextInput
 
-from .models import Material
+from apps.material.models import Material
+from apps.producto_base.models import Producto_base
 
 
 class MaterialForm(forms.ModelForm):
@@ -13,40 +13,47 @@ class MaterialForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
+            self.fields['p_compra'].widget.attrs = {'class': 'form-control form-control-sm input-sm',
+                                                    'value': 1}
 
+    class Meta:
+        model = Material
+        fields = ['p_compra']
+        labels = {'p_compra': 'P. Compra'}
+        widgets = {'p_compra': forms.TextInput()}
+
+
+class Producto_baseForm(forms.ModelForm):
+    # constructor
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el nombre del material', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese el nombre del producto', 'class': 'form-control form-rounded'})
             self.fields['descripcion'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese una descripcion del material', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control form-rounded'})
             self.fields['categoria'].widget.attrs = {
                 'class': 'form-control select2'}
             self.fields['presentacion'].widget.attrs = {
                 'class': 'form-control select2'}
-            self.fields['p_compra'].widget.attrs = {
-                'class': 'form-control form-control-sm input-sm'}
-            self.fields['pvp'].widget.attrs = {
-                'class': 'form-control form-control-sm input-sm'}
-
-        # habilitar, desabilitar, y mas
 
     class Meta:
-        model = Material
+        model = Producto_base
         fields = ['nombre',
                   'descripcion',
                   'categoria',
-                  'presentacion',
-                  'p_compra',
+                  'presentacion'
                   ]
         labels = {
             'nombre': 'Nombre',
             'descripcion': 'Decripcion',
             'categoria': 'Categoria',
-            'presentacion': 'Presentacion',
-            'p_compra': 'Precio de Compra',
-            'pvp': 'P.V.P.',
+            'presentacion': 'Presentacion'
         }
         widgets = {
             'nombre': forms.TextInput(),
-            'p_compra': forms.TextInput(),
             'decripcion': forms.Textarea(attrs={'col': '3', 'row': '2'})
         }

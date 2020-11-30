@@ -1,11 +1,7 @@
 from django import forms
-from datetime import *
-from .models import Venta, Detalle_venta
-from tempus_dominus.widgets import DatePicker
 
-from ..cliente.models import Cliente
-from ..inventario.models import Inventario
-from ..producto.models import Producto
+from .models import Detalle_venta
+from apps.inventario_productos.models import Inventario_producto
 
 
 class Detalle_VentaForm(forms.ModelForm):
@@ -16,15 +12,15 @@ class Detalle_VentaForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-            self.fields['producto'].widget.attrs = {
+            self.fields['inventario'].widget.attrs = {
                 'class': 'form-control select2',
                 'data-live-search': "true"
             }
-            self.fields["producto"].queryset = Inventario.objects.none()
+            self.fields["inventario"].queryset = Inventario_producto.objects.none()
         # habilitar, desabilitar, y mas
 
     class Meta:
         model = Detalle_venta
         fields = [
-            'producto',
+            'inventario',
         ]

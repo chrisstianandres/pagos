@@ -5,7 +5,6 @@ from django.forms import model_to_dict
 
 from apps.compra.models import Compra
 from apps.producto.models import Producto
-from apps.venta.models import Venta
 
 ESTADO = (
     (1, 'En stock'),
@@ -13,9 +12,7 @@ ESTADO = (
 )
 
 
-class Inventario(models.Model):
-    compra = models.ForeignKey(Compra, on_delete=models.PROTECT)
-    venta = models.ForeignKey(Venta, on_delete=models.PROTECT, null=True, blank=True)
+class Inventario_producto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT, null=True, blank=True)
     estado = models.IntegerField(choices=ESTADO, default=1)
 
@@ -24,12 +21,11 @@ class Inventario(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
-        item['compra'] = self.compra.toJSON()
         item['producto'] = self.producto.toJSON()
         return item
 
     class Meta:
-        db_table = 'inventario'
-        verbose_name = 'inventario'
-        verbose_name_plural = 'inventarios'
+        db_table = 'inventario_producto'
+        verbose_name = 'inventario_producto'
+        verbose_name_plural = 'inventario_productos'
         ordering = ['-id']
