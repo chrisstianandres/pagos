@@ -3,36 +3,30 @@ from django.db import models
 from django.forms import model_to_dict
 
 from apps.cliente.models import Cliente
-from apps.user.models import User
+from apps.transaccion.models import Transaccion
 from apps.producto.models import Producto
 from apps.empresa.models import Empresa
 
 estado = (
-    (0, 'DEVUELTA'),
-    (1, 'FINALIZADA')
+    (0, 'PENDIENTE'),
+    (1, 'ENTREGADA')
 )
 
 
 class Reparacion(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    transaccion = models.ForeignKey(Transaccion, on_delete=models.PROTECT)
     fecha_ingreso = models.DateField(default=datetime.now)
     fecha_entrega = models.DateField(default=datetime.now)
-    subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     estado = models.IntegerField(choices=estado, default=1)
 
     def __str__(self):
-        return '%s %s %s' % (self.cliente, self.fecha_ingreso, self.total)
+        return '%s %s' % (self.transaccion.cliente, self.fecha_ingreso)
 
     def toJSON(self):
         item = model_to_dict(self)
-        item['cliente'] = self.cliente.toJSON()
-        item['empleado'] = self.user.toJSON()
-        item['subtotal'] = format(self.subtotal, '.2f')
-        item['iva'] = format(self.iva, '.2f')
-        item['total'] = format(self.total, '.2f')
+        item['trasnsaccion'] = self.transaccion.toJSON()
+        item['fecha_ingreso'] = self.fecha_ingreso.strftime('%d-%mm-%YYYY')
+        item['fecha_entrega'] = self.fecha_entrega.strftime('%d-%mm-%YYYY')
         return item
 
     class Meta:
@@ -57,6 +51,8 @@ class Detalle_reparacion(models.Model):
         item = model_to_dict(self)
         item['reparcion'] = self.reparacion.toJSON()
         item['producto'] = self.producto.toJSON()
+        item['pvp'] = format(self.pvp_rep_by_prod, '.2f')  # format(self.iva, '.2f')
+        item['subtotal'] = format(self.subtotal, '.2f')  # format(self.iva, '.2f')
         return item
 
     class Meta:

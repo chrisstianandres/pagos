@@ -1,6 +1,6 @@
 from django import forms
 from datetime import *
-from .models import Venta, Detalle_venta
+from .models import Transaccion
 from tempus_dominus.widgets import DatePicker
 
 from ..cliente.models import Cliente
@@ -8,7 +8,7 @@ from ..inventario.models import Inventario
 from ..producto.models import Producto
 
 
-class VentaForm(forms.ModelForm):
+class TransaccionForm(forms.ModelForm):
     # constructor
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -16,7 +16,7 @@ class VentaForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-            self.fields['fecha_venta'].widget.attrs = {
+            self.fields['fecha_trans'].widget.attrs = {
                 'readonly': True,
                 'class': 'form-control'
             }
@@ -43,23 +43,23 @@ class VentaForm(forms.ModelForm):
         # habilitar, desabilitar, y mas
 
     class Meta:
-        model = Venta
+        model = Transaccion
         fields = [
-            'fecha_venta',
+            'fecha_trans',
             'cliente',
             'subtotal',
             'iva',
             'total'
         ]
         labels = {
-            'fecha_venta': 'Fecha de Venta',
+            'fecha_trans': 'Fecha',
             'cliente': 'Cliente',
             'subtotal': 'Subtotal',
             'iva': 'I.V.A.',
             'total': 'TOTAL'
         }
         widgets = {
-            'fecha_venta': forms.DateInput(
+            'fecha_trans': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'value': datetime.now().strftime('%Y-%m-%d')},
             ),
@@ -67,53 +67,3 @@ class VentaForm(forms.ModelForm):
             'iva': forms.TextInput(),
             'total': forms.TextInput(),
         }
-
-
-class Detalle_VentaForm(forms.ModelForm):
-    # constructor
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.Meta.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
-            self.fields['producto'].widget.attrs = {
-                'class': 'form-control select2',
-                'data-live-search': "true"
-            }
-            self.fields["producto"].queryset = Inventario.objects.none()
-            self.fields['servicio'].widget.attrs = {
-                'class': 'form-control select2',
-                'style': 'width: 100%',
-                'data-live-search': "true"
-            }
-        # habilitar, desabilitar, y mas
-
-    class Meta:
-        model = Detalle_venta
-        fields = [
-            'producto',
-            'servicio',
-        ]
-
-
-# class Detalle_VentaForm_serv(forms.ModelForm):
-#     # constructor
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         for field in self.Meta.fields:
-#             self.fields[field].widget.attrs.update({
-#                 'class': 'form-control'
-#             })
-#             self.fields['producto'].widget.attrs = {
-#                 'class': 'form-control select2',
-#                 'data-live-search': "true"
-#             }
-#             self.fields["producto"].queryset = Producto.objects.filter(stock__gte=1)
-#         # habilitar, desabilitar, y mas
-#
-#     class Meta:
-#         model = Detalle_venta
-#         fields = [
-#             'producto'
-#         ]

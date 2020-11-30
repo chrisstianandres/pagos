@@ -10,37 +10,36 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('producto', '0001_initial'),
-        ('transaccion', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Venta',
+            name='Confeccion',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('estado', models.IntegerField(choices=[(0, 'DEVUELTA'), (1, 'FINALIZADA')], default=1)),
-                ('transaccion', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='transaccion.transaccion')),
+                ('fecha_entrega', models.DateField(blank=True, default=None, null=True)),
+                ('estado', models.IntegerField(choices=[(0, 'PENDIENTE'), (1, 'ENTREGADA')], default=0)),
             ],
             options={
-                'verbose_name': 'venta',
-                'verbose_name_plural': 'ventas',
-                'db_table': 'venta',
+                'verbose_name': 'confeccion',
+                'verbose_name_plural': 'confeccion',
+                'db_table': 'confeccion',
             },
         ),
         migrations.CreateModel(
-            name='Detalle_venta',
+            name='Detalle_confeccion',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('pvp_actual', models.DecimalField(blank=True, decimal_places=2, default=0.0, max_digits=9, null=True)),
+                ('pvp_by_confec', models.DecimalField(blank=True, decimal_places=2, default=0.0, max_digits=9, null=True)),
                 ('cantidad', models.IntegerField(default=0)),
                 ('subtotal', models.DecimalField(decimal_places=2, default=0.0, max_digits=9)),
+                ('confeccion', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='confeccion.confeccion')),
                 ('producto', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.PROTECT, to='producto.producto')),
-                ('venta', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='venta.venta')),
             ],
             options={
-                'verbose_name': 'detalle_venta',
-                'verbose_name_plural': 'detalles_ventas',
-                'db_table': 'detalle_venta',
+                'verbose_name': 'detalle_confeccion',
+                'verbose_name_plural': 'detalle_confecciones',
+                'db_table': 'detalle_confeccion',
             },
         ),
     ]

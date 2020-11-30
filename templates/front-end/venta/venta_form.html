@@ -12,15 +12,74 @@
     <input type="hidden" name="crud" value="{{ crud }}">
     <input type="hidden" name="crudserv" value="{{ crudserv }}">
     <input type="hidden" name="key" value="{{ key }}">
-    <div class="card">
+    <div class="card card-secondary">
         <div class="card-header">
             <h4> &nbsp;<i class="{{ icono }}"></i> {{ titulo }}</h4>
         </div>
         <div class="card-body">
             <div class="container col-lg-12">
                 <div class="row">
+                    <div class="col-lg-3 col-md-12">
+                        <div class="card card-success">
+                            <div class="card-header">
+                                <h5>&nbsp;<i class="fa fa-book-open"></i> Datos de la Venta</h5>
+                            </div>
+                            <div class="card-body">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="id_fecha_venta">{{ form.fecha_trans.label_tag }}</label>
+                                     <div class="input-group">
+                                        {{ form.fecha_trans }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_cliente">{{ form.cliente.label_tag }}</label>
+                                    <div class="input-group form-group-lg">
+                                        {{ form.cliente }}
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary btn-sm" id="id_new_client" type="button"><i
+                                                    class="fas fa-user-plus"></i></button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_subtotal">{{ form.subtotal.label_tag }}</label>
+                                    <div class="input-group">
+                                        {{ form.subtotal }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_iva">{{ form.iva.label_tag }}</label>
+                                    <div class="input-group">
+                                       {{ form.iva }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_total">{{ form.total.label_tag }}</label>
+                                   <div class="input-group">
+                                       {{ form.total }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-9 col-md-12">
-                        <div class="card">
+                        <div class="card card-success">
                             <div class="card-header">
                                 <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
                                     <li class="nav-item">
@@ -120,65 +179,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>&nbsp;<i class="fa fa-book-open"></i> Datos de la Venta</h5>
-                            </div>
-                            <div class="card-body">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label for="id_fecha_venta">{{ form.fecha_venta.label_tag }}</label>
-                                     <div class="input-group">
-                                        {{ form.fecha_venta }}
-                                        <div class="input-group-append">
-                                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="id_cliente">{{ form.cliente.label_tag }}</label>
-                                    <div class="input-group form-group-lg">
-                                        {{ form.cliente }}
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary btn-sm" id="id_new_client" type="button"><i
-                                                    class="fas fa-user-plus"></i></button>
-                                        </div>
-                                    </div>
 
-                                </div>
-                                <div class="form-group">
-                                    <label for="id_subtotal">{{ form.subtotal.label_tag }}</label>
-                                    <div class="input-group">
-                                        {{ form.subtotal }}
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">$</span>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="form-group">
-                                    <label for="id_iva">{{ form.iva.label_tag }}</label>
-                                    <div class="input-group">
-                                       {{ form.iva }}
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">$</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="id_total">{{ form.total.label_tag }}</label>
-                                   <div class="input-group">
-                                       {{ form.total }}
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">$</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
                     <br><br><br><br>
                     <div class="col-lg-12">
                         <button type="submit" class="btn btn-primary btn-sm btn-flat" id="save">

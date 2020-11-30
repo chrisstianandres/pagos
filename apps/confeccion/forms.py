@@ -1,9 +1,14 @@
 from django import forms
 from datetime import *
-from .models import Compra, Detalle_compra
+from .models import Reparacion, Detalle_reparacion
+from tempus_dominus.widgets import DatePicker
+
+from ..cliente.models import Cliente
+# from ..inventario.models import Inventario
+from ..producto.models import Producto
 
 
-class CompraForm(forms.ModelForm):
+class ReparacionForm(forms.ModelForm):
     # constructor
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -11,14 +16,18 @@ class CompraForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-            self.fields['fecha_compra'].widget.attrs = {
+            self.fields['fecha_ingreso'].widget.attrs = {
                 'readonly': True,
                 'class': 'form-control'
             }
-            self.fields['proveedor'].widget.attrs = {
-                'class': 'form-control select2',
-                'data-live-search': "true"
+            self.fields['fecha_entrega'].widget.attrs = {
+                'readonly': True,
+                'class': 'form-control'
             }
+            self.fields['cliente'].widget.attrs = {
+                'class': 'custom-select select2'
+            }
+            self.fields["cliente"].queryset = Cliente.objects.none()
             self.fields['subtotal'].widget.attrs = {
                 'value': '0.00',
                 'class': 'form-control',
@@ -38,32 +47,39 @@ class CompraForm(forms.ModelForm):
         # habilitar, desabilitar, y mas
 
     class Meta:
-        model = Compra
+        model = Reparacion
         fields = [
-            'fecha_compra',
-            'proveedor',
+            'fecha_ingreso',
+            'fecha_entrega',
+            'cliente',
             'subtotal',
             'iva',
             'total'
         ]
         labels = {
-            'fecha_compra': 'Fecha de Compra',
-            'proveedor': 'Proveedor',
+            'fecha_ingreso': 'Fecha de Recepcion',
+            'fecha_entrega': 'Fecha de Entrega',
+            'cliente': 'Cliente',
             'subtotal': 'Subtotal',
             'iva': 'I.V.A.',
             'total': 'TOTAL'
         }
         widgets = {
-            'fecha_compra': forms.DateInput(
+            'fecha_ingreso': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'value': datetime.now().strftime('%Y-%m-%d')},
             ),
+            'fecha_entrega': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={'value': datetime.now().strftime('%Y-%m-%d')},
+            ),
+            'subtotal': forms.TextInput(),
             'iva': forms.TextInput(),
             'total': forms.TextInput(),
         }
 
 
-class Detalle_CompraForm(forms.ModelForm):
+class Detalle_reparacionform(forms.ModelForm):
     # constructor
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -71,14 +87,14 @@ class Detalle_CompraForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-            self.fields['material'].widget.attrs = {
+            self.fields['producto'].widget.attrs = {
                 'class': 'form-control select2',
                 'data-live-search': "true"
             }
         # habilitar, desabilitar, y mas
 
     class Meta:
-        model = Detalle_compra
+        model = Detalle_reparacion
         fields = [
-            'material'
+            'producto'
         ]

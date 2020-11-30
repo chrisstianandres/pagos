@@ -1,6 +1,3 @@
-from django.utils.decorators import method_decorator
-
-from apps.inventario.models import Inventario
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
 from datetime import datetime
@@ -20,12 +17,8 @@ from apps.cliente.forms import ClienteForm
 # from apps.delvoluciones_venta.models import Devolucion
 # from apps.inventario.models import Inventario
 # from apps.servicio.models import Servicio
-# from apps.venta.forms import VentaForm, Detalle_VentaForm
-from apps.proveedor.forms import ProveedorForm
-from apps.transaccion.forms import TransaccionForm
-from apps.transaccion.models import Transaccion
-from apps.venta.forms import Detalle_VentaForm
-from apps.venta.models import Venta, Detalle_venta
+from apps.reparacion.forms import ReparacionForm, Detalle_reparacionform
+from apps.reparacion.models import Reparacion, Detalle_reparacion
 from apps.empresa.models import Empresa
 from apps.producto.models import Producto
 
@@ -35,16 +28,18 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
 
-opc_icono = 'fa fa-shopping-basket '
-opc_entidad = 'Ventas'
-crud = '/venta/crear'
+from apps.transaccion.models import Transaccion
+
+opc_icono = 'fas fa-tools'
+opc_entidad = 'Reparaciones'
+crud = '/reparacion/crear'
 empresa = nombre_empresa()
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
-    model = Venta
-    template_name = 'front-end/transaccion/transaccion_list.html'
-    permission_required = 'venta.view_venta'
+    model = Producto
+    template_name = 'front-end/reparacion/reparacion_list.html'
+    permission_required = 'reparacion.view_reparacion'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -56,13 +51,12 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             start = request.POST['start_date']
             end = request.POST['end_date']
-            if action == 'venta':
-                query = ''
+            if action == 'reparacion':
                 data = []
                 if start == '' and end == '':
-                    query = Venta.objects.filter(transaccion__tipo=0)
+                    query = Transaccion.objects.filter(tipo=1)
                 else:
-                    query = Venta.objects.filter(transaccion__tipo=0, fecha_trans__range=[start, end])
+                    query = Transaccion.objects.filter(tipo=1, fecha_trans__range=[start, end])
                 for c in query:
                     data.append(c.toJSON())
             else:
@@ -75,86 +69,12 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nueva Venta'
-        data['titulo'] = 'Listado de Ventas'
-        data['nuevo'] = '/transsacion/nuevo'
+        data['boton'] = 'Nueva Reparacion'
+        data['titulo'] = 'Listado de Reparaciones'
+        data['nuevo'] = '/Reparacion/nuevo'
         data['empresa'] = empresa
         return data
 
-
-class CrudView(ValidatePermissionRequiredMixin, TemplateView):
-    form_class = Venta
-    template_name = 'front-end/venta/venta_form.html'
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        data = {}
-        action = request.POST['action']
-        pk = request.POST['id']
-        try:
-            if action == 'add':
-                datos = json.loads(request.POST['ventas'])
-                if datos:
-                    dtp = []
-                    with transaction.atomic():
-                        c = Transaccion()
-                        c.fecha_trans = datos['fecha_transaccion']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
-                        c.subtotal = float(datos['subtotal'])
-                        c.iva = float(datos['iva'])
-                        c.total = float(datos['total'])
-                        c.save()
-                        v = Venta()
-                        v.transaccion = c.id
-                        v.save()
-                        if datos['productos']:
-                            for i in datos['productos']:
-                                dv = Detalle_venta()
-                                dv.venta_id = v.id
-                                dv.producto_id = i['producto']['id']
-                                dv.cantidadp = int(i['cantidad'])
-                                dv.subtotalp = float(i['subtotal'])
-                                x = Producto.objects.get(pk=i['producto']['id'])
-                                dv.pvp_actual = float(x.pvp)
-                                x.stock = x.stock - int(i['cantidad'])
-                                x.save()
-                                inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[
-                                      :i['cantidad']]
-                                for itr in inv:
-                                    x = Inventario.objects.get(pk=itr.id)
-                                    x.estado = 0
-                                    x.venta_id = c.id
-                                    x.save()
-                                dv.save()
-                            data['id'] = c.id
-                            data['resp'] = True
-                else:
-                    data['resp'] = False
-                    data['error'] = "Datos Incompletos"
-
-            else:
-                data['error'] = 'No ha seleccionado ninguna opción'
-        except Exception as e:
-            data['error'] = str(e)
-        return HttpResponse(json.dumps(data), content_type='application/json')
-
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        data['icono'] = opc_icono
-        data['entidad'] = opc_entidad
-        data['boton'] = 'Guardar Venta'
-        data['titulo'] = 'Nueva Venta'
-        data['nuevo'] = '/venta/nuevo'
-        data['empresa'] = empresa
-        data['form'] = TransaccionForm()
-        data['form2'] = Detalle_VentaForm()
-        data['detalle'] = []
-        data['formp'] = ProveedorForm()
-        return data
 
 # @csrf_exempt
 # def data(request):
@@ -198,82 +118,82 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 #     return render(request, 'front-end/venta/venta_form.html', data)
 #
 #
-@csrf_exempt
-def crear(request):
-    data = {}
-    if request.method == 'POST':
-        datos = json.loads(request.POST['ventas'])
-        if datos:
-            dtp = []
-            with transaction.atomic():
-                c = Venta()
-                c.fecha_venta = datos['fecha_venta']
-                c.cliente_id = datos['cliente']
-                c.empleado_id = request.user.id
-                c.subtotal = float(datos['subtotal'])
-                c.iva = float(datos['iva'])
-                c.total = float(datos['total'])
-                c.save()
-                if datos['productos'] and datos['servicios']:
-                    for i in datos['productos']:
-                        dv = Detalle_venta()
-                        dv.venta_id = c.id
-                        dv.producto_id = i['producto']['id']
-                        dv.cantidadp = int(i['cantidad'])
-                        x = Producto.objects.get(pk=i['producto']['id'])
-                        dv.pvp_actual = float(x.pvp)
-                        x.stock = x.stock - int(i['cantidad'])
-                        dv.subtotalp = float(i['subtotal'])
-                        x.save()
-                        inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[:i['cantidad']]
-                        for itr in inv:
-                            x = Inventario.objects.get(pk=itr.id)
-                            x.estado = 0
-                            x.venta_id = c.id
-                            x.save()
-                        for s in datos['servicios']:
-                            dv.servicio_id = s['id']
-                            dv.cantidads = int(s['cantidad'])
-                            dv.subtotals = float(s['subtotal'])
-                            dv.pvp_actual_s = float(s['pvp'])
-                            dv.save()
-                        data['id'] = c.id
-                        data['resp'] = True
-                elif datos['productos']:
-                    for i in datos['productos']:
-                        dv = Detalle_venta()
-                        dv.venta_id = c.id
-                        dv.producto_id = i['producto']['id']
-                        dv.cantidadp = int(i['cantidad'])
-                        dv.subtotalp = float(i['subtotal'])
-                        x = Producto.objects.get(pk=i['producto']['id'])
-                        dv.pvp_actual = float(x.pvp)
-                        x.stock = x.stock - int(i['cantidad'])
-                        x.save()
-                        inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[:i['cantidad']]
-                        for itr in inv:
-                            x = Inventario.objects.get(pk=itr.id)
-                            x.estado = 0
-                            x.venta_id = c.id
-                            x.save()
-                            dv.save()
-                    data['id'] = c.id
-                    data['resp'] = True
-                else:
-                    for i in datos['servicios']:
-                        dv = Detalle_venta()
-                        dv.venta_id = c.id
-                        dv.servicio_id = i['id']
-                        dv.cantidads = int(i['cantidad'])
-                        dv.subtotals = float(i['subtotal'])
-                        dv.pvp_actual_s = float(i['pvp'])
-                        dv.save()
-                    data['id'] = c.id
-                    data['resp'] = True
-        else:
-            data['resp'] = False
-            data['error'] = "Datos Incompletos"
-    return HttpResponse(json.dumps(data), content_type="application/json")
+# @csrf_exempt
+# def crear(request):
+#     data = {}
+#     if request.method == 'POST':
+#         datos = json.loads(request.POST['ventas'])
+#         if datos:
+#             dtp = []
+#             with transaction.atomic():
+#                 c = Venta()
+#                 c.fecha_venta = datos['fecha_venta']
+#                 c.cliente_id = datos['cliente']
+#                 c.empleado_id = request.user.id
+#                 c.subtotal = float(datos['subtotal'])
+#                 c.iva = float(datos['iva'])
+#                 c.total = float(datos['total'])
+#                 c.save()
+#                 if datos['productos'] and datos['servicios']:
+#                     for i in datos['productos']:
+#                         dv = Detalle_venta()
+#                         dv.venta_id = c.id
+#                         dv.producto_id = i['producto']['id']
+#                         dv.cantidadp = int(i['cantidad'])
+#                         x = Producto.objects.get(pk=i['producto']['id'])
+#                         dv.pvp_actual = float(x.pvp)
+#                         x.stock = x.stock - int(i['cantidad'])
+#                         dv.subtotalp = float(i['subtotal'])
+#                         x.save()
+#                         inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[:i['cantidad']]
+#                         for itr in inv:
+#                             x = Inventario.objects.get(pk=itr.id)
+#                             x.estado = 0
+#                             x.venta_id = c.id
+#                             x.save()
+#                         for s in datos['servicios']:
+#                             dv.servicio_id = s['id']
+#                             dv.cantidads = int(s['cantidad'])
+#                             dv.subtotals = float(s['subtotal'])
+#                             dv.pvp_actual_s = float(s['pvp'])
+#                             dv.save()
+#                         data['id'] = c.id
+#                         data['resp'] = True
+#                 elif datos['productos']:
+#                     for i in datos['productos']:
+#                         dv = Detalle_venta()
+#                         dv.venta_id = c.id
+#                         dv.producto_id = i['producto']['id']
+#                         dv.cantidadp = int(i['cantidad'])
+#                         dv.subtotalp = float(i['subtotal'])
+#                         x = Producto.objects.get(pk=i['producto']['id'])
+#                         dv.pvp_actual = float(x.pvp)
+#                         x.stock = x.stock - int(i['cantidad'])
+#                         x.save()
+#                         inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[:i['cantidad']]
+#                         for itr in inv:
+#                             x = Inventario.objects.get(pk=itr.id)
+#                             x.estado = 0
+#                             x.venta_id = c.id
+#                             x.save()
+#                             dv.save()
+#                     data['id'] = c.id
+#                     data['resp'] = True
+#                 else:
+#                     for i in datos['servicios']:
+#                         dv = Detalle_venta()
+#                         dv.venta_id = c.id
+#                         dv.servicio_id = i['id']
+#                         dv.cantidads = int(i['cantidad'])
+#                         dv.subtotals = float(i['subtotal'])
+#                         dv.pvp_actual_s = float(i['pvp'])
+#                         dv.save()
+#                     data['id'] = c.id
+#                     data['resp'] = True
+#         else:
+#             data['resp'] = False
+#             data['error'] = "Datos Incompletos"
+#     return HttpResponse(json.dumps(data), content_type="application/json")
 #
 #
 # def editar(request, id):

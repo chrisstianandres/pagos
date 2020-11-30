@@ -32,19 +32,19 @@ class Venta(models.Model):
 
 
 class Detalle_venta(models.Model):
-    transaccion = models.ForeignKey(Transaccion, on_delete=models.PROTECT)
+    venta = models.ForeignKey(Venta, on_delete=models.PROTECT)
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT, null=True, blank=True, default=None)
     pvp_actual = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, blank=True, null=True)
     cantidad = models.IntegerField(default=0)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
     def __str__(self):
-        return '%s' % self.transaccion
+        return '%s' % self.venta
 
     def toJSON(self):
         empresa = Empresa.objects.first()
         item = model_to_dict(self)
-        item['transaccion'] = self.transaccion.toJSON()
+        item['venta'] = self.venta.toJSON()
         item['producto'] = self.producto.toJSON()
         return item
 

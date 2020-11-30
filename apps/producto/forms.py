@@ -20,13 +20,9 @@ class ProductoForm(forms.ModelForm):
                 attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control form-rounded'})
             self.fields['categoria'].widget.attrs = {
                 'class': 'form-control select2'}
-            self.fields['tipo'].widget.attrs = {
-                'class': 'form-control'}
             self.fields['presentacion'].widget.attrs = {
                 'class': 'form-control select2'}
             self.fields['pvp'].widget.attrs = {
-                'class': 'form-control form-control-sm input-sm'}
-            self.fields['pcp'].widget.attrs = {
                 'class': 'form-control form-control-sm input-sm'}
 
         # habilitar, desabilitar, y mas
@@ -35,24 +31,19 @@ class ProductoForm(forms.ModelForm):
         model = Producto
         fields = ['nombre',
                   'descripcion',
-                  'tipo',
                   'categoria',
                   'presentacion',
-                  'pcp',
                   'pvp',
                   ]
         labels = {
             'nombre': 'Nombre',
             'descripcion': 'Decripcion',
-            'tipo': 'Tipo',
             'categoria': 'Categoria',
             'presentacion': 'Presentacion',
-            'pcp': 'P. Compra.',
             'pvp': 'P.V.P.',
         }
         widgets = {
             'nombre': forms.TextInput(),
-            'pcp': forms.TextInput(),
             'pvp': forms.TextInput(),
             'decripcion': forms.Textarea(attrs={'col': '3', 'row': '2'})
         }
