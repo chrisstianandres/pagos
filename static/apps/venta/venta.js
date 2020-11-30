@@ -174,6 +174,8 @@ var ventas = {
 
 };
 $(function () {
+     var action = '';
+    var pk = '';
     //texto de los selects
     $('.select2').select2({
         "language": {
@@ -344,10 +346,12 @@ $(function () {
     $('#form').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
+         parametros.append('action', action);
+        parametros.append('id', pk);
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
-                '/cliente/crearcli', 'Esta seguro que desea guardar este cliente?', parametros,
+                '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
@@ -376,10 +380,11 @@ $(function () {
         ajax: {
             delay: 250,
             type: 'POST',
-            url: '/cliente/data',
+            url: '/cliente/lista',
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
+                    'action': 'search'
                 };
                 return queryParameters;
             },
@@ -436,71 +441,4 @@ $(function () {
         minimumInputLength: 1,
     });
 });
-
-
-function aggservicio(id, idp) {
-    var crudserv = $('input[name="crudserv"]').val();
-    $.ajax({
-        type: "POST",
-        url: crudserv,
-        data: {
-            "id": id,
-        },
-        dataType: 'json',
-        success: function (data) {
-            data[0]['idp'] = idp;
-            ventas.addserv(data[0]);
-            $('#id_servicio').val(null).trigger('change');
-        },
-        error: function (xhr, status, data) {
-            alert(data['0']);
-        },
-
-    })
-}
-
-function checkserv(ser, p) {
-    if (ser.length !== 0) {
-        for (var srv in ser) {
-            ser.forEach(function (car, index, object) {
-                if (car.idp === p.id) {
-                    object.splice(index, 1);
-                }
-            });
-        }
-    }
-    if (p.length > 0) {
-        for (var pr in p) {
-            ser.forEach(function (car, index, object) {
-                if (car.idp === p[pr].id) {
-                    object.splice(index, 1);
-                }
-            });
-        }
-    }
-}
-
-function cancel() {
-    var productos = {'productos': JSON.stringify(ventas.items.productos)};
-    productos['id'] = 0;
-    productos['key'] = 1;
-    $.ajax({
-        url: '/inventario/remove_select',
-        type: 'POST',
-        data: productos,
-        success: function () {
-            checkserv(ventas.items.servicios, ventas.items.productos);
-            window.history.back();
-        }
-    });
-
-}
-
-//
-//const fruits = ["apple", "banana", "cantaloupe", "blueberries", "grapefruit"];
-//
-// const index = fruits.findIndex(fruit => fruit === "blueberries");
-//
-// console.log(index); // 3
-// console.log(fruits[index]); // blueberries
 

@@ -28,7 +28,7 @@
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <label for="id_fecha_venta">{{ form.fecha_trans.label_tag }}</label>
-                                     <div class="input-group">
+                                    <div class="input-group">
                                         {{ form.fecha_trans }}
                                         <div class="input-group-append">
                                             <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
@@ -40,11 +40,10 @@
                                     <div class="input-group form-group-lg">
                                         {{ form.cliente }}
                                         <div class="input-group-append">
-                                            <button class="btn btn-primary btn-sm" id="id_new_client" type="button"><i
-                                                    class="fas fa-user-plus"></i></button>
+                                            <button class="btn btn-warning btn-xs" id="id_new_client" type="button"><i
+                                                    class="fas fa-user-plus" style="color: white"></i></button>
                                         </div>
                                     </div>
-
                                 </div>
                                 <div class="form-group">
                                     <label for="id_subtotal">{{ form.subtotal.label_tag }}</label>
@@ -59,7 +58,7 @@
                                 <div class="form-group">
                                     <label for="id_iva">{{ form.iva.label_tag }}</label>
                                     <div class="input-group">
-                                       {{ form.iva }}
+                                        {{ form.iva }}
                                         <div class="input-group-append">
                                             <span class="input-group-text">$</span>
                                         </div>
@@ -67,8 +66,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="id_total">{{ form.total.label_tag }}</label>
-                                   <div class="input-group">
-                                       {{ form.total }}
+                                    <div class="input-group">
+                                        {{ form.total }}
                                         <div class="input-group-append">
                                             <span class="input-group-text">$</span>
                                         </div>
@@ -81,26 +80,12 @@
                     <div class="col-lg-9 col-md-12">
                         <div class="card card-success">
                             <div class="card-header">
-                                <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" id="prod-tab" data-toggle="tab" href="#prod"
-                                           style="color: black">
-                                            <i class="fab fa-amazon"></i>
-                                            &nbsp;<strong>Productos</strong></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="serivces-tab" data-toggle="tab" href="#services"
-                                           role="tab" aria-controls="services" aria-selected="false"
-                                           style="color: black"> <i
-                                                class="fas fa-concierge-bell"></i>&nbsp;Servicios</a>
-                                    </li>
-                                </ul>
+                                <a style="color: white">
+                                    <i class="fab fa-amazon"></i>
+                                    &nbsp;<strong>Productos</strong></a>
                             </div>
                             <div class="card-body">
-                                <div class="tab-content" id="myTabContent" role="tablist">
-                                    <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="prod-tab"
-                                         id="prod">
-                                        <div class="card">
+                                 <div class="card">
                                             <div class="card-header">
                                                 <h5><i class="fab fa-amazon"></i> Detalle de Productos</h5>
                                             </div>
@@ -137,45 +122,6 @@
 
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="tab-pane fade" role="tabpanel" aria-labelledby="services-tab"
-                                         id="services">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5><i class="fas fa-concierge-bell"></i> Detalle de Servicios</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label> Buscar Servicios:</label>
-                                                    <br>
-                                                    {{ form2.servicio }}
-                                                </div>
-                                                <br>
-                                                <button type="button"
-                                                        class="btn btn-danger btn-sm btn-flat btnRemoveallserv">
-                                                    <i class="far fa-trash-alt"></i> Eliminar todos los Servicios
-                                                </button>
-                                                <br><br>
-                                                <div class="table-responsive">
-                                                    <table class="table" id="tblservicios">
-                                                        <thead>
-                                                        <tr>
-                                                            <th><em class="fas fa-trash-alt"></em></th>
-                                                            <th>Servicio</th>
-                                                            <th>Cant</th>
-                                                            <th>Pvp</th>
-                                                            <th>Subtotal</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,7 +156,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body" met>
+                    <div class="modal-body">
                         <div class="container-fluid">
                             <div class="form-group">
                                 {{ formc.as_p }}
@@ -246,6 +192,5 @@
     <script src="{% static 'apps/cliente/cliente.js' %}"></script>
     <script>
         ventas.list();
-        ventas.listserv();
     </script>
 {% endblock %}

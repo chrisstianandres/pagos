@@ -40,7 +40,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for c in Cliente.objects.all():
                     data.append(c.toJSON())
-            elif action == data:
+            elif action == 'search':
                 data = []
                 term = request.POST['term']
                 query = Cliente.objects.filter(
@@ -109,8 +109,9 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 f.add_error("cedula", "Numero de Cedula ya exitente en los Clientes")
                 data['error'] = f.errors
             elif verificar(f.data['cedula']):
-                f.save()
+                cli = f.save()
                 data['resp'] = True
+                data['cliente'] = cli.toJSON()
             else:
                 f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
                 data['error'] = f.errors

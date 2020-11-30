@@ -153,7 +153,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['form'] = TransaccionForm()
         data['form2'] = Detalle_VentaForm()
         data['detalle'] = []
-        data['formp'] = ProveedorForm()
+        data['formc'] = ClienteForm()
         return data
 
 # @csrf_exempt

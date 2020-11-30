@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'apps.confeccion',
     'apps.alquiler',
     'apps.material',
+    'apps.asignar_recursos',
 ]
 
 MIDDLEWARE = [
