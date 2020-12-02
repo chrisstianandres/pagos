@@ -42,10 +42,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'search':
                 data = []
                 term = request.POST['term']
-                if request.POST['key'] == 'material':
-                    query = Producto.objects.filter(Q(nombre__icontains=term), tipo=0)[0:10]
-                else:
-                    query = Producto.objects.filter(Q(nombre__icontains=term), tipo=1)[0:10]
+                query = Producto.objects.filter(Q(nombre__icontains=term, producto_base__stock__gte=1), tipo=1)[0:10]
                 for a in query:
                     result = {'id': int(a.id), 'text': str(a.nombre)}
                     data.append(result)

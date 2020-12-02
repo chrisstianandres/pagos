@@ -49,8 +49,9 @@ var ventas = {
             columns: [
                 {data: 'id'},
                 {data: "producto_base.nombre"},
-                {data: "producto_base..categoria.nombre"},
-                {data: "producto_base..presentacion.nombre"},
+                {data: "producto_base.categoria.nombre"},
+                {data: "producto_base.presentacion.nombre"},
+                {data: "producto_base.stock"},
                 {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
@@ -59,9 +60,10 @@ var ventas = {
                 {
                     targets: [0],
                     class: 'text-center',
+                    width: '5%',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Producto"><i class="fa fa-trash-alt"></i></a>';
+                        return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat rounded-pill" style="color: white" data-toggle="tooltip" title="Quitar Producto"><i class="fa fa-times"></i></a>';
                         //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
 
                     }
@@ -86,7 +88,7 @@ var ventas = {
             ],  rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: 100000000,
+                    max: data.producto_base.stock,
                     step: 1
                 });
             }
@@ -170,14 +172,14 @@ $(function () {
             return false
         }
         var parametros;
-        ventas.items.fecha_venta = $('input[name="fecha_venta"]').val();
+        ventas.items.fecha_venta = $('input[name="fecha_trans"]').val();
         ventas.items.cliente = $('#id_cliente option:selected').val();
 
         parametros = {'ventas': JSON.stringify(ventas.items)};
         parametros['action']='add';
         parametros['id']='';
         save_with_ajax('Alerta',
-            '/venta/crear', 'Esta seguro que desea guardar esta venta?', parametros, function (response) {
+            '/venta/nuevo', 'Esta seguro que desea guardar esta venta?', parametros, function (response) {
                 printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
                     window.open('/venta/printpdf/' + response['id'], '_blank');
                     // location.href = '/venta/printpdf/' + response['id'];
