@@ -9,6 +9,7 @@ from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
+from apps.empresa.models import Empresa
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.presentacion.forms import PresentacionForm
 from apps.producto.forms import ProductoForm, Producto_baseForm
@@ -49,23 +50,15 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     result = {'id': int(a.id), 'text': str(a.nombre)}
                     data.append(result)
             elif action == 'get':
-                id = request.POST['id']
-                if request.POST['key'] == 'material':
-                    producto = ''
-                    if id:
-                        producto = Producto.objects.filter(pk=id, tipo=0)
-                    else:
-                        data['error'] = 'No ha selecionado ningun Material'
-                else:
-                    producto = Producto.objects.filter(pk=id, tipo=1)
                 data = []
+                id = request.POST['id']
+                producto = Producto.objects.filter(pk=id)
+                empresa = Empresa.objects.first()
                 for i in producto:
                     item = i.toJSON()
                     item['cantidad'] = 1
                     item['subtotal'] = 0.00
-                    item['iva_emp'] = 12
-                    cal = float((i.pcp*100)/112)
-                    item['p_compra'] = cal
+                    item['iva_emp'] = empresa.iva
                     data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'

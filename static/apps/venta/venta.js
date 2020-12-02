@@ -31,7 +31,8 @@ var ventas = {
         $('input[name="total"]').val(this.items.total.toFixed(2));
     },
     add: function (data) {
-        this.items.productos.push(data);
+        this.items.productos.push(data[0]);
+        this.items.productos = this.exclude_duplicados(this.items.productos);
         this.list();
     },
     list: function () {
@@ -47,10 +48,10 @@ var ventas = {
             data: this.items.productos,
             columns: [
                 {data: 'id'},
-                {data: "producto.nombre"},
-                {data: "producto.categoria.nombre"},
-                {data: "producto.presentacion.nombre"},
-                {data: "serie"},
+                {data: "producto_base.nombre"},
+                {data: "producto_base..categoria.nombre"},
+                {data: "producto_base..presentacion.nombre"},
+                {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
             ],
@@ -73,68 +74,6 @@ var ventas = {
                         return '$' + parseFloat(data).toFixed(2);
                     }
                 },
-                // {
-                //     targets: [-3],
-                //     class: 'text-center',
-                //     orderable: false,
-                //     render: function (data, type, row) {
-                //         return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
-                //
-                //     }
-                // }
-            ]
-        });
-    },
-    addserv: function (data) {
-        this.items.servicios.push(data);
-        this.listserv();
-    },
-    listserv: function () {
-        this.calculate();
-        tblservicios = $("#tblservicios").DataTable({
-            destroy: true,
-            autoWidth: false,
-            dataSrc: "",
-            responsive: true,
-            language: {
-                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
-            },
-            data: this.items.servicios,
-            columns: [
-                {data: 'id'},
-                {data: "nombre"},
-                {data: "cantidad"},
-                {data: "pvp"},
-                {data: "subtotal"}
-            ],
-            columnDefs: [
-                {
-                    targets: [0],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Servicio"><i class="fa fa-trash-alt"></i></a>';
-                        //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
-
-                    }
-                },
-                {
-                    targets: [-1],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    targets: [-2],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<input type="text" name="pvp" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
-
-                    }
-                },
                 {
                     targets: [-3],
                     class: 'text-center',
@@ -143,34 +82,23 @@ var ventas = {
                         return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
 
                     }
-                }],
-            rowCallback: function (row, data,) {
-                if (data.idp > 0) {
-                    $(row).find('input[name="cantidad"]').TouchSpin({
-                        min: 1,
-                        max: 100000,
-                        step: 1
-                    }).attr('disabled', 'disabled');
                 }
+            ],  rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: 100000,
+                    max: 100000000,
                     step: 1
-                });
-                $(row).find('input[name="pvp"]').TouchSpin({
-                    min: 1.00,
-                    max: 1000000,
-                    step: 0.01,
-                    decimals: 2,
-                    forcestepdivisibility: 'none',
-                    boostat: 5,
-                    maxboostedstep: 10,
-                    prefix: '$'
                 });
             }
         });
     },
+     exclude_duplicados: function (array) {
+        this.items.productos = [];
+        let hash = {};
+        result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
+        return result;
 
+    }
 };
 $(function () {
     var action = '';
@@ -185,28 +113,28 @@ $(function () {
         allowClear: true
     });
     //seleccionar producto del select producto
-    $('#id_producto').on('select2:select', function (e) {
-        var crud = $('input[name="crud"]').val();
+    $('#id_inventario').on('select2:select', function (e) {
         $.ajax({
             type: "POST",
-            url: 'inventario_producto/lista',
+            url: '/producto/lista',
             data: {
-                "id": $('#id_producto option:selected').val(),
+                "id": $('#id_inventario option:selected').val(),
                 'action': 'get'
             },
             dataType: 'json',
             success: function (data) {
-                ventas.add(data['0']);
+                ventas.add(data);
                 $('#id_inventario').val(null).trigger('change');
             },
             error: function (xhr, status, data) {
-                alert(data['0']);
+                alert(data);
             },
 
         })
     });
     //remover producto del detalle
-    $('#tblproductos tbody').on('click', 'a[rel="remove"]', function () {
+    $('#tblproductos tbody')
+        .on('click', 'a[rel="remove"]', function () {
         var tr = tblventa.cell($(this).closest('td, li')).index();
         borrar_todo_alert('Alerta de Eliminación',
             'Esta seguro que desea eliminar este producto de tu detalle <br> ' +
@@ -214,7 +142,14 @@ $(function () {
                 ventas.items.productos.splice(tr.row, 1);
                 ventas.list();
             })
-    });
+    })
+        .on('change keyup', 'input[name="cantidad"]', function () {
+            var cantidad = parseInt($(this).val());
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            ventas.items.productos[tr.row].cantidad = cantidad;
+            ventas.calculate();
+            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+        });
     //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {
         if (ventas.items.productos.length === 0) return false;
@@ -234,13 +169,13 @@ $(function () {
             menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
             return false
         }
-        var action = $('input[name="action"]').val();
-        var key = $('input[name="key"]').val();
         var parametros;
         ventas.items.fecha_venta = $('input[name="fecha_venta"]').val();
         ventas.items.cliente = $('#id_cliente option:selected').val();
 
         parametros = {'ventas': JSON.stringify(ventas.items)};
+        parametros['action']='add';
+        parametros['id']='';
         save_with_ajax('Alerta',
             '/venta/crear', 'Esta seguro que desea guardar esta venta?', parametros, function (response) {
                 printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
@@ -349,7 +284,6 @@ $(function () {
                 return queryParameters;
             },
             processResults: function (data) {
-                console.log(data);
                 return {
                     results: data
                 };

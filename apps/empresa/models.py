@@ -15,8 +15,13 @@ class Empresa(models.Model):
     def __str__(self):
         return '%s %s' % (self.nombre, self.ruc)
 
+    def iva_def(self):
+        if self.id is None:
+            return 12
+
     def toJSON(self):
         item = model_to_dict(self)
+        item['iva'] = self.iva_def
         return item
 
     class Meta:

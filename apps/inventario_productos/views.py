@@ -64,7 +64,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         'text': str(p['producto__producto_base__nombre'])
                     }
                     data.append(result)
-                    print(data)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
