@@ -8,8 +8,7 @@ var ventas = {
         iva: 0.00,
         iva_emp: 0.00,
         total: 0.00,
-        productos: [],
-        servicios: [],
+        productos: []
     },
     calculate: function () {
         var subtotal = 0.00;
@@ -174,7 +173,7 @@ var ventas = {
 
 };
 $(function () {
-     var action = '';
+    var action = '';
     var pk = '';
     //texto de los selects
     $('.select2').select2({
@@ -190,9 +189,10 @@ $(function () {
         var crud = $('input[name="crud"]').val();
         $.ajax({
             type: "POST",
-            url: crud,
+            url: 'inventario_producto/lista',
             data: {
                 "id": $('#id_producto option:selected').val(),
+                'action': 'get'
             },
             dataType: 'json',
             success: function (data) {
@@ -205,34 +205,14 @@ $(function () {
 
         })
     });
-    //seleccionar servicio del select servicio
-    $('#id_servicio').on('select2:select', function (e) {
-        aggservicio($('#id_servicio option:selected').val(), 0);
-    });
     //remover producto del detalle
     $('#tblproductos tbody').on('click', 'a[rel="remove"]', function () {
         var tr = tblventa.cell($(this).closest('td, li')).index();
         borrar_todo_alert('Alerta de Eliminación',
             'Esta seguro que desea eliminar este producto de tu detalle <br> ' +
-            'Recuerda que si seleccionaste la instalacion de este producto tambien se eliminará <br>' +
             '<strong>CONTINUAR?</strong>', function () {
-                var p = ventas.items.productos[tr.row];
-                checkserv(ventas.items.servicios, p);
                 ventas.items.productos.splice(tr.row, 1);
-                var productos = {'productos': JSON.stringify(ventas.items.productos)};
-                productos['id'] = p.id;
-                productos['key'] = 0;
-                $.ajax({
-                    url: '/inventario/remove_select',
-                    type: 'POST',
-                    data: productos,
-                    success: function () {
-                        menssaje_ok('Confirmacion!', 'Producto eliminado y servicio', 'far fa-smile-wink', function () {
-                            ventas.list();
-                            ventas.listserv();
-                        });
-                    }
-                });
+                ventas.list();
             })
     });
     //remover todos los productos del detalle
@@ -240,24 +220,9 @@ $(function () {
         if (ventas.items.productos.length === 0) return false;
         borrar_todo_alert('Alerta de Eliminación',
             'Esta seguro que desea eliminar todos los productos seleccionados? <br>' +
-            'Recuerda que si seleccionaste las instalaciones de estos productos tambien se eliminarán <br>' +
             '<strong>CONTINUAR?</strong>', function () {
-                var productos = {'productos': JSON.stringify(ventas.items.productos)};
-                productos['id'] = 0;
-                productos['key'] = 1;
-                $.ajax({
-                    url: '/inventario/remove_select',
-                    type: 'POST',
-                    data: productos,
-                    success: function () {
-                        menssaje_ok('Confirmacion!', 'Productos y servicios eliminados', 'far fa-smile-wink', function () {
-                            checkserv(ventas.items.servicios, ventas.items.productos);
-                            ventas.items.productos = [];
-                            ventas.listserv();
-                            ventas.list();
-                        });
-                    }
-                });
+                ventas.items.productos = [];
+                ventas.list();
             });
     });
     //boton guardar
@@ -265,8 +230,8 @@ $(function () {
         if ($('select[name="cliente"]').val() === "") {
             menssaje_error('Error!', "Debe seleccionar un cliente", 'far fa-times-circle');
             return false
-        } else if (ventas.items.productos.length === 0 && ventas.items.servicios.length === 0) {
-            menssaje_error('Error!', "Debe seleccionar al menos un producto o servicio", 'far fa-times-circle');
+        } else if (ventas.items.productos.length === 0) {
+            menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
             return false
         }
         var action = $('input[name="action"]').val();
@@ -296,9 +261,9 @@ $(function () {
     //enviar formulario de nuevo cliente
     $('#form').on('submit', function (e) {
         e.preventDefault();
-        action='add';
+        action = 'add';
         var parametros = new FormData(this);
-         parametros.append('action', action);
+        parametros.append('action', action);
         parametros.append('id', pk);
         var isvalid = $(this).valid();
         if (isvalid) {
@@ -374,7 +339,7 @@ $(function () {
         ajax: {
             delay: 250,
             type: 'POST',
-            url: '/inventario/lista',
+            url: '/inventario_producto/lista',
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
@@ -384,6 +349,7 @@ $(function () {
                 return queryParameters;
             },
             processResults: function (data) {
+                console.log(data);
                 return {
                     results: data
                 };

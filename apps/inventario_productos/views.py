@@ -56,16 +56,15 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     ])
             elif action == 'search':
                 data = []
-                query = Inventario_producto.objects.values('producto_id', 'producto__nombre').filter(estado=1
-                                                                                                     ).order_by(). \
-                    annotate(Max('producto__id'))
-                print(query)
+                query = Inventario_producto.objects.values('producto_id', 'producto__producto_base__nombre').\
+                    filter(estado=1).order_by().annotate(Max('producto__id'))
                 for p in query:
                     result = {
-                        'id': int(p['id']),
-                        'text': str(p['producto__nombre'])
+                        'id': int(p['producto_id']),
+                        'text': str(p['producto__producto_base__nombre'])
                     }
                     data.append(result)
+                    print(data)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:

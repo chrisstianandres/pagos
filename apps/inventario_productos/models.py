@@ -17,7 +17,7 @@ class Inventario_producto(models.Model):
     estado = models.IntegerField(choices=ESTADO, default=1)
 
     def __str__(self):
-        return '%s' % self.producto.nombre
+        return '%s' % self.producto.producto_base.nombre
 
     def toJSON(self):
         item = model_to_dict(self)

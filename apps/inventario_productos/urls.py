@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 app_name = 'Inventario'
 
 urlpatterns = [
-    # path('lista', login_required(lista.as_view()), name='lista'),
+    path('lista', login_required(lista.as_view()), name='lista'),
     # path('data', login_required(views.data), name='data'),
     # path('nuevo', login_required(views.nuevo), name='nuevo'),
     # path('crear', login_required(views.crear), name='crear'),
