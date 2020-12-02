@@ -22,7 +22,7 @@ class Venta(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
-        item['trasnsaccion'] = self.transaccion.toJSON()
+        item['transaccion'] = self.transaccion.toJSON()
         return item
 
     class Meta:

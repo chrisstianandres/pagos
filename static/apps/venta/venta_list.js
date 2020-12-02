@@ -45,7 +45,7 @@ $(function () {
         scrollX: true,
         autoWidth: false,
         ajax: {
-            url: '/transaccion/lista',
+            url: '/venta/lista',
             type: 'POST',
             data: datos.fechas,
             dataSrc: ""
@@ -144,6 +144,15 @@ $(function () {
                 extend: 'excel'
             }
         ],
+        columns: [
+            {data: 'id'},
+            {data: "transaccion.cliente.full_name_list"},
+            {data: "transaccion.user.full_name"},
+            {data: "transaccion.subtotal"},
+            {data: "transaccion.iva"},
+            {data: "transaccion.total"},
+            {data: "id"},
+        ],
         columnDefs: [
             {
                 targets: '_all',
@@ -185,6 +194,7 @@ $(function () {
             }
         ],
         createdRow: function (row, data, dataIndex) {
+            console.log(data);
             if (data[5] === 'FINALIZADA') {
                 $('td', row).eq(5).find('span').addClass('badge bg-success').attr("style", "color: white");
             } else if (data[5] === 'DEVUELTA') {
@@ -221,112 +231,74 @@ $(function () {
             });
     })
         .on('click', 'a[rel="detalle"]', function () {
-        $('.tooltip').remove();
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var resp = {};
-        $('#Modal').modal('show');
-        $("#tbldetalle_productos").DataTable({
-            responsive: true,
-            autoWidth: false,
-            language: {
-                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
-            },
-            destroy: true,
-            ajax: {
-                url: '/venta/get_detalle',
-                type: 'Post',
-                data: {
-                    'id': data['4']
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var resp = {};
+            $('#Modal').modal('show');
+            $("#tbldetalle_productos").DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
                 },
-                dataSrc: ""
-            },
-            columns: [
-                {data: 'producto'},
-                {data: 'categoria'},
-                {data: 'presentacion'},
-                {data: 'cantidad'},
-                {data: 'pvp'},
-                {data: 'subtotal'}
-            ],
-            columnDefs: [
-                {
-                    targets: '_all',
-                    class: 'text-center'
+                destroy: true,
+                ajax: {
+                    url: '/venta/lista',
+                    type: 'Post',
+                    data: {
+                        'id': data['4']
+                    },
+                    dataSrc: ""
                 },
-                {
-                    targets: [-1, -2],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
-                    }
-                },
-            ],
-            footerCallback: function (row, data, start, end, display) {
-                var api = this.api(), data;
+                columns: [
+                    {data: 'producto'},
+                    {data: 'categoria'},
+                    {data: 'presentacion'},
+                    {data: 'cantidad'},
+                    {data: 'pvp'},
+                    {data: 'subtotal'}
+                ],
+                columnDefs: [
+                    {
+                        targets: '_all',
+                        class: 'text-center'
+                    },
+                    {
+                        targets: [-1, -2],
+                        class: 'text-center',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '$' + parseFloat(data).toFixed(2);
+                        }
+                    },
+                ],
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api(), data;
 
-                // Remove the formatting to get integer data for summation
-                var intVal = function (i) {
-                    return typeof i === 'string' ?
-                        i.replace(/[\$,]/g, '') * 1 :
-                        typeof i === 'number' ?
-                            i : 0;
-                };
-                // Total over this page
-                pageTotal = api
-                    .column(3, {page: 'current'})
-                    .data()
-                    .reduce(function (a, b) {
-                        return intVal(a) + intVal(b);
-                    }, 0);
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+                    // Total over this page
+                    pageTotal = api
+                        .column(3, {page: 'current'})
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
 
-                // Update footer
-                $(api.column(3).footer()).html(
-                    '$' + parseFloat(pageTotal).toFixed(2)
-                    // parseFloat(data).toFixed(2)
-                );
-            },
+                    // Update footer
+                    $(api.column(3).footer()).html(
+                        '$' + parseFloat(pageTotal).toFixed(2)
+                        // parseFloat(data).toFixed(2)
+                    );
+                },
+            });
         });
-        $("#tbldetalle_servicios").DataTable({
-            responsive: true,
-            autoWidth: false,
-            language: {
-                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
-            },
-            destroy: true,
-            ajax: {
-                url: '/venta/get_detalle_serv',
-                type: 'POST',
-                data: {
-                    'id': data['4']
-                },
-                dataSrc: ""
-            },
-            columns: [
-                {data: 'servicio'},
-                {data: 'cantidad'},
-                {data: 'pvp'},
-                {data: 'subtotal'}
-            ],
-            columnDefs: [
-                {
-                    targets: '_all',
-                    class: 'text-center'
-                },
-                {
-                    targets: [-1, -2],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
-                    }
-                },
-            ],
-        });
-
-    });
-
 });
 
 function daterange() {
@@ -351,6 +323,6 @@ function daterange() {
 }
 
 function pad(str, max) {
-    str = str.toString();
+    str = 14;
     return str.length < max ? pad("0" + str, max) : str;
 }

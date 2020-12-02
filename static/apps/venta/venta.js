@@ -16,12 +16,7 @@ var ventas = {
         $.each(this.items.productos, function (pos, dict) {
             dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
-            iva_emp = dict.iva_emp;
-        });
-        $.each(this.items.servicios, function (pos, dict) {
-            dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
-            subtotal += dict.subtotal;
-            iva_emp = dict.iva_emp;
+            iva_emp = (dict.iva_emp/100);
         });
         this.items.subtotal = subtotal;
         this.items.iva = this.items.subtotal * iva_emp;
@@ -34,6 +29,7 @@ var ventas = {
         this.items.productos.push(data[0]);
         this.items.productos = this.exclude_duplicados(this.items.productos);
         this.list();
+        console.log(this.items)
     },
     list: function () {
         this.calculate();
@@ -276,7 +272,7 @@ $(function () {
         ajax: {
             delay: 250,
             type: 'POST',
-            url: '/inventario_producto/lista',
+            url: '/producto/lista',
             data: function (params) {
                 var queryParameters = {
                     term: params.term,

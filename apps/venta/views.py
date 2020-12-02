@@ -21,6 +21,7 @@ from apps.cliente.forms import ClienteForm
 # from apps.inventario.models import Inventario
 # from apps.servicio.models import Servicio
 # from apps.venta.forms import VentaForm, Detalle_VentaForm
+from apps.producto_base.models import Producto_base
 from apps.proveedor.forms import ProveedorForm
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
@@ -57,7 +58,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             start = request.POST['start_date']
             end = request.POST['end_date']
             if action == 'venta':
-                query = ''
                 data = []
                 if start == '' and end == '':
                     query = Venta.objects.filter(transaccion__tipo=0)
@@ -65,6 +65,22 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     query = Venta.objects.filter(transaccion__tipo=0, fecha_trans__range=[start, end])
                 for c in query:
                     data.append(c.toJSON())
+            elif action == 'detalle':
+                id = request.POST['id']
+                if id:
+                    result = Detalle_venta.objects.filter(venta_id=id)
+                    for p in result:
+                        if p.producto != None:
+                            data = []
+                            data.append({
+                                'producto': p.inventario.producto.producto_base.nombre,
+                                'categoria': p.inventario.producto.producto_base.categoria.nombre,
+                                'presentacion': p.inventario.producto.producto_base.presentacion.nombre,
+                                'cantidad': p.cantidad,
+                                'pvp': p.pvp_actual,
+                                'subtotal': p.subtotal})
+                        else:
+                            data['error'] = 'Ha ocurrido un error'
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -106,6 +122,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
+                        c.tipo = 0
                         c.save()
                         v = Venta()
                         v.transaccion_id = c.id
@@ -118,12 +135,13 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                     dv.inventario_id = in_pr.id
                                     dv.cantidad = int(i['cantidad'])
                                     dv.pvp_actual = float(in_pr.producto.pvp)
+                                    dv.subtotal = float(i['subtotal'])
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
-                            stock = Producto.objects.get(producto_base_id=i['producto_base']['id'])
-                            stock.producto_base.stock = Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count()
-                            stock.save()
+                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock.stock = int(Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock.save()
                         data['id'] = v.id
                         data['resp'] = True
                 else:

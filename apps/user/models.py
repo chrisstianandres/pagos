@@ -37,6 +37,7 @@ class User(AbstractUser):
         item['last_login'] = self.last_login.strftime('%d-%m-%Y')
         item['date_joined'] = self.date_joined.strftime('%d-%m-%Y')
         item['avatar'] = self.get_image()
+        item['full_name'] = self.get_full_name()
         return item
 
     class Meta:
