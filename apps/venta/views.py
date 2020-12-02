@@ -106,34 +106,26 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
-                        # c.save()
+                        c.save()
                         v = Venta()
-                        v.transaccion = c.id
-                        # v.save()
+                        v.transaccion_id = c.id
+                        v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'])[:5]:
+                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[:i['cantidad']]:
                                     dv = Detalle_venta()
                                     dv.venta_id = v.id
                                     dv.inventario_id = in_pr.id
                                     dv.cantidad = int(i['cantidad'])
                                     dv.pvp_actual = float(in_pr.producto.pvp)
                                     in_pr.estado = 0
+                                    in_pr.save()
                                     dv.save()
                             stock = Producto.objects.get(producto_base_id=i['producto_base']['id'])
                             stock.producto_base.stock = Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count()
                             stock.save()
-                    #     #         x.save()
-                    #     #         inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[
-                    #     #               :i['cantidad']]
-                    #     #         for itr in inv:
-                    #     #             x = Inventario.objects.get(pk=itr.id)
-                    #     #             x.estado = 0
-                    #     #             x.venta_id = c.id
-                    #     #             x.save()
-                    #     #         dv.save()
-                    #     #     data['id'] = c.id
-                    #     #     data['resp'] = True
+                        data['id'] = v.id
+                        data['resp'] = True
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"

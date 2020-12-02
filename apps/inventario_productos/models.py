@@ -28,4 +28,4 @@ class Inventario_producto(models.Model):
         db_table = 'inventario_producto'
         verbose_name = 'inventario_producto'
         verbose_name_plural = 'inventario_productos'
-        ordering = ['-id']
+        ordering = ['id']
