@@ -7,6 +7,7 @@ from apps.producto_base.models import Producto_base
 class Producto(models.Model):
     producto_base = models.ForeignKey(Producto_base, on_delete=models.PROTECT)
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
+    pvp_alq = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return '%s' % self.producto_base.nombre

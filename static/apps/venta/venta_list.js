@@ -8,7 +8,7 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.readAsDataURL(blob)
     }));
 
-toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
+toDataURL('/media/imagen.PNG').then(dataUrl => {
     logotipo = dataUrl;
 });
 var datos = {
@@ -54,103 +54,120 @@ $(function () {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
         },
         order: [[0, "desc"]],
-        dom: 'l<"toolbar">' + "<br>" + 'Bfrtip ',
-        buttons: [
-            {
-                text: '<i class="fa fa-file-pdf"> </i> Reporte PDF',
-                className: 'btn btn-danger my_class',
-                extend: 'pdfHtml5',
-                //filename: 'dt_custom_pdf',
-                orientation: 'landscape', //portrait
-                pageSize: 'A4', //A3 , A5 , A6 , legal , letter
-                download: 'open',
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5],
-                    search: 'applied',
-                    order: 'applied'
+        dom: "<'row'<'col-sm-12 col-md-12'B>>" +
+            "<'row'<'col-sm-12 col-md-3'l>>" +
+            "<'row'<'col-sm-12 col-md-12'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        buttons: {
+            dom: {
+                button: {
+                    className: '',
+
                 },
-                customize: function (doc) {
-                    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
-                        "Noviembre", "Diciembre"
-                    ];
-                    var date = new Date();
-
-                    function formatDateToString(date) {
-                        // 01, 02, 03, ... 29, 30, 31
-                        var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
-                        // 01, 02, 03, ... 10, 11, 12
-                        // month < 10 ? '0' + month : '' + month; // ('' + month) for string result
-                        var MM = monthNames[date.getMonth() + 1]; //monthNames[d.getMonth()])
-                        // 1970, 1971, ... 2015, 2016, ...
-                        var yyyy = date.getFullYear();
-                        // create the format you want
-                        return (dd + " de " + MM + " de " + yyyy);
-                    }
-
-                    var jsDate = formatDateToString(date);
-
-                    //[izquierda, arriba, derecha, abajo]
-                    doc.pageMargins = [25, 120, 25, 50];
-                    doc.defaultStyle.fontSize = 12;
-                    doc.styles.tableHeader.fontSize = 14;
-                    doc['header'] = (function () {
-                        return {
-                            columns: [{alignment: 'center', image: logotipo, width: 300}],
-                            margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
-                        }
-                    });
-                    doc['footer'] = (function (page, pages) {
-                        return {
-                            columns: [
-                                {
-                                    alignment: 'left',
-                                    text: ['Reporte creado el: ', {text: jsDate.toString()}]
-                                },
-                                {
-                                    alignment: 'right',
-                                    text: ['Pagina ', {text: page.toString()}, ' de ', {text: pages.toString()}]
-                                }
-                            ],
-                            margin: 20
-                        }
-                    });
-                    var objLayout = {};
-                    objLayout['hLineWidth'] = function (i) {
-                        return .5;
-                    };
-                    objLayout['vLineWidth'] = function (i) {
-                        return .5;
-                    };
-                    objLayout['hLineColor'] = function (i) {
-                        return '#000000';
-                    };
-                    objLayout['vLineColor'] = function (i) {
-                        return '#000000';
-                    };
-                    objLayout['paddingLeft'] = function (i) {
-                        return 4;
-                    };
-                    objLayout['paddingRight'] = function (i) {
-                        return 4;
-                    };
-                    doc.content[0].layout = objLayout;
-                    doc.content[1].table.widths = [65, '*', "*", 85, 75, 85];
-                    doc.styles.tableBodyEven.alignment = 'center';
-                    doc.styles.tableBodyOdd.alignment = 'center';
+                container: {
+                    className: 'buttons-container float-md-right'
                 }
             },
-            {
-                text: '<i class="fa fa-file-excel"> </i> Reporte Excel', className: "btn btn-success my_class",
-                extend: 'excel'
-            }
-        ],
+            buttons: [
+                {
+                    text: '<i class="fa fa-file-excel"> </i>Excel', className: "btn btn-success my_class",
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fa fa-file-pdf"> </i>PDF',
+                    className: 'btn btn-danger my_class',
+                    extend: 'pdfHtml5',
+                    //filename: 'dt_custom_pdf',
+                    orientation: 'landscape', //portrait
+                    pageSize: 'A4', //A3 , A5 , A6 , legal , letter
+                    download: 'open',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7],
+                        search: 'applied',
+                        order: 'applied'
+                    },
+                    customize: function (doc) {
+                        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
+                            "Noviembre", "Diciembre"
+                        ];
+                        var date = new Date();
+
+                        function formatDateToString(date) {
+                            // 01, 02, 03, ... 29, 30, 31
+                            var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
+                            // 01, 02, 03, ... 10, 11, 12
+                            // month < 10 ? '0' + month : '' + month; // ('' + month) for string result
+                            var MM = monthNames[date.getMonth() + 1]; //monthNames[d.getMonth()])
+                            // 1970, 1971, ... 2015, 2016, ...
+                            var yyyy = date.getFullYear();
+                            // create the format you want
+                            return (dd + " de " + MM + " de " + yyyy);
+                        }
+
+                        var jsDate = formatDateToString(date);
+
+                        //[izquierda, arriba, derecha, abajo]
+                        doc.pageMargins = [25, 180, 25, 50];
+                        doc.defaultStyle.fontSize = 12;
+                        doc.styles.tableHeader.fontSize = 14;
+                        doc['header'] = (function () {
+                            return {
+                                columns: [{alignment: 'center', image: logotipo, width: 300}],
+                                margin: [280, 10, 0, 50] //[izquierda, arriba, derecha, abajo]
+                            }
+                        });
+                        doc['footer'] = (function (page, pages) {
+                            return {
+                                columns: [
+                                    {
+                                        alignment: 'left',
+                                        text: ['Reporte creado el: ', {text: jsDate.toString()}]
+                                    },
+                                    {
+                                        alignment: 'right',
+                                        text: ['Pagina ', {text: page.toString()}, ' de ', {text: pages.toString()}]
+                                    }
+                                ],
+                                margin: 20
+                            }
+                        });
+                        var objLayout = {};
+                        objLayout['hLineWidth'] = function (i) {
+                            return .5;
+                        };
+                        objLayout['vLineWidth'] = function (i) {
+                            return .5;
+                        };
+                        objLayout['hLineColor'] = function (i) {
+                            return '#000000';
+                        };
+                        objLayout['vLineColor'] = function (i) {
+                            return '#000000';
+                        };
+                        objLayout['paddingLeft'] = function (i) {
+                            return 4;
+                        };
+                        objLayout['paddingRight'] = function (i) {
+                            return 4;
+                        };
+                        doc.content[0].layout = objLayout;
+                        doc.content[1].table.widths = [65, '*', "*", 85, 75, 85, '*', '*'];
+                        doc.styles.tableBodyEven.alignment = 'center';
+                        doc.styles.tableBodyOdd.alignment = 'center';
+                    }
+                },
+            ],
+        },
         columns: [
-            {data: 'id'},
+            {data: 'transaccion.fecha_trans'},
             {data: "transaccion.cliente.full_name_list"},
             {data: "transaccion.user.full_name"},
             {data: "transaccion.subtotal"},
             {data: "transaccion.iva"},
             {data: "transaccion.total"},
+            {data: "id"},
+            {data: "estado"},
             {data: "id"},
         ],
         columnDefs: [
@@ -189,18 +206,17 @@ $(function () {
             {
                 targets: [-3],
                 render: function (data, type, row) {
-                    return pad(data, 10);
+                   return pad(data, 10);
                 }
             }
         ],
         createdRow: function (row, data, dataIndex) {
-            console.log(data);
-            if (data[5] === 'FINALIZADA') {
-                $('td', row).eq(5).find('span').addClass('badge bg-success').attr("style", "color: white");
-            } else if (data[5] === 'DEVUELTA') {
-                $('td', row).eq(5).find('span').addClass('badge bg-danger').attr("style", "color: white");
-                $('td', row).eq(6).find('a[rel="devolver"]').hide();
-                $('td', row).eq(6).find('a[rel="pdf"]').hide();
+            if (data.estado === 'FINALIZADA') {
+                $('td', row).eq(7).find('span').addClass('badge bg-success').attr("style", "color: white");
+            } else if (data.estado === 'DEVUELTA') {
+                $('td', row).eq(7).find('span').addClass('badge bg-danger').attr("style", "color: white");
+                $('td', row).eq(8).find('a[rel="devolver"]').hide();
+                $('td', row).eq(8).find('a[rel="pdf"]').hide();
             }
 
         }
@@ -244,10 +260,11 @@ $(function () {
                 },
                 destroy: true,
                 ajax: {
-                    url: '/venta/lista',
+                    url: window.location.pathname,
                     type: 'Post',
                     data: {
-                        'id': data['4']
+                        'id': data.id,
+                        'action': 'detalle'
                     },
                     dataSrc: ""
                 },
@@ -264,6 +281,7 @@ $(function () {
                         targets: '_all',
                         class: 'text-center'
                     },
+
                     {
                         targets: [-1, -2],
                         class: 'text-center',
@@ -299,6 +317,10 @@ $(function () {
                 },
             });
         });
+    $('#nuevo').on('click', function () {
+        window.location.replace('/venta/nuevo')
+
+    })
 });
 
 function daterange() {
@@ -323,6 +345,6 @@ function daterange() {
 }
 
 function pad(str, max) {
-    str = 14;
+    str = str.toString();
     return str.length < max ? pad("0" + str, max) : str;
 }

@@ -8,7 +8,7 @@ app_name = 'Venta'
 
 urlpatterns = [
     path('lista', login_required(lista.as_view()), name='lista'),
-    # path('nuevo', login_required(views.nuevo), name='nuevo'),
+    path('nuevo', login_required(CrudView.as_view()), name='nuevo'),
     # path('get_producto', login_required(views.get_producto), name='get_producto'),
     # path('get_servicio', login_required(views.get_servicio), name='get_servicio'),
     # path('crear', login_required(views.crear), name='crear'),

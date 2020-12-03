@@ -55,9 +55,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = {}
         try:
             action = request.POST['action']
-            start = request.POST['start_date']
-            end = request.POST['end_date']
             if action == 'venta':
+                start = request.POST['start_date']
+                end = request.POST['end_date']
                 data = []
                 if start == '' and end == '':
                     query = Venta.objects.filter(transaccion__tipo=0)
@@ -68,19 +68,17 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'detalle':
                 id = request.POST['id']
                 if id:
+                    data = []
                     result = Detalle_venta.objects.filter(venta_id=id)
                     for p in result:
-                        if p.producto != None:
-                            data = []
-                            data.append({
-                                'producto': p.inventario.producto.producto_base.nombre,
-                                'categoria': p.inventario.producto.producto_base.categoria.nombre,
-                                'presentacion': p.inventario.producto.producto_base.presentacion.nombre,
-                                'cantidad': p.cantidad,
-                                'pvp': p.pvp_actual,
-                                'subtotal': p.subtotal})
-                        else:
-                            data['error'] = 'Ha ocurrido un error'
+                        data.append({
+                            'producto': p.inventario.producto.producto_base.nombre,
+                            'categoria': p.inventario.producto.producto_base.categoria.nombre,
+                            'presentacion': p.inventario.producto.producto_base.presentacion.nombre,
+                            'cantidad': p.cantidad,
+                            'pvp': p.pvp_actual,
+                            'subtotal': p.subtotal
+                        })
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:

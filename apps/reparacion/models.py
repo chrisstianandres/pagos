@@ -15,9 +15,9 @@ estado = (
 
 class Reparacion(models.Model):
     transaccion = models.ForeignKey(Transaccion, on_delete=models.PROTECT)
-    fecha_ingreso = models.DateField(default=datetime.now)
-    fecha_entrega = models.DateField(default=datetime.now)
-    estado = models.IntegerField(choices=estado, default=1)
+    fecha_ingreso = models.DateField(default=None, null=True, blank=True)
+    fecha_entrega = models.DateField(default=None, null=True, blank=True)
+    estado = models.IntegerField(choices=estado, default=0)
 
     def __str__(self):
         return '%s %s' % (self.transaccion.cliente, self.fecha_ingreso)

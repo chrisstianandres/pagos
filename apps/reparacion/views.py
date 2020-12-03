@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
 from datetime import datetime
@@ -28,6 +30,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
 
+from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
 
 opc_icono = 'fas fa-tools'
@@ -35,9 +38,49 @@ opc_entidad = 'Reparaciones'
 crud = '/reparacion/crear'
 empresa = nombre_empresa()
 
+#
+# class lista(ValidatePermissionRequiredMixin, ListView):
+#     model = Producto
+#     template_name = 'front-end/reparacion/reparacion_list.html'
+#     permission_required = 'reparacion.view_reparacion'
+#
+#     @csrf_exempt
+#     def dispatch(self, request, *args, **kwargs):
+#         return super().dispatch(request, *args, **kwargs)
+#
+#     def post(self, request, *args, **kwargs):
+#         data = {}
+#         try:
+#             action = request.POST['action']
+#             start = request.POST['start_date']
+#             end = request.POST['end_date']
+#             if action == 'reparacion':
+#                 data = []
+#                 if start == '' and end == '':
+#                     query = Transaccion.objects.filter(tipo=1)
+#                 else:
+#                     query = Transaccion.objects.filter(tipo=1, fecha_trans__range=[start, end])
+#                 for c in query:
+#                     data.append(c.toJSON())
+#             else:
+#                 data['error'] = 'No ha seleccionado una opcion'
+#         except Exception as e:
+#             data['error'] = 'No ha seleccionado una opcion'
+#         return JsonResponse(data, safe=False)
+#
+#     def get_context_data(self, **kwargs):
+#         data = super().get_context_data(**kwargs)
+#         data['icono'] = opc_icono
+#         data['entidad'] = opc_entidad
+#         data['boton'] = 'Nueva Reparacion'
+#         data['titulo'] = 'Listado de Reparaciones'
+#         data['nuevo'] = '/Reparacion/nuevo'
+#         data['empresa'] = empresa
+#         return data
+
 
 class lista(ValidatePermissionRequiredMixin, ListView):
-    model = Producto
+    model = Reparacion
     template_name = 'front-end/reparacion/reparacion_list.html'
     permission_required = 'reparacion.view_reparacion'
 
@@ -49,16 +92,30 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = {}
         try:
             action = request.POST['action']
-            start = request.POST['start_date']
-            end = request.POST['end_date']
             if action == 'reparacion':
+                start = request.POST['start_date']
+                end = request.POST['end_date']
                 data = []
                 if start == '' and end == '':
-                    query = Transaccion.objects.filter(tipo=1)
+                    query = Reparacion.objects.filter(transaccion__tipo=1)
                 else:
-                    query = Transaccion.objects.filter(tipo=1, fecha_trans__range=[start, end])
+                    query = Reparacion.objects.filter(transaccion__tipo=1, fecha_trans__range=[start, end])
                 for c in query:
                     data.append(c.toJSON())
+            elif action == 'detalle':
+                id = request.POST['id']
+                if id:
+                    data = []
+                    result = Detalle_reparacion.objects.filter(reparacion_id=id)
+                    for p in result:
+                        data.append({
+                            'producto': p.producto.producto_base.nombre,
+                            'categoria': p.producto.producto_base.categoria.nombre,
+                            'presentacion': p.producto.producto_base.presentacion.nombre,
+                            'cantidad': p.cantidad,
+                            'pvp': p.pvp_rep_by_prod,
+                            'subtotal': p.subtotal
+                        })
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -71,8 +128,76 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Nueva Reparacion'
         data['titulo'] = 'Listado de Reparaciones'
-        data['nuevo'] = '/Reparacion/nuevo'
+        data['nuevo'] = '/reparacion/nuevo'
         data['empresa'] = empresa
+        return data
+
+
+class CrudView(ValidatePermissionRequiredMixin, TemplateView):
+    form_class = Reparacion
+    template_name = 'front-end/reparacion/reparacion_form.html'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        pk = request.POST['id']
+        try:
+            if action == 'add':
+                datos = json.loads(request.POST['reparacion'])
+                if datos:
+                    with transaction.atomic():
+                        c = Transaccion()
+                        c.fecha_trans = datos['fecha_trans']
+                        c.cliente_id = datos['cliente']
+                        c.user_id = request.user.id
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.tipo = 1
+                        c.save()
+                        v = Reparacion()
+                        v.transaccion_id = c.id
+                        v.fecha_ingreso = datos['fecha_ingreso']
+                        v.fecha_entrega = datos['fecha_entrega']
+                        v.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                dv = Detalle_reparacion()
+                                dv.reparacion_id = v.id
+                                dv.producto_id= int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_rep_by_prod = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                        data['id'] = v.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Guardar Repararcion'
+        data['titulo'] = 'Nueva Repararcion'
+        data['nuevo'] = '/reparacion/nuevo'
+        data['empresa'] = empresa
+        data['form'] = TransaccionForm()
+        data['formr'] = ReparacionForm()
+        data['form2'] = Detalle_reparacionform()
+        data['detalle'] = []
+        data['formc'] = ClienteForm()
         return data
 
 

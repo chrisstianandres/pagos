@@ -50,9 +50,15 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = {}
         try:
             action = request.POST['action']
+            start = request.POST['start_date']
+            end = request.POST['end_date']
             if action == 'list':
                 data = []
-                for c in Compra.objects.all():
+                if start and end:
+                    compra = Compra.objects.filter(fecha_compra__range=[start, end])
+                else:
+                    compra = Compra.objects.all()
+                for c in compra:
                     data.append(c.toJSON())
             elif action == 'detalle':
                 id = request.POST['id']

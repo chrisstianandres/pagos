@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'apps.material',
     'apps.asignar_recursos',
     'apps.producto_base',
+    'apps.sitioweb',
 ]
 
 MIDDLEWARE = [
