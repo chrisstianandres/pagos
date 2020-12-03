@@ -1,0 +1,19 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block table %}
+    <thead>
+    <tr>
+        <th style="width: 5%">Id</th>
+        <th style="width: 5%">Nombre</th>
+        <th style="width: 80%">Permisos</th>
+        <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+{% endblock %}
+{% block extra %}
+    <script src="{% static 'apps/group/group_list.js' %}"></script>
+{#    <script src="{% static 'apps/maquina/maquina.js' %}"></script>#}
+{% endblock %}

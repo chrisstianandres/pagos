@@ -91,7 +91,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                cli = Cliente.objects.get(pk=pk)
                cli.delete()
                data['resp'] = True
-
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:

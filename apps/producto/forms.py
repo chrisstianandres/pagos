@@ -1,5 +1,7 @@
 from django import forms
 from datetime import *
+
+from django.contrib.auth.models import Group
 from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput
 
 from apps.producto.models import Producto
@@ -59,3 +61,26 @@ class ProductoForm(forms.ModelForm):
         fields = ['pvp']
         labels = {'pvp': 'P.V.P.'}
         widgets = {'pvp': forms.TextInput()}
+
+
+class GroupForm(forms.ModelForm):
+    # constructor
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+            self.fields['name'].widget.attrs = {
+                'class': 'form-control form-control-sm input-sm'}
+
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions']
+        labels = {'name': 'Nombre', 'permissions': 'Permisos'}
+        widgets = {'name': forms.TextInput(),
+                   'permissions': forms.SelectMultiple(attrs={
+                       'class': 'form-control c',
+                       'style': 'width: 100%',
+                       'multiple': 'multiple'
+                   })}

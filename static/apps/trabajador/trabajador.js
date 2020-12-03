@@ -26,6 +26,11 @@ $(document).ready(function () {
     });
     $("#form").validate({
         rules: {
+            username: {
+                required: true,
+                minlength: 3,
+                maxlength: 50
+            },
             first_name: {
                 required: true,
                 minlength: 3,
@@ -56,6 +61,11 @@ $(document).ready(function () {
                 minlength: 9,
                 digits: true
             },
+            celular: {
+                required: true,
+                minlength: 10,
+                digits: true
+            },
             direccion: {
                 required: true,
                 minlength: 5,
@@ -69,6 +79,10 @@ $(document).ready(function () {
 
         },
         messages: {
+            username: {
+                required: "Por favor ingresa un nombre de usuario",
+                minlength: "Debe ingresar al menos tres letras"
+            },
             first_name: {
                 required: "Por favor ingresa tus nombres",
                 minlength: "Debe ingresar al menos tres letras",
@@ -92,6 +106,12 @@ $(document).ready(function () {
                 minlength: "Tu contraseña debe tener al menos 5 digitos"
             },
             telefono: {
+                required: "Por favor ingresa tu numero convencional",
+                minlength: "Tu numero de documento debe tener al menos 9 digitos",
+                digits: "Debe ingresar unicamente numeros",
+                maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+            },
+            celular: {
                 required: "Por favor ingresa tu numero celular",
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
@@ -116,6 +136,11 @@ $(document).ready(function () {
             return l.toUpperCase()
         });
         $(this).val(changue);
+    });
+     $('#id_groups').select2({
+        theme: 'classic',
+        languaje: 'es',
+        placeholder: 'Buscar...',
     });
 
 });

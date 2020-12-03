@@ -54,7 +54,7 @@ $(function () {
             },
             buttons: [
                 {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel', className: "btn btn-success my_class",
+                    text: '<i class="fa fa-file-excel"></i> Excel', className: "btn btn-success my_class",
                     extend: 'excel'
                 },
                 {
@@ -176,7 +176,7 @@ $(function () {
                 class: 'text-center',
                 width: '10%',
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" href="/user/editar/'+data+'" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
+                    var edit = '<a style="color: white" href="/user/editar/' + data + '" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
                         'data-toggle="tooltip" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
                     var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
                         'data-toggle="tooltip" title="Eliminar"><i class="fa fa-user-times"></i></a>' + ' ';
@@ -200,14 +200,28 @@ $(function () {
         .on('click', 'a[rel="estado"]', function () {
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var parametros = {'id': data['0']};
+            var parametros = {'id': data.id, 'action': 'estado'};
             save_estado('Alerta',
-                '/empleado/estado', 'Esta seguro que desea cambiar el estado de este trabajador?', parametros,
+                window.location.pathname, 'Esta seguro que desea cambiar el estado de este trabajador?', parametros,
                 function () {
                     menssaje_ok('Exito!', 'Exito en la actualizacion', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false);
                     })
                 });
+        })
+        .on('click', 'a[rel="del"]', function () {
+            action = 'delete';
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'delete'};
+            parametros['action'] = action;
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea eliminar este usuario?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al eliminar este usuario!', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false)
+                    })
+                })
         });
 });
 
