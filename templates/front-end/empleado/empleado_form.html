@@ -20,7 +20,6 @@
                     <form class="cmxform form-horizontal style-form" id="form" method="POST" action="{{ crud }}" enctype="multipart/form-data">
                         <input type="hidden" id="action" name="action" value="{{ action }}">
                         <input type="hidden" name="option" value="{{ option }}">
-                        <label class="badge bg-important">{{ error }}</label>
                         {% for hidden in form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
@@ -29,7 +28,7 @@
                             <div class="form-group col-lg-12">
                                 <label style="font-size: 13px;"
                                        class="col-lg-3 control-label"><strong>{{ field.label }}:</strong></label>
-                                 <label class="badge bg-important">{{ field.errors }}</label>
+                                 <label class="badge badge-danger">{{ field.errors }}</label>
                                 <div class="col-lg-10">
                                     {% csrf_token %}
                                     {{ form.media }}

@@ -52,7 +52,12 @@ $(function () {
             },
             buttons: [
                 {
-                    text: '<i class="fa fa-file-pdf"></i> Reporte PDF',
+                    text: '<i class="fa fa-file-excel"></i> Reporte Excel',
+                    className: "btn btn-success btn-space float-right",
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fa fa-file-pdf"></i>PDF',
                     className: 'btn btn-danger btn-space float-right',
                     extend: 'pdfHtml5',
                     //filename: 'dt_custom_pdf',
@@ -137,11 +142,7 @@ $(function () {
                         doc.styles.tableBodyOdd.alignment = 'center';
                     }
                 },
-                {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel',
-                    className: "btn btn-success btn-space float-right",
-                    extend: 'excel'
-                }
+
             ]
         },
         columnDefs: [

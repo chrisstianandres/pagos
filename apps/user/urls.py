@@ -10,7 +10,7 @@ urlpatterns = [
     path('nuevo', views.nuevo, name='nuevo'),
     path('crear', views.crear, name='crear'),
     path('estado', login_required(views.estado), name='estado'),
-    path('editar/<int:id>', views.editar, name='editar'),
+    path('editar/<int:pk>', login_required(Updateview.as_view()), name='editar'),
     path('data', login_required(views.data), name='data'),
     path('profile', login_required(views.profile), name='profile'),
 

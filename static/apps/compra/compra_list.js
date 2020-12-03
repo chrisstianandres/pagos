@@ -26,7 +26,7 @@ var datos = {
             this.fechas['end_date'] = '';
         }
         $.ajax({
-            url: '/compra/list',
+            url: '/compra/lista',
             type: 'POST',
             data: this.fechas,
             success: function (data) {

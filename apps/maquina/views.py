@@ -12,7 +12,7 @@ from apps.mixins import ValidatePermissionRequiredMixin
 from apps.maquina.forms import MaquinaForm
 from apps.maquina.models import Maquina
 
-opc_icono = 'fas fa-mitten'
+opc_icono = 'fas fa-subway'
 opc_entidad = 'Maquinas'
 crud = '/maquina/crear'
 empresa = nombre_empresa()

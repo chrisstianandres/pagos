@@ -53,7 +53,7 @@ $(document).ready(function () {
             },
             telefono: {
                 required: true,
-                minlength: 10,
+                minlength: 9,
                 digits: true
             },
             direccion: {

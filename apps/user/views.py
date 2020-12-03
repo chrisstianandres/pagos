@@ -1,42 +1,62 @@
 import json
 
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, request
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView
+from django.views.generic import ListView, UpdateView
 
 from apps.backEnd import nombre_empresa
 from apps.cliente.models import Cliente
+from apps.mixins import ValidatePermissionRequiredMixin
 from apps.user.forms import UserForm
 from apps.user.models import User
 from apps.proveedor.models import Proveedor
 
-opc_icono = 'fas fa-people-carry'
+opc_icono = 'fas fa-user-shield'
 opc_entidad = 'Usuarios'
-crud = '/user/crear'
 empresa = nombre_empresa()
 
 
-class lista(ListView):
+class lista(ValidatePermissionRequiredMixin, ListView):
     model = User
     template_name = 'front-end/empleado/empleado_list.html'
+    permission_required = 'user.view_user'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'list':
+                data = []
+                user = User.objects.all()
+                for c in user:
+                    data.append(c.toJSON())
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nuevo Empleado'
-        data['titulo'] = 'Listado de Empleados'
-        data['nuevo'] = '/empleado/nuevo'
-        data['empresa'] = nombre_empresa()
+        data['boton'] = 'Nuevo Usuario'
+        data['titulo'] = 'Listado de Usuarios'
+        data['nuevo'] = '/usuario/nuevo'
+        data['form'] = UserForm
+        data['empresa'] = empresa
         return data
-
-
 @csrf_exempt
 def data(request):
     data = []
     try:
-        empleado = Empleado.objects.all()
+        empleado = User.objects.all()
         for c in empleado:
             data.append([
                 c.id,
@@ -104,7 +124,6 @@ def crear(request):
                     data['error'] = 'Numero de Cedula no valido para Ecuador'
                     data['form'] = f
             else:
-
                 data['form'] = f
             return render(request, 'front-end/empleado/empleado_form.html', data)
 
@@ -127,9 +146,78 @@ def editar(request, id):
             form.save()
         else:
             data['form'] = form
+
         return HttpResponseRedirect('/empleado/lista')
     return render(request, 'front-end/empleado/empleado_form.html', data)
 
+
+class Updateview(ValidatePermissionRequiredMixin, UpdateView):
+    model = User
+    form_class = UserForm
+    success_url = 'user:lista'
+    template_name = 'front-end/empleado/empleado_form.html'
+    permission_required = 'user.change_user'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        try:
+            pk = self.kwargs.get('pk', 0)
+            user = self.model.objects.get(id=pk)
+            data = {
+                'icono': opc_icono, 'crud': '/user/editar/' + str(self.kwargs['pk']), 'entidad': opc_entidad, 'empresa': empresa,
+                'boton': 'Guardar Edicion', 'titulo': 'Edicion del Registro de un Usuario',
+                'action': 'edit'
+            }
+            if action == 'edit':
+                f = self.form_class(request.POST, request.FILES, instance=user)
+                if f.is_valid():
+                    f.save(commit=False)
+                    if Proveedor.objects.filter(tipo=0, num_doc=f.data['cedula']):
+                        f.add_error("cedula", "Numero de Cedula ya exitente en los Proveedores")
+                        data['form'] = f
+                        return render(request, 'front-end/empleado/empleado_form.html', data)
+                    elif Cliente.objects.filter(cedula=f.data['cedula']):
+                        f.add_error("cedula", "Numero de Cedula ya exitente en los Clientes")
+                        data['form'] = f
+                        return render(request, 'front-end/empleado/empleado_form.html', data)
+                    elif verificar(f.data['cedula']):
+                        f.save()
+                        data['resp'] = True
+                    else:
+                        f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
+                        data['error'] = f.errors
+                        data['form'] = f
+                        return render(request, 'front-end/empleado/empleado_form.html', data)
+                else:
+                    data['form'] = f
+                    data['error'] = f.errors
+                    return render(request, 'front-end/empleado/empleado_form.html', data)
+                return HttpResponseRedirect('/user/lista')
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        pk = self.kwargs.get('pk', 0)
+        user = self.model.objects.get(id=pk)
+        data['form'] = self.form_class(instance=user)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Guardar Edicion'
+        data['titulo'] = 'Edicion del Registro de un Usuario'
+        data['action'] = 'edit'
+        data['crud'] = '/user/editar/' + str(self.kwargs['pk'])
+        data['empresa'] = empresa
+        return data
 
 @csrf_exempt
 def eliminar(request):
