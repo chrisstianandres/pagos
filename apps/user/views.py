@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, reques
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView, UpdateView, TemplateView
 
 from apps.backEnd import nombre_empresa
 from apps.cliente.models import Cliente
@@ -128,6 +128,60 @@ def crear(request):
             return render(request, 'front-end/empleado/empleado_form.html', data)
 
 
+class CrudView(ValidatePermissionRequiredMixin, TemplateView):
+    form_class = UserForm
+    template_name = 'front-end/empleado/empleado_form.html'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        pk = request.POST['id']
+        try:
+            if action == 'add':
+                f = UserForm(request.POST, request.FILES)
+                if f.is_valid():
+                    f.save(commit=False)
+                    if Proveedor.objects.filter(tipo=0, num_doc=f.data['cedula']):
+                        f.add_error("cedula", "Numero de Cedula ya exitente en los Proveedores")
+                        data['form'] = f
+                    elif Cliente.objects.filter(cedula=f.data['cedula']):
+                        f.add_error("cedula", "Numero de Cedula ya exitente en los Clientes")
+                        data['form'] = f
+                    elif verificar(f.data['cedula']):
+                        f.save()
+                        return HttpResponseRedirect('/empleado/lista')
+                    else:
+                        f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
+                        data['form'] = f
+                else:
+                    data['form'] = f
+                return render(request, 'front-end/empleado/empleado_form.html', data)
+            elif action == 'delete':
+               cli = User.objects.get(pk=pk)
+               cli.delete()
+               data['resp'] = True
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Nuevo Usuario'
+        data['titulo'] = 'Listado de Usuarios'
+        data['nuevo'] = '/usuario/nuevo'
+        data['form'] = UserForm
+        data['empresa'] = empresa
+        return data
+
+
 def editar(request, id):
     empleado = User.objects.get(id=id)
     crud = '/user/editar/' + str(id)
@@ -203,7 +257,6 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
-
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)

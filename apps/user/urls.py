@@ -7,7 +7,7 @@ app_name = 'Usuarios'
 
 urlpatterns = [
     path('lista', lista.as_view(), name='lista'),
-    path('nuevo', views.nuevo, name='nuevo'),
+    path('nuevo', login_required(CrudView.as_view()), name='nuevo'),
     path('crear', views.crear, name='crear'),
     path('estado', login_required(views.estado), name='estado'),
     path('editar/<int:pk>', login_required(Updateview.as_view()), name='editar'),
