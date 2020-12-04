@@ -40,6 +40,7 @@ class Transaccion(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
+        item['fecha_trans'] = self.fecha_trans.strftime('%d-%m-%Y')
         item['cliente'] = self.cliente.toJSON()
         item['user'] = self.user.toJSON()
         item['subtotal'] = format(self.subtotal, '.2f')

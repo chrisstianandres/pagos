@@ -11,16 +11,6 @@ $(document).ready(function () {
         maxboostedstep: 10,
         prefix: '$'
     });
-    $('input[name="pcp"]').TouchSpin({
-        min: 0.05,
-        max: 1000000,
-        step: 0.01,
-        decimals: 2,
-        forcestepdivisibility: 'none',
-        boostat: 5,
-        maxboostedstep: 10,
-        prefix: '$'
-    }).attr('disabled', true);
     $('.select2').select2({
         language: {
             "noResults": function () {
@@ -139,17 +129,6 @@ $(document).ready(function () {
                         $('#id_presentacion').append(newOption).trigger('change');
                     });
                 });
-        }
-    });
-
-    $('select[name="tipo"]').on('change', function (e) {
-        if ($(this).val()==='0'){
-            $('input[name="pcp"]').attr('disabled', false).val(parseFloat('0.05').toFixed(2));
-            $('input[name="pvp"]').attr('disabled', true).val(parseFloat('0.00').toFixed(2));
-        }
-        else {
-            $('input[name="pcp"]').attr('disabled', true).val(parseFloat('0.00').toFixed(2));
-            $('input[name="pvp"]').attr('disabled', false).val(parseFloat('0.05').toFixed(2));
         }
     });
 

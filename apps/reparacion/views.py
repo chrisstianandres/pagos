@@ -99,7 +99,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 if start == '' and end == '':
                     query = Reparacion.objects.filter(transaccion__tipo=1)
                 else:
-                    query = Reparacion.objects.filter(transaccion__tipo=1, fecha_trans__range=[start, end])
+                    query = Reparacion.objects.filter(transaccion__tipo=1, transaccion__fecha_trans__range=[start, end])
                 for c in query:
                     data.append(c.toJSON())
             elif action == 'detalle':
@@ -151,7 +151,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 if datos:
                     with transaction.atomic():
                         c = Transaccion()
-                        c.fecha_trans = datos['fecha_trans']
+                        c.fecha_trans = datos['fecha_venta']
                         c.cliente_id = datos['cliente']
                         c.user_id = request.user.id
                         c.subtotal = float(datos['subtotal'])
@@ -162,13 +162,12 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v = Reparacion()
                         v.transaccion_id = c.id
                         v.fecha_ingreso = datos['fecha_ingreso']
-                        v.fecha_entrega = datos['fecha_entrega']
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
                                 dv = Detalle_reparacion()
                                 dv.reparacion_id = v.id
-                                dv.producto_id= int(i['id'])
+                                dv.producto_id = int(i['id'])
                                 dv.cantidad = int(i['cantidad'])
                                 dv.pvp_rep_by_prod = float(i['pvp'])
                                 dv.subtotal = float(i['subtotal'])
@@ -178,7 +177,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
-
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:

@@ -46,6 +46,13 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 for a in query:
                     result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
                     data.append(result)
+            elif action == 'search_rep':
+                data = []
+                term = request.POST['term']
+                query = Producto.objects.filter(producto_base__nombre__icontains=term)[0:10]
+                for a in query:
+                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
+                    data.append(result)
             elif action == 'get':
                 data = []
                 id = request.POST['id']
@@ -54,6 +61,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 for i in producto:
                     item = i.toJSON()
                     item['cantidad'] = 1
+                    item['subtotal'] = 0.00
+                    item['iva_emp'] = empresa.iva
+                    data.append(item)
+            elif action == 'get_rep':
+                data = []
+                id = request.POST['id']
+                producto = Producto.objects.filter(pk=id)
+                empresa = Empresa.objects.first()
+                for i in producto:
+                    item = i.toJSON()
+                    item['cantidad'] = 1
+                    item['pvp'] = 1.00
                     item['subtotal'] = 0.00
                     item['iva_emp'] = empresa.iva
                     data.append(item)
