@@ -48,6 +48,7 @@ urlpatterns = [
     path('transaccion/', include('apps.transaccion.urls', namespace='transaccion')),
     path('reparacion/', include('apps.reparacion.urls', namespace='reparacion')),
     path('alquiler/', include('apps.alquiler.urls', namespace='alquiler')),
+    path('confeccion/', include('apps.confeccion.urls', namespace='confeccion')),
     path('sitio/', include('apps.sitioweb.urls', namespace='sitio')),
     # path('devolucion/', include('apps.delvoluciones_venta.urls', namespace='devolucion')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\

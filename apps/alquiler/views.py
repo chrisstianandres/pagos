@@ -37,49 +37,9 @@ from django.contrib.staticfiles import finders
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
 
-opc_icono = 'fas fa-tools'
+opc_icono = 'fas fa-donate'
 opc_entidad = 'Alquileres'
 empresa = nombre_empresa()
-
-#
-# class lista(ValidatePermissionRequiredMixin, ListView):
-#     model = Producto
-#     template_name = 'front-end/reparacion/reparacion_list.html'
-#     permission_required = 'reparacion.view_reparacion'
-#
-#     @csrf_exempt
-#     def dispatch(self, request, *args, **kwargs):
-#         return super().dispatch(request, *args, **kwargs)
-#
-#     def post(self, request, *args, **kwargs):
-#         data = {}
-#         try:
-#             action = request.POST['action']
-#             start = request.POST['start_date']
-#             end = request.POST['end_date']
-#             if action == 'reparacion':
-#                 data = []
-#                 if start == '' and end == '':
-#                     query = Transaccion.objects.filter(tipo=1)
-#                 else:
-#                     query = Transaccion.objects.filter(tipo=1, fecha_trans__range=[start, end])
-#                 for c in query:
-#                     data.append(c.toJSON())
-#             else:
-#                 data['error'] = 'No ha seleccionado una opcion'
-#         except Exception as e:
-#             data['error'] = 'No ha seleccionado una opcion'
-#         return JsonResponse(data, safe=False)
-#
-#     def get_context_data(self, **kwargs):
-#         data = super().get_context_data(**kwargs)
-#         data['icono'] = opc_icono
-#         data['entidad'] = opc_entidad
-#         data['boton'] = 'Nueva Reparacion'
-#         data['titulo'] = 'Listado de Reparaciones'
-#         data['nuevo'] = '/Reparacion/nuevo'
-#         data['empresa'] = empresa
-#         return data
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):

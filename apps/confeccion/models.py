@@ -7,7 +7,8 @@ from apps.producto.models import Producto
 
 estado = (
     (0, 'PENDIENTE'),
-    (1, 'ENTREGADA')
+    (1, 'ENTREGADA'),
+    (2, 'ANULADA'),
 )
 
 
@@ -21,8 +22,11 @@ class Confeccion(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
-        item['trasnsaccion'] = self.transaccion.toJSON()
-        item['fecha_entrega'] = self.fecha_entrega.strftime('%d-%mm-%YYYY')
+        item['transaccion'] = self.transaccion.toJSON()
+        if self.fecha_entrega is None:
+            item['fecha_entrega'] = self.fecha_entrega
+        else:
+            item['fecha_entrega'] = self.fecha_entrega.strftime('%d-%m-%Y')
         return item
 
     class Meta:

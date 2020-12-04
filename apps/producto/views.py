@@ -76,6 +76,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     item['subtotal'] = 0.00
                     item['iva_emp'] = empresa.iva
                     data.append(item)
+            elif action == 'get_confec':
+                data = []
+                id = request.POST['id']
+                producto = Producto.objects.filter(pk=id)
+                empresa = Empresa.objects.first()
+                for i in producto:
+                    item = i.toJSON()
+                    item['cantidad'] = 1
+                    item['pvp'] = format(i.pvp_confec, '.2f')
+                    item['subtotal'] = 0.00
+                    item['iva_emp'] = empresa.iva
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:

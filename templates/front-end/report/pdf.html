@@ -59,10 +59,7 @@
     <b>{{ empresa.direccion|upper }} / ECUADOR</b>
 </p>
 <h1 class="head">
-    {% if sale.transaccion.tipo == 0 %}COMPROBANDTE DE VENTA {% endif %}
-    {% if sale.transaccion.tipo == 1 %}COMPROBANDTE DE REPARACION{% endif %}
-    {% if sale.transaccion.tipo == 2 %}COMPROBANDTE DE ALQUILER{% endif %}
-    {% if sale.transaccion.tipo == 3 %}COMPROBANDTE DE CONFECCION{% endif %}</h1>
+    {{ title|upper }}</h1>
 <p class="fact">
     <b>FACTURA N°:</b><br>
     <b class="n">{{ sale.transaccion.id|stringformat:"010d" }}</b>
@@ -127,7 +124,7 @@
 <table style="margin-top: 250px;">
     <thead>
     <tr>
-        <th><br>****GRACIAS POR SU COMPRA****</th>
+        <th><br>****GRACIAS POR PREFERIRNOS****</th>
     </tr>
     <tr>
         <th><br>NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES</th>
