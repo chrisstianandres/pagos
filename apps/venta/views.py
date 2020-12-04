@@ -1,5 +1,6 @@
 from django.utils.decorators import method_decorator
 
+from apps.delvoluciones_venta.models import Devolucion
 from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
@@ -62,7 +63,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 if start == '' and end == '':
                     query = Venta.objects.filter(transaccion__tipo=0)
                 else:
-                    query = Venta.objects.filter(transaccion__tipo=0, fecha_trans__range=[start, end])
+                    query = Venta.objects.filter(transaccion__tipo=0, transaccion__fecha_trans__range=[start, end])
                 for c in query:
                     data.append(c.toJSON())
             elif action == 'detalle':
@@ -79,6 +80,23 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                             'pvp': p.pvp_actual,
                             'subtotal': p.subtotal
                         })
+            elif action == 'estado':
+                id = request.POST['id']
+                if id:
+                    with transaction.atomic():
+                        es = Venta.objects.get(id=id)
+                        es.estado = 0
+                        dev = Devolucion()
+                        dev.venta_id = id
+                        dev.fecha = datetime.now()
+                        dev.save()
+                        for i in Detalle_venta.objects.filter(venta_id=id):
+                            for a in Inventario_producto.objects.filter(id=i.inventario.id):
+                                a.estado = 1
+                                a.save()
+                        es.save()
+                else:
+                    data['error'] = 'Ha ocurrido un error'
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -571,76 +589,72 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 #     return data
 #
 #
-# class printpdf(View):
-#
-#     def link_callback(self, uri, rel):
-#         """
-#         Convert HTML URIs to absolute system paths so xhtml2pdf can access those
-#         resources
-#         """
-#         result = finders.find(uri)
-#         if result:
-#             if not isinstance(result, (list, tuple)):
-#                 result = [result]
-#             result = list(os.path.realpath(path) for path in result)
-#             path = result[0]
-#         else:
-#             sUrl = settings.STATIC_URL  # Typically /static/
-#             sRoot = settings.STATIC_ROOT  # Typically /home/userX/project_static/
-#             mUrl = settings.MEDIA_URL  # Typically /media/
-#             mRoot = settings.MEDIA_ROOT  # Typically /home/userX/project_static/media/
-#
-#             if uri.startswith(mUrl):
-#                 path = os.path.join(mRoot, uri.replace(mUrl, ""))
-#             elif uri.startswith(sUrl):
-#                 path = os.path.join(sRoot, uri.replace(sUrl, ""))
-#             else:
-#                 return uri
-#
-#         # make sure that file exists
-#         if not os.path.isfile(path):
-#             raise Exception(
-#                 'media URI must start with %s or %s' % (sUrl, mUrl)
-#             )
-#         return path
-#
-#     def pvp_cal(self, *args, **kwargs):
-#         data = []
-#         try:
-#             iva_emp = Empresa.objects.get(pk=1)
-#             for i in Detalle_venta.objects.filter(venta_id=self.kwargs['pk']):
-#                 item = i.venta.toJSON()
-#                 item['producto'] = i.producto.toJSON()
-#                 item['servicio'] = i.servicio.toJSON()
-#                 item['pvp'] = format(((i.pvp_actual * 100) / (iva_emp.iva + 100)), '.2f')
-#                 item['pvp_s'] = format(((i.pvp_actual_s * 100) / (iva_emp.iva + 100)), '.2f')
-#                 item['cantidadp'] = i.cantidadp
-#                 item['subtotalp'] = i.subtotalp
-#                 item['cantidads'] = i.cantidads
-#                 item['subtotals'] = i.subtotals
-#                 data.append(item)
-#         except:
-#             pass
-#         return data
-#
-#     def get(self, request, *args, **kwargs):
-#         try:
-#             template = get_template('front-end/report/pdf.html')
-#             context = {'title': 'Comprobante de Venta',
-#                        'sale': Venta.objects.get(pk=self.kwargs['pk']),
-#                        'det_sale': self.pvp_cal(),
-#                        'empresa': Empresa.objects.get(id=1),
-#                        'icon': 'media/logo_don_chuta.png',
-#                        'inventario': Inventario.objects.filter(venta_id=self.kwargs['pk'])
-#                        }
-#             html = template.render(context)
-#             response = HttpResponse(content_type='application/pdf')
-#             response['Content-Disposition'] = 'attachment; filename="report.pdf"'
-#             pisa_status = pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
-#             return response
-#         except:
-#             pass
-#         return HttpResponseRedirect(reverse_lazy('venta:lista'))
+
+
+class printpdf(View):
+
+    def link_callback(self, uri, rel):
+        """
+        Convert HTML URIs to absolute system paths so xhtml2pdf can access those
+        resources
+        """
+        result = finders.find(uri)
+        if result:
+            if not isinstance(result, (list, tuple)):
+                result = [result]
+            result = list(os.path.realpath(path) for path in result)
+            path = result[0]
+        else:
+            sUrl = settings.STATIC_URL  # Typically /static/
+            sRoot = settings.STATIC_ROOT  # Typically /home/userX/project_static/
+            mUrl = settings.MEDIA_URL  # Typically /media/
+            mRoot = settings.MEDIA_ROOT  # Typically /home/userX/project_static/media/
+
+            if uri.startswith(mUrl):
+                path = os.path.join(mRoot, uri.replace(mUrl, ""))
+            elif uri.startswith(sUrl):
+                path = os.path.join(sRoot, uri.replace(sUrl, ""))
+            else:
+                return uri
+
+        # make sure that file exists
+        if not os.path.isfile(path):
+            raise Exception(
+                'media URI must start with %s or %s' % (sUrl, mUrl)
+            )
+        return path
+
+    def pvp_cal(self, *args, **kwargs):
+        data = []
+        try:
+            for i in Detalle_venta.objects.filter(venta_id=self.kwargs['pk']):
+                item = i.venta.toJSON()
+                item['producto'] = i.inventario.toJSON()
+                item['pvp'] = format(i.pvp_actual, '.2f')
+                item['cantidad'] = i.cantidad
+                item['subtotal'] = i.subtotal
+                data.append(item)
+        except:
+            pass
+        return data
+
+    def get(self, request, *args, **kwargs):
+        try:
+            template = get_template('front-end/report/pdf.html')
+            context = {'title': 'Comprobante de Venta',
+                       'sale': Venta.objects.get(pk=self.kwargs['pk']),
+                       'empresa': Empresa.objects.first(),
+                       'det_sale': self.pvp_cal(),
+                       'icon': 'media/imagen.PNG',
+                       }
+            html = template.render(context)
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+            pisa_status = pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
+            return response
+        except:
+           pass
+        return HttpResponseRedirect(reverse_lazy('venta:lista'))
 #
 #
 # @csrf_exempt

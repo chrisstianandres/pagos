@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.producto',
     'apps.proveedor',
     'apps.tipogasto',
+    'apps.delvoluciones_venta',
     'apps.user',
     'apps.maquina',
     'apps.reparacion',

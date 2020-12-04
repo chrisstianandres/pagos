@@ -116,6 +116,19 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                             'pvp': p.pvp_rep_by_prod,
                             'subtotal': p.subtotal
                         })
+            elif action == 'anular':
+                id = request.POST['id']
+                result = Reparacion.objects.get(id=id)
+                result.estado = 2
+                result.save()
+                data['resp'] = True
+            elif action == 'entregar':
+                id = request.POST['id']
+                result = Reparacion.objects.get(id=id)
+                result.estado = 1
+                result.fecha_entrega = datetime.now()
+                result.save()
+                data['resp'] = True
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -198,6 +211,89 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['formc'] = ClienteForm()
         return data
 
+
+class printpdf(View):
+
+    def link_callback(self, uri, rel):
+        """
+        Convert HTML URIs to absolute system paths so xhtml2pdf can access those
+        resources
+        """
+        result = finders.find(uri)
+        if result:
+            if not isinstance(result, (list, tuple)):
+                result = [result]
+            result = list(os.path.realpath(path) for path in result)
+            path = result[0]
+        else:
+            sUrl = settings.STATIC_URL  # Typically /static/
+            sRoot = settings.STATIC_ROOT  # Typically /home/userX/project_static/
+            mUrl = settings.MEDIA_URL  # Typically /media/
+            mRoot = settings.MEDIA_ROOT  # Typically /home/userX/project_static/media/
+
+            if uri.startswith(mUrl):
+                path = os.path.join(mRoot, uri.replace(mUrl, ""))
+            elif uri.startswith(sUrl):
+                path = os.path.join(sRoot, uri.replace(sUrl, ""))
+            else:
+                return uri
+
+        # make sure that file exists
+        if not os.path.isfile(path):
+            raise Exception(
+                'media URI must start with %s or %s' % (sUrl, mUrl)
+            )
+        return path
+
+    def pvp_cal(self, *args, **kwargs):
+        data = []
+        try:
+            for i in Detalle_reparacion.objects.filter(reparacion_id=self.kwargs['pk']):
+                item = i.reparacion.toJSON()
+                item['producto'] = {'producto': i.producto.toJSON()}
+                item['pvp'] = format(i.pvp_rep_by_prod, '.2f')
+                item['cantidad'] = i.cantidad
+                item['subtotal'] = i.subtotal
+                data.append(item)
+        except:
+            pass
+        return data
+
+    def get(self, request, *args, **kwargs):
+        try:
+            template = get_template('front-end/report/pdf.html')
+            context = {'title': 'Comprobante de Reparacion',
+                       'sale': Reparacion.objects.get(pk=self.kwargs['pk']),
+                       'det_sale': self.pvp_cal(),
+                       'empresa': Empresa.objects.first(),
+                       'icon': 'media/imagen.PNG',
+                       }
+            html = template.render(context)
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+            pisa_status = pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
+            return response
+        except:
+            pass
+        return HttpResponseRedirect(reverse_lazy('reparacion:lista'))
+
+# class report_total(ListView):
+#     model = Venta
+#     template_name = 'front-end/venta/venta_report_total.html'
+#
+#     def get_queryset(self):
+#         return Venta.objects.none()
+#
+#     def get_context_data(self, **kwargs):
+#         data = super().get_context_data(**kwargs)
+#         data['icono'] = opc_icono
+#         data['entidad'] = opc_entidad
+#         data['boton'] = 'Nueva Venta'
+#         data['titulo'] = 'Listado de Ventas'
+#         data['nuevo'] = '/venta/nuevo'
+#         data['empresa'] = empresa
+#         data['filter_prod'] = '/venta/lista'
+#         return data
 
 # @csrf_exempt
 # def data(request):

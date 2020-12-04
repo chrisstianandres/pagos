@@ -39,6 +39,7 @@ var datos = {
     },
 };
 $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
     daterange();
     datatable = $("#datatable").DataTable({
         // responsive: true,
@@ -201,58 +202,66 @@ $(function () {
                 width: "15%",
                 render: function (data, type, row) {
                     var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
+                    var entregar = '<a type="button" rel="entregar" class="btn btn-warning btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Entregar" ><i class="fa fa-check"></i></a>' + ' ';
                     var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ';
-                    var pdf = '<a type="button" href= "/venta/printpdf/' + row[4] + '" rel="pdf" class="btn btn-primary btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
-                    return detalle + devolver + pdf;
+                    var pdf = '<a type="button" href= "/reparacion/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
+                    return detalle + entregar + devolver + pdf;
                 }
             },
             {
                 targets: [-3],
                 render: function (data, type, row) {
-                   return pad(data, 10);
+                    return pad(data, 10);
                 }
             }
         ],
         createdRow: function (row, data, dataIndex) {
             if (data.estado === 1) {
                 $('td', row).eq(9).html('<span class="badge badge-success" style="color: white"> ENTREGADA');
-                $('td', row).eq(10).find('a[rel="devolver"]').hide();
-                $('td', row).eq(10).find('a[rel="pdf"]').hide();
+                $('td', row).eq(10).find('a[rel="entregar"]').hide();
             } else if (data.estado === 0) {
                 $('td', row).eq(9).html('<span class="badge badge-warning" style="color: white"> POR ENTREGAR');
+                $('td', row).eq(2).html('<span class="badge badge-warning" style="color: white"> SIN FECHA');
             } else if (data.estado === 2) {
                 $('td', row).eq(9).html('<span class="badge badge-danger" style="color: white"> ANULADA');
+                $('td', row).eq(2).html('<span class="badge badge-danger" style="color: white"> ANULADA');
                 $('td', row).eq(10).find('a[rel="devolver"]').hide();
+                $('td', row).eq(10).find('a[rel="entregar"]').hide();
                 $('td', row).eq(10).find('a[rel="pdf"]').hide();
             }
 
         }
     });
 
-    $('#datatable tbody').on('click', 'a[rel="devolver"]', function () {
-        $('.tooltip').remove();
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var parametros = {'id': data['6']};
-        save_estado('Alerta',
-            '/venta/estado', 'Esta seguro que desea devolver esta venta?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al devolver la venta', 'far fa-smile-wink', function () {
-                    datatable.ajax.reload(null, false);
-                })
-            });
+    $('#datatable tbody')
+        .on('click', 'a[rel="devolver"]', function () {
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'anular'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea anular esta reparacion?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al anular la reparacion', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    })
+                });
 
-    }).on('click', 'a[rel="borrar"]', function () {
-        $('.tooltip').remove();
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var parametros = {'id': data['6']};
-        save_estado('Alerta',
-            '/venta/eliminar', 'Esta seguro que desea eliminar esta venta?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al Eliminar la venta', 'far fa-smile-wink')
-            });
-    })
+        })
+        .on('click', 'a[rel="entregar"]', function () {
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'entregar'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea realizar la entrega de esta/as reparaciones?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al entregar la/as reparaciones', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    });
+
+                });
+        })
         .on('click', 'a[rel="detalle"]', function () {
             $('.tooltip').remove();
             var tr = datatable.cell($(this).closest('td, li')).index();
@@ -324,6 +333,7 @@ $(function () {
                 },
             });
         });
+
     $('#nuevo').on('click', function () {
         window.location.replace('/reparacion/nuevo')
 

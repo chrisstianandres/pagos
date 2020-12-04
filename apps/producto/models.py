@@ -8,6 +8,7 @@ class Producto(models.Model):
     producto_base = models.ForeignKey(Producto_base, on_delete=models.PROTECT)
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     pvp_alq = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
+    pvp_confec = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return '%s' % self.producto_base.nombre
@@ -16,6 +17,8 @@ class Producto(models.Model):
         item = model_to_dict(self)
         item['producto_base'] = self.producto_base.toJSON()
         item['pvp'] = format(self.pvp, '.2f')
+        item['pvp_alq'] = format(self.pvp_alq, '.2f')
+        item['pvp_confec'] = format(self.pvp_confec, '.2f')
         return item
 
 

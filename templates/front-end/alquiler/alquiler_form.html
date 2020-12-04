@@ -1,0 +1,205 @@
+{% extends 'front-end/base.html' %}
+{% load static %}
+{% block head %}
+    {% block form_head %}
+        <!-- Latest compiled and minified CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.css' %}"/>
+    {% endblock %}
+{% endblock %}
+{% block content %}
+    <input type="hidden" id="action" name="action" value="{{ action }}">
+    <input type="hidden" name="key" value="{{ key }}">
+    <div class="card card-secondary">
+        <div class="card-header">
+            <h4> &nbsp;<i class="{{ icono }}"></i> {{ titulo }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="container col-lg-12">
+                <div class="row">
+                    <div class="col-lg-3 col-md-12">
+                        <div class="card card-success">
+                            <div class="card-header">
+                                <h5>&nbsp;<i class="fa fa-book-open"></i> Datos del Alquiler</h5>
+                            </div>
+                            <div class="card-body">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="id_fecha_venta">{{ form.fecha_trans.label_tag }}</label>
+                                    <div class="input-group">
+                                        {{ form.fecha_trans }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_fecha_salida">{{ formr.fecha_salida.label_tag }}</label>
+                                    <div class="input-group">
+                                        {{ formr.fecha_salida }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_cliente">{{ form.cliente.label_tag }}</label>
+                                    <div class="input-group form-group-lg">
+                                        {{ form.cliente }}
+                                        <div class="input-group-append">
+                                            <button class="btn btn-warning btn-xs" id="id_new_client" type="button"><i
+                                                    class="fas fa-user-plus" style="color: white"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_subtotal">{{ form.subtotal.label_tag }}</label>
+                                    <div class="input-group">
+                                        {{ form.subtotal }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_iva">{{ form.iva.label_tag }}</label>
+                                    <div class="input-group">
+                                        {{ form.iva }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_total">{{ form.total.label_tag }}</label>
+                                    <div class="input-group">
+                                        {{ form.total }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-12">
+                        <div class="card card-success">
+                            <div class="card-header">
+                                <h5><i class="fas fa-piggy-bank"></i>&nbsp;<strong>Alquiler</strong></h5>
+                            </div>
+                            <div class="card-body">
+                                    <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="venta-tab"
+                                         id="venta">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5><i class="fas fa-piggy-bank"></i> Detalle de Productos</h5>
+                                            </div>
+                                            <div class="card-body">
+
+                                                <div class="form-group">
+                                                    <label> Buscar Productos:</label>
+                                                    <br>
+                                                    {{ form2.inventario }}
+                                                </div>
+                                                <br>
+                                                <button type="button"
+                                                        class="btn btn-danger btn-sm btn-flat btnRemoveall">
+                                                    <i class="far fa-trash-alt"></i> Quitar todo
+                                                </button>
+                                                <br><br>
+                                                <div class="table-responsive">
+                                                    <table class="table" id="tblproductos">
+                                                        <thead>
+                                                        <tr>
+                                                            <th><em class="fas fa-trash-alt"></em></th>
+                                                            <th>Producto</th>
+                                                            <th>Catg</th>
+                                                            <th>Prest</th>
+                                                            <th>Stock</th>
+                                                            <th>Cant</th>
+                                                            <th>Precio</th>
+                                                            <th>Subtotal</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br><br><br><br>
+                    <div class="col-lg-12">
+                        <button type="submit" class="btn btn-primary btn-sm btn-flat" id="save">
+                            <i class="far fa-save"></i> {{ boton }}
+                            <span class="ripple ripple-animate"
+                                  style="height: 115px; width: 115px; animation-duration: 0.7s; animation-timing-function: linear; background: rgb(255, 255, 255); opacity: 0.4; top: -47.875px; left: -23.5px;"></span>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm btn-flat"
+                                onclick="cancel();">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form method="post" id="form" enctype="multipart/form-data" action=".">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-plus"></i>&nbsp;Registro de
+                            un
+                            Cliente</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="form-group">
+                                {{ formc.as_p }}
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" value="{{ action }}">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i
+                                class="fas fa-user-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar Cliente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    <!-- Latest compiled and minified JavaScript -->
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+    <script src="{% static 'apps/alquiler/alquiler.js' %}"></script>
+    <script src="{% static 'apps/cliente/cliente.js' %}"></script>
+    <script>
+        ventas.list();
+    </script>
+{% endblock %}

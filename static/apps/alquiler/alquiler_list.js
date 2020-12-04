@@ -15,7 +15,7 @@ var datos = {
     fechas: {
         'start_date': '',
         'end_date': '',
-        'action': 'venta',
+        'action': 'alquiler',
     },
     add: function (data) {
         if (data.key === 1) {
@@ -38,6 +38,7 @@ var datos = {
     },
 };
 $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
     daterange();
     datatable = $("#datatable").DataTable({
         // responsive: true,
@@ -161,12 +162,14 @@ $(function () {
         },
         columns: [
             {data: 'transaccion.fecha_trans'},
+            {data: 'fecha_salida'},
+            {data: 'fecha_entrega'},
             {data: "transaccion.cliente.full_name_list"},
             {data: "transaccion.user.full_name"},
             {data: "transaccion.subtotal"},
             {data: "transaccion.iva"},
             {data: "transaccion.total"},
-            {data: "id"},
+            {data: "transaccion.id"},
             {data: "estado"},
             {data: "id"},
         ],
@@ -177,7 +180,7 @@ $(function () {
 
             },
             {
-                targets: [3],
+                targets: [-4, -5, -6],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -197,31 +200,33 @@ $(function () {
                 class: 'text-center',
                 width: "15%",
                 render: function (data, type, row) {
-                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-sm btn-round" ' +
-                        'style="color: white" data-toggle="tooltip" title="Detalle de Productos" >' +
-                        '<i class="fa fa-search"></i></a>' + ' ';
-                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-sm btn-round" ' +
-                        'style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ';
-                    var pdf = '<a type="button" href= "/venta/printpdf/' + data + '" rel="pdf" ' +
-                        'class="btn btn-primary btn-sm btn-round" style="color: white" data-toggle="tooltip" ' +
-                        'title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
-                    return detalle + devolver + pdf;
+                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
+                    var entregar = '<a type="button" rel="entregar" class="btn btn-warning btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Recibir prenda" ><i class="fa fa-check"></i></a>' + ' ';
+                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ';
+                    var pdf = '<a type="button" href= "/alquiler/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
+                    return detalle + entregar + devolver + pdf;
                 }
             },
             {
                 targets: [-3],
                 render: function (data, type, row) {
-                   return pad(data, 10);
+                    return pad(data, 10);
                 }
             }
         ],
         createdRow: function (row, data, dataIndex) {
-            if (data.estado === 'FINALIZADA') {
-                $('td', row).eq(7).find('span').addClass('badge bg-success').attr("style", "color: white");
-            } else if (data.estado === 'DEVUELTA') {
-                $('td', row).eq(7).find('span').addClass('badge bg-danger').attr("style", "color: white");
-                $('td', row).eq(8).find('a[rel="devolver"]').hide();
-                $('td', row).eq(8).find('a[rel="pdf"]').hide();
+            if (data.estado === 1) {
+                $('td', row).eq(9).html('<span class="badge badge-success" style="color: white"> ENTREGADA');
+                $('td', row).eq(10).find('a[rel="entregar"]').hide();
+            } else if (data.estado === 0) {
+                $('td', row).eq(9).html('<span class="badge badge-warning" style="color: white"> ALQUILADA');
+                $('td', row).eq(2).html('<span class="badge badge-warning" style="color: white"> ALQUILADA');
+            } else if (data.estado === 2) {
+                $('td', row).eq(9).html('<span class="badge badge-danger" style="color: white"> ANULADA');
+                $('td', row).eq(2).html('<span class="badge badge-danger" style="color: white"> ANULADA');
+                $('td', row).eq(10).find('a[rel="devolver"]').hide();
+                $('td', row).eq(10).find('a[rel="entregar"]').hide();
+                $('td', row).eq(10).find('a[rel="pdf"]').hide();
             }
 
         }
@@ -229,30 +234,33 @@ $(function () {
 
     $('#datatable tbody')
         .on('click', 'a[rel="devolver"]', function () {
-        $('.tooltip').remove();
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var parametros = {'id': data.id, 'action': 'estado'};
-        save_estado('Alerta',
-            window.location.pathname, 'Esta seguro que desea devolver esta venta?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al devolver la venta', 'far fa-smile-wink', function () {
-                    datatable.ajax.reload(null, false);
-                })
-            });
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'anular'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea anular esta reparacion?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al anular la reparacion', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    })
+                });
 
-    })
-        .on('click', 'a[rel="borrar"]', function () {
-        $('.tooltip').remove();
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var parametros = {'id': data.id};
-        save_estado('Alerta',
-            '/venta/eliminar', 'Esta seguro que desea eliminar esta venta?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al Eliminar la venta', 'far fa-smile-wink')
-            });
-    })
+        })
+        .on('click', 'a[rel="entregar"]', function () {
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'recibir'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea realizar la recepcion de esta/as prendas?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al receptar la/as prendas', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    });
+
+                });
+        })
         .on('click', 'a[rel="detalle"]', function () {
             $('.tooltip').remove();
             var tr = datatable.cell($(this).closest('td, li')).index();
@@ -326,7 +334,7 @@ $(function () {
         });
 
     $('#nuevo').on('click', function () {
-        window.location.replace('/venta/nuevo')
+        window.location.replace('/reparacion/nuevo')
 
     })
 });

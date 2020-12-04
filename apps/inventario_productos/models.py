@@ -9,6 +9,7 @@ from apps.producto.models import Producto
 ESTADO = (
     (1, 'En stock'),
     (0, 'Vendido'),
+    (2, 'Alquilado'),
 )
 
 
