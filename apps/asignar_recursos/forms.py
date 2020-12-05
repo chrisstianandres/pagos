@@ -1,10 +1,12 @@
 from django import forms
 from datetime import *
-from .models import Asig_insumo, Detalle_asig_insumo
+from .models import Asig_recurso, Detalle_asig_recurso, Detalle_asig_maquina
 from tempus_dominus.widgets import DatePicker
 
 from apps.producto.models import Producto
 from apps.maquina.models import Maquina
+from ..material.models import Material
+
 SUP = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
 
 
@@ -20,40 +22,31 @@ class Asig_recursoForm(forms.ModelForm):
                 'readonly': True,
                 'class': 'form-control'
             }
-            self.fields['periodo'].widget.attrs = {
-                'class': 'form-control',
-                # 'value': Periodo.objects.get(estado=0),
-                'disabled': True,
-            }
-            self.initial['periodo'] = Periodo.objects.get(estado=1)
-            self.fields['cantero'].widget.attrs = {
-                'class': 'form-control select2',
-                'data-live-search': "true"
+            self.fields['lote'].widget.attrs = {
+                'class': 'form-control'
             }
         # habilitar, desabilitar, y mas
 
     class Meta:
-        model = Asig_insumo
+        model = Asig_recurso
         fields = [
             'fecha_asig',
-            'periodo',
-            'cantero'
+            'lote',
+
         ]
         labels = {
             'fecha_asig': 'Fecha de Asignacion',
-            'periodo': 'Periodo',
-            'cantero': 'Cantero / Area (m2)'.translate(SUP)
+            'lote': 'Lote',
         }
         widgets = {
             'fecha_asig': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'value': datetime.now().strftime('%Y-%m-%d')},
             ),
-            # 'periodo': forms.TextInput()
         }
 
 
-class Detalle_Asig_InsumoForm(forms.ModelForm):
+class Detalle_Asig_recursoForm(forms.ModelForm):
     # constructor
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -61,15 +54,38 @@ class Detalle_Asig_InsumoForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-            self.fields['insumo'].widget.attrs = {
+            self.fields['inventario_material'].widget.attrs = {
                 'class': 'form-control select2',
                 'data-live-search': "true"
             }
-            self.fields["insumo"].queryset = Insumo.objects.filter(stock__gte=1)
+            self.fields["inventario_material"].queryset = Material.objects.none()
         # habilitar, desabilitar, y mas
 
     class Meta:
-        model = Detalle_asig_insumo
+        model = Detalle_asig_recurso
         fields = [
-            'insumo'
+            'inventario_material'
+        ]
+
+
+class Detalle_Asig_maquinaForm(forms.ModelForm):
+    # constructor
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+            self.fields['maquina'].widget.attrs = {
+                'class': 'form-control select2',
+                'data-live-search': "true",
+                'style': 'width: 100%'
+            }
+            self.fields["maquina"].queryset = Maquina.objects.none()
+        # habilitar, desabilitar, y mas
+
+    class Meta:
+        model = Detalle_asig_maquina
+        fields = [
+            'maquina'
         ]

@@ -1,5 +1,12 @@
 $(document).ready(function () {
-
+    $('.select2').select2({
+        language: {
+            "noResults": function () {
+                return "Sin resultados";
+            }
+        },
+        theme: "classic"
+    });
 
     jQuery.validator.addMethod("lettersonly", function (value, element) {
         return this.optional(element) || /^[a-zA-z\s\ñ\Ñ," "]+$/i.test(value);
@@ -22,39 +29,55 @@ $(document).ready(function () {
     });
     $("#form").validate({
         rules: {
-            nombre: {
+            tipo: {
                 required: true,
-                minlength: 3,
-                maxlength: 50
             },
-            descripcion: {
+            serie: {
                 required: true,
                 minlength: 3,
                 maxlength: 50
             },
         },
         messages: {
-            nombre: {
-                required: "Porfavor ingresa el nombre de la maquina",
-                minlength: "Debe ingresar al menos 3 letras",
+            tipo: {
+                required: "Porfavor escoje un tipo de maquina",
             },
-            descripcion: {
-                required: "Porfavor ingresa una descripcion",
-                minlength: "Debe ingresar al menos 3 letras",
-                maxlength: "Debe ingresar hasta 50 letras"
+            serie: {
+                required: "Porfavor ingresa una serie",
+                minlength: "Debe ingresar al menos 3 caracteres",
+                maxlength: "Debe ingresar hasta 50 caracteres"
             },
         },
     });
 
-    $('#id_nombre').keyup(function () {
-        var pal = $(this).val();
-        var changue = pal.substr(0, 1).toUpperCase() + pal.substr(1);
-        $(this).val(changue);
+    $('#id_new_tipo').on('click', function () {
+        $('#Modal').modal('show');
+        action = 'add';
+        pk = '';
     });
-    $('#id_descripcion').keyup(function () {
-        var pal = $(this).val();
-        var changue = pal.substr(0, 1).toUpperCase() + pal.substr(1);
-        $(this).val(changue);
+    var valu = $('#id_serie').val();
+
+    if (valu===0){
+        $('#id_serie').val('');
+    }
+
+    $('#form_tipo').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', 'add_tipo');
+        parametros.append('id', '');
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/maquina/nuevo', 'Esta seguro que desea guardar este tipo de maquina?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar tipo de maquina!', 'far fa-smile-wink', function () {
+                        $('#Modal').modal('hide');
+                        var newOption = new Option(response.tipo['nombre'], response.tipo['id'], false, true);
+                        $('#id_tipo').append(newOption).trigger('change');
+                    });
+                });
+        }
     });
 
 });

@@ -58,6 +58,21 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     cal = format(float((i.p_compra*100)/112), '.2f')
                     item['p_compra'] = cal
                     data.append(item)
+            elif action == 'search_asig':
+                data = []
+                term = request.POST['term']
+                query = Material.objects.filter(Q(producto_base__nombre__icontains=term, producto_base__stock__gte=1))[0:10]
+                for a in query:
+                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
+                    data.append(result)
+            elif action == 'get_asig':
+                id = request.POST['id']
+                material = Material.objects.filter(pk=id)
+                data = []
+                for i in material:
+                    item = i.toJSON()
+                    item['cantidad'] = 1
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:

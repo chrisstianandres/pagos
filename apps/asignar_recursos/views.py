@@ -1,22 +1,151 @@
-# import json
-#
-# from django.db import transaction
-# from django.http import JsonResponse, HttpResponse
-# from django.shortcuts import render
-# from django.urls import reverse_lazy
-# from django.views.decorators.csrf import csrf_exempt
-# from django.views.generic import *
-#
-# # from apps.Mixins import SuperUserRequiredMixin
-# # from apps.asignar_insumo.forms import Asig_InsumoForm, Detalle_Asig_InsumoForm
-# # from apps.asignar_insumo.models import Asig_insumo, Detalle_asig_insumo
-# # from apps.insumo.models import Insumo
-#
-# opc_icono = 'fa fa-shopping-bag'
-# opc_entidad = 'Asignacion de Insumos'
-# crud = '/asig_insumo/crear'
-#
-#
+import json
+
+from django.db import transaction
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import *
+
+# from apps.Mixins import SuperUserRequiredMixin
+# from apps.asignar_insumo.forms import Asig_InsumoForm, Detalle_Asig_InsumoForm
+# from apps.asignar_insumo.models import Asig_insumo, Detalle_asig_insumo
+# from apps.insumo.models import Insumo
+from apps.asignar_recursos.forms import Asig_recursoForm, Detalle_Asig_recursoForm, Detalle_Asig_maquinaForm
+from apps.asignar_recursos.models import Asig_recurso, Detalle_asig_recurso, Detalle_asig_maquina
+from apps.backEnd import nombre_empresa
+from apps.inventario_material.models import Inventario_material
+from apps.maquina.models import Maquina
+from apps.material.models import Material
+from apps.mixins import ValidatePermissionRequiredMixin
+
+opc_icono = 'fas fa-toolbox'
+opc_entidad = 'Asignacion de Insumos'
+crud = '/asignar/crear'
+empresa = nombre_empresa()
+
+
+class lista(ValidatePermissionRequiredMixin, ListView):
+    model = Asig_recurso
+    template_name = 'front-end/asignacion/asignacion_list.html'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Asig_recurso.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            start = request.POST['start_date']
+            end = request.POST['end_date']
+            if action == 'list':
+                data = []
+                if start and end:
+                    asignacion = Asig_recurso.objects.filter(fecha_asig__range=[start, end])
+                else:
+                    asignacion = Asig_recurso.objects.all()
+                for c in asignacion:
+                    data.append(c.toJSON())
+            elif action == 'detalle':
+                id = request.POST['id']
+                if id:
+                    data = []
+                    for p in Detalle_asig_recurso.objects.filter(asig_recurso_id=id):
+                        item = p.toJSON()
+                        data.append(item)
+                    for m in Detalle_asig_maquina.objects.filter(asig_recurso_id=id):
+                        item = m.toJSON()
+                        data.append(item)
+                else:
+                    data['error'] = 'Ha ocurrido un error'
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Nueva Asignacion'
+        data['titulo'] = 'Listado de Asignaciones'
+        data['nuevo'] = '/asignacion/nuevo'
+        data['empresa'] = empresa
+        return data
+
+
+class CrudView(ValidatePermissionRequiredMixin, TemplateView):
+    form_class = Asig_recurso
+    template_name = 'front-end/asignacion/asignar_form.html'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        pk = request.POST['id']
+        try:
+            if action == 'add':
+                datos = json.loads(request.POST['asignaciones'])
+                if datos:
+                    pr = []
+                    with transaction.atomic():
+                        c = Asig_recurso()
+                        c.fecha_asig = datos['fecha_asig']
+                        c.lote = datos['lote']
+                        c.user_id = request.user.id
+                        c.save()
+                        for i in datos['materiales']:
+                            dv = Detalle_asig_recurso()
+                            dv.asig_recurso = c.id
+                            dv.inventario_material = i['id']
+                            dv.cantidad = int(i['cantidad'])
+                            x = Inventario_material.objects.get(pk=i['id'])
+                            x.estado = 0
+                            x.save()
+                        for m in datos['maquinas']:
+                            dv = Detalle_asig_maquina()
+                            dv.asig_recurso = c.id
+                            dv.maquina = m['id']
+                            x = Maquina.objects.get(pk=m['id'])
+                            x.estado = 0
+                            x.save()
+                        dv.save()
+                        data['id'] = c.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Guardar Asignacion'
+        data['titulo'] = 'Nueva Asignacion'
+        data['nuevo'] = '/asignar/nuevo'
+        data['empresa'] = empresa
+        data['form'] = Asig_recursoForm()
+        data['form2'] = Detalle_Asig_recursoForm()
+        data['detalle'] = []
+        data['formp'] = Detalle_Asig_maquinaForm()
+        return data
+
+
 # class lista(SuperUserRequiredMixin, ListView):
 #     model = Asig_insumo
 #     template_name = 'front-end/asig_insumo/asig_insumo_list.html'
@@ -29,7 +158,7 @@
 #         data['titulo'] = 'Listado de Asignacion de Insumos'
 #         data['nuevo'] = '/asig_insumo/nuevo'
 #         return data
-#
+
 #
 # def nuevo(request):
 #     data = {

@@ -1,4 +1,6 @@
 $(function () {
+
+
     var action = '';
     var pk = '';
     var datatable = $("#datatable").DataTable({
@@ -12,8 +14,10 @@ $(function () {
         },
         columns: [
             {"data": "id"},
-            {"data": "nombre"},
-            {"data": "descripcion"},
+            {"data": "tipo.nombre"},
+            {"data": "tipo.descripcion"},
+            {"data": "serie"},
+            {"data": "estado"},
             {"data": "id"}
         ],
         language:
@@ -32,14 +36,22 @@ $(function () {
                 orderable: false,
                 render: function (data, type, row) {
                     var edit = '<a style="color: white" type="button" class="btn btn-warning btn-sm" rel="edit" ' +
-                        'data-toggle="tooltip" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
+                        'data-toggle="tooltip" href="/maquina/editar/' + data + '" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
                     var del = '<a type="button" class="btn btn-danger btn-sm"  style="color: white" rel="del" ' +
                         'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
                     return edit + del
 
                 }
             },
-        ]
+        ],
+        createdRow: function (row, data, dataIndex) {
+            if (data.estado === 0) {
+                $('td', row).eq(4).html('<span class = "badge badge-success" style="color: white "> DISPONIBLE </span>');
+            } else if (data.estado === 1) {
+                $('td', row).eq(4).html('<span class = "badge badge-danger" style="color: white "> EN USO </span>');
+            }
+
+        }
     });
     $('#datatable tbody')
         .on('click', 'a[rel="del"]', function () {
@@ -47,32 +59,19 @@ $(function () {
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
             var parametros = {'id': data.id};
-            parametros['action'] = action;
+            parametros['action'] = 'delete';
             save_estado('Alerta',
-                window.location.pathname, 'Esta seguro que desea eliminar esta maquina?', parametros,
+                '/maquina/nuevo', 'Esta seguro que desea eliminar esta maquina?', parametros,
                 function () {
                     menssaje_ok('Exito!', 'Exito al eliminar esta maquina!', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false)
                     })
                 })
-        })
-        .on('click', 'a[rel="edit"]', function () {
-            $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
-            var tr = datatable.cell($(this).closest('td, li')).index();
-            var data = datatable.row(tr.row).data();
-            $('input[name="nombre"]').val(data.nombre);
-            $('input[name="descripcion"]').val(data.descripcion);
-            $('#Modal').modal('show');
-            action = 'edit';
-            pk = data.id;
         });
 
 
     $('#nuevo').on('click', function () {
-        $('#exampleModalLabel').html('<i class="fas fa-plus"></i>&nbsp;Nuevo registro de una Maquina');
-        $('#Modal').modal('show');
-        action = 'add';
-        pk = '';
+        window.location.replace('/maquina/nuevo')
     });
 
     //enviar formulario de nuevo tipo de gasto
@@ -94,4 +93,6 @@ $(function () {
                 });
         }
     });
+
+
 });
