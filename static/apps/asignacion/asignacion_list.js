@@ -185,9 +185,10 @@ $(function () {
                 class: 'text-center',
                 width: "15%",
                 render: function (data, type, row) {
-                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Asignacion" ><i class="fa fa-search"></i></a>' + ' ';
-                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ';
-                    return detalle + devolver;
+                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Asignacion" ><i class="fa fa-search"></i></a>' + ' ';
+                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ';
+                    var finaizar = '<a type="button" rel="finalizar" class="btn btn-warning btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Finalizar"><i class="fas fa-hourglass-end"></i></a>' + ' ';
+                    return detalle + finaizar + devolver;
                 }
             },
         ],
@@ -196,8 +197,12 @@ $(function () {
                 $('td', row).eq(3).find('span').addClass('badge bg-warning').attr("style", "color: white");
             } else if (data.estado === 2) {
                 $('td', row).eq(3).find('span').addClass('badge bg-success').attr("style", "color: white");
+                $('td', row).eq(4).find('a[rel="devolver"]').hide();
+                $('td', row).eq(4).find('a[rel="finalizar"]').hide();
             } else if (data.estado === 0) {
                 $('td', row).eq(3).find('span').addClass('badge bg-danger').attr("style", "color: white");
+                $('td', row).eq(4).find('a[rel="devolver"]').hide();
+                $('td', row).eq(4).find('a[rel="finalizar"]').hide();
             }
 
         }
@@ -266,6 +271,20 @@ $(function () {
                     {data: 'maquina.serie'}
                 ]
             });
+
+        })
+        .on('click', 'a[rel="finalizar"]', function () {
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'finalizar'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea finalizar esta asignacion?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al finalizar esta asignacion', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    })
+                });
 
         });
 

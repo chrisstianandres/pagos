@@ -69,6 +69,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         data.append(item)
                 else:
                     data['error'] = 'Ha ocurrido un error'
+            elif action == 'finalizar':
+                id = request.POST['id']
+                if id:
+                   asignar = Asig_recurso.objects.get(id=id)
+                   asignar.estado = 2
+                   asignar.save()
+                   for m in Detalle_asig_maquina.objects.filter(asig_recurso_id=id):
+                       for x in Maquina.objects.filter(id=m.maquina.pk):
+                         x.estado = 0
+                         x.save()
+                else:
+                    data['error'] = 'Ha ocurrido un error'
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
