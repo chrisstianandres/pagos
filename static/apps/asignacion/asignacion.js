@@ -1,7 +1,7 @@
 var tblcompra;
 var compras = {
     items: {
-        fecha_compra: '',
+        fecha_asig: '',
         lote: '',
         productos: [],
         maquinas: [],
@@ -201,16 +201,16 @@ $(function () {
             return false
         }
         var parametros;
-        compras.items.fecha_compra = $('input[name="fecha_asig"]').val();
+        compras.items.fecha_asig = $('input[name="fecha_asig"]').val();
         compras.items.lote = $('#id_lote').val();
         console.log(compras.items);
         parametros = {'asignaciones': JSON.stringify(compras.items)};
         parametros['action']='add';
         parametros['id']='';
-        // save_with_ajax('Alerta',
-        //     window.location.pathname, 'Esta seguro que desea guardar esta asignacion?', parametros, function (response) {
-        //         window.location.replace('/asignacion/lista')
-        //     });
+        save_with_ajax('Alerta',
+            window.location.pathname, 'Esta seguro que desea guardar esta asignacion?', parametros, function (response) {
+                window.location.replace('/asignacion/lista')
+            });
     });
 
     $('#id_inventario_material').select2({

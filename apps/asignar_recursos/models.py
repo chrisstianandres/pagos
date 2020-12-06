@@ -10,7 +10,8 @@ from apps.user.models import User
 
 estado = (
     (0, 'ANULADA'),
-    (1, 'FINALIZADA')
+    (1, 'EN PRODUCCION'),
+    (2, 'FINALIZADA'),
 )
 
 class Asig_recurso(models.Model):
@@ -24,6 +25,8 @@ class Asig_recurso(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
+        item['user'] = self.user.toJSON()
+        item['estado_label'] = self.get_estado_display()
         return item
 
     class Meta:
@@ -35,6 +38,7 @@ class Asig_recurso(models.Model):
 class Detalle_asig_recurso(models.Model):
     asig_recurso = models.ForeignKey(Asig_recurso, on_delete=models.CASCADE)
     inventario_material = models.ForeignKey(Inventario_material, on_delete=models.CASCADE, null=True, blank=True)
+    cantidad = models.IntegerField(default=0)
 
     def __str__(self):
         return '%s %s' % (self.asig_recurso, self.inventario_material.material.producto_base.nombre)
@@ -56,7 +60,7 @@ class Detalle_asig_maquina(models.Model):
     maquina = models.ForeignKey(Maquina, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s %s' % (self.asig_recurso, self.maquina.nombre)
+        return '%s %s' % (self.asig_recurso, self.maquina.tipo.nombre)
 
     def toJSON(self):
         item = model_to_dict(self)

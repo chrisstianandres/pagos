@@ -21,7 +21,7 @@ from apps.material.models import Material
 from apps.mixins import ValidatePermissionRequiredMixin
 
 opc_icono = 'fas fa-toolbox'
-opc_entidad = 'Asignacion de Insumos'
+opc_entidad = 'Asignacion de Recursos'
 crud = '/asignar/crear'
 empresa = nombre_empresa()
 
@@ -41,9 +41,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = {}
         try:
             action = request.POST['action']
-            start = request.POST['start_date']
-            end = request.POST['end_date']
             if action == 'list':
+                start = request.POST['start_date']
+                end = request.POST['end_date']
                 data = []
                 if start and end:
                     asignacion = Asig_recurso.objects.filter(fecha_asig__range=[start, end])
@@ -58,6 +58,12 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     for p in Detalle_asig_recurso.objects.filter(asig_recurso_id=id):
                         item = p.toJSON()
                         data.append(item)
+                else:
+                    data['error'] = 'Ha ocurrido un error'
+            elif action == 'detalle_maquina':
+                id = request.POST['id']
+                if id:
+                    data = []
                     for m in Detalle_asig_maquina.objects.filter(asig_recurso_id=id):
                         item = m.toJSON()
                         data.append(item)
@@ -96,29 +102,30 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             if action == 'add':
                 datos = json.loads(request.POST['asignaciones'])
                 if datos:
-                    pr = []
                     with transaction.atomic():
                         c = Asig_recurso()
                         c.fecha_asig = datos['fecha_asig']
                         c.lote = datos['lote']
                         c.user_id = request.user.id
                         c.save()
-                        for i in datos['materiales']:
+                        for i in datos['productos']:
                             dv = Detalle_asig_recurso()
-                            dv.asig_recurso = c.id
-                            dv.inventario_material = i['id']
+                            dv.asig_recurso_id = c.id
+                            dv.inventario_material_id = i['id']
                             dv.cantidad = int(i['cantidad'])
+                            dv.save()
                             x = Inventario_material.objects.get(pk=i['id'])
                             x.estado = 0
                             x.save()
                         for m in datos['maquinas']:
-                            dv = Detalle_asig_maquina()
-                            dv.asig_recurso = c.id
-                            dv.maquina = m['id']
+                            dm = Detalle_asig_maquina()
+                            dm.asig_recurso_id = c.id
+                            dm.maquina_id = m['id']
+                            dm.save()
                             x = Maquina.objects.get(pk=m['id'])
-                            x.estado = 0
+                            x.estado = 1
                             x.save()
-                        dv.save()
+
                         data['id'] = c.id
                         data['resp'] = True
                 else:
