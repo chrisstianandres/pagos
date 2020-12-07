@@ -19,6 +19,7 @@ from apps.inventario_material.models import Inventario_material
 from apps.maquina.models import Maquina
 from apps.material.models import Material
 from apps.mixins import ValidatePermissionRequiredMixin
+from apps.producto_base.models import Producto_base
 
 opc_icono = 'fas fa-toolbox'
 opc_entidad = 'Asignacion de Recursos'
@@ -81,6 +82,13 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                          x.save()
                 else:
                     data['error'] = 'Ha ocurrido un error'
+            elif action == 'search':
+                data = []
+                term = request.POST['term']
+                query = Asig_recurso.objects.filter(lote__icontains=term, estado=2, inventariado=0)[0:10]
+                for a in query:
+                    result = {'id': int(a.id), 'text': str('Lote N°: ' + a.lote+' / Fecha : '+a.fecha_asig.strftime('%d-%m-%Y'))}
+                    data.append(result)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -121,14 +129,19 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.user_id = request.user.id
                         c.save()
                         for i in datos['productos']:
-                            dv = Detalle_asig_recurso()
-                            dv.asig_recurso_id = c.id
-                            dv.inventario_material_id = i['id']
-                            dv.cantidad = int(i['cantidad'])
-                            dv.save()
-                            x = Inventario_material.objects.get(pk=i['id'])
-                            x.estado = 0
-                            x.save()
+
+                            for inv in Inventario_material.objects.filter(material_id=i['id'], estado=1)[:i['cantidad']]:
+                                dv = Detalle_asig_recurso()
+                                dv.asig_recurso_id = c.id
+                                dv.inventario_material_id = inv.id
+                                inv.estado = 0
+                                inv.save()
+                                dv.save()
+                            s = Material.objects.get(pk=i['id'])
+                            pb = Producto_base.objects.get(pk=s.producto_base.id)
+                            stock = int(Inventario_material.objects.filter(material_id=i['id'], estado=1).count())
+                            pb.stock = stock
+                            pb.save()
                         for m in datos['maquinas']:
                             dm = Detalle_asig_maquina()
                             dm.asig_recurso_id = c.id
@@ -137,17 +150,16 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             x = Maquina.objects.get(pk=m['id'])
                             x.estado = 1
                             x.save()
-
                         data['id'] = c.id
                         data['resp'] = True
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
-
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
+            print(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
     def get_context_data(self, **kwargs):

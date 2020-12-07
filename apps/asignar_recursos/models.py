@@ -14,11 +14,17 @@ estado = (
     (2, 'FINALIZADA'),
 )
 
+option = (
+    (0, 'NO'),
+    (1, 'SI')
+)
+
 class Asig_recurso(models.Model):
     fecha_asig = models.DateField(default=datetime.now)
-    lote = models.IntegerField(unique=True, null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    lote = models.CharField(unique=True, max_length=100)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     estado = models.IntegerField(choices=estado, default=1)
+    inventariado = models.IntegerField(choices=option, default=0)
 
     def __str__(self):
         return '%s' % self.fecha_asig
@@ -38,7 +44,6 @@ class Asig_recurso(models.Model):
 class Detalle_asig_recurso(models.Model):
     asig_recurso = models.ForeignKey(Asig_recurso, on_delete=models.CASCADE)
     inventario_material = models.ForeignKey(Inventario_material, on_delete=models.CASCADE, null=True, blank=True)
-    cantidad = models.IntegerField(default=0)
 
     def __str__(self):
         return '%s %s' % (self.asig_recurso, self.inventario_material.material.producto_base.nombre)

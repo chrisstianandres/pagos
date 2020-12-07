@@ -48,6 +48,7 @@ urlpatterns = [
     path('alquiler/', include('apps.alquiler.urls', namespace='alquiler')),
     path('confeccion/', include('apps.confeccion.urls', namespace='confeccion')),
     path('sitio/', include('apps.sitioweb.urls', namespace='sitio')),
+    path('produccion/', include('apps.produccion.urls', namespace='produccion')),
     # path('asignacion/', include('apps.asignar_recursos.urls', namespace='asignacion')),
     # path('devolucion/', include('apps.delvoluciones_venta.urls', namespace='devolucion')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\

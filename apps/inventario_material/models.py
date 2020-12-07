@@ -12,7 +12,7 @@ ESTADO = (
 
 class Inventario_material(models.Model):
     compra = models.ForeignKey(Compra, on_delete=models.PROTECT)
-    material = models.ForeignKey(Material, on_delete=models.PROTECT, null=True, blank=True)
+    material = models.ForeignKey(Material, on_delete=models.PROTECT)
     estado = models.IntegerField(choices=ESTADO, default=1)
 
     def __str__(self):

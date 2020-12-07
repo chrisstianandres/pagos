@@ -17,7 +17,7 @@ estado = (
 class Compra(models.Model):
     fecha_compra = models.DateField(default=datetime.now)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
-    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)

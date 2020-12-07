@@ -26,7 +26,7 @@ class Tipo_maquina(models.Model):
 
 
 class Maquina(models.Model):
-    tipo = models.ForeignKey(Tipo_maquina, on_delete=models.PROTECT, default=None)
+    tipo = models.ForeignKey(Tipo_maquina, on_delete=models.PROTECT)
     estado = models.IntegerField(choices=estado, default=0)
     serie = models.CharField(max_length=50, null=False, blank=False, default=000000000)
 

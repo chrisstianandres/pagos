@@ -121,8 +121,10 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dv.cantidad = int(i['cantidad'])
                             dv.subtotal = float(i['subtotal'])
                             x = Material.objects.get(pk=i['id'])
-                            x.producto_base.stock = x.producto_base.stock + int(i['cantidad'])
                             dv.p_compra_actual = float(x.p_compra)
+                            pb = Producto_base.objects.get(material=x.id)
+                            pb.stock = pb.stock + int(i['cantidad'])
+                            pb.save()
                             x.save()
                             dv.save()
                             for p in range(0, i['cantidad']):

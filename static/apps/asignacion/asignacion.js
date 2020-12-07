@@ -1,4 +1,5 @@
 var tblcompra;
+var tblmaquinas;
 var compras = {
     items: {
         fecha_asig: '',
@@ -60,15 +61,14 @@ var compras = {
                 });
             },
             createdRow: function (row, data, dataIndex) {
-            if (data.producto_base.stock <= 5) {
-                $('td', row).eq(4).html('<span class = "badge badge-danger" style="color: white ">'+ data.producto_base.stock+'</span>');
-            } else if (data.data.producto_base.stock <= 10) {
-                $('td', row).eq(4).html('<span class = "badge badge-warning" style="color: white ">'+ data.producto_base.stock+'</span>');
-            } else if (data.data.producto_base.stock > 10) {
-                $('td', row).eq(4).html('<span class = "badge badge-success" style="color: white ">'+ data.producto_base.stock+'</span>');
+                if (data.producto_base.stock <= 5) {
+                    $('td', row).eq(4).html('<span class = "badge badge-danger" style="color: white ">' + data.producto_base.stock + '</span>');
+                } else if (data.producto_base.stock <= 10) {
+                    $('td', row).eq(4).html('<span class = "badge badge-warning" style="color: white ">' + data.producto_base.stock + '</span>');
+                } else if (data.producto_base.stock > 10) {
+                    $('td', row).eq(4).html('<span class = "badge badge-success" style="color: white ">' + data.producto_base.stock + '</span>');
+                }
             }
-
-        }
         });
     },
 
@@ -79,7 +79,7 @@ var compras = {
 
     },
     list_machine: function () {
-        tblcompra = $("#tblmaquinas").DataTable({
+        tblmaquinas = $("#tblmaquinas").DataTable({
             destroy: true,
             autoWidth: false,
             dataSrc: "",
@@ -169,7 +169,8 @@ $(function () {
         })
     });
     //cantidad de productos
-    $('#tblinsumos tbody').on('click', 'a[rel="remove"]', function () {
+    $('#tblinsumos tbody')
+        .on('click', 'a[rel="remove"]', function () {
         var tr = tblcompra.cell($(this).closest('td, li')).index();
         borrar_todo_alert('Alerta de Eliminación',
             'Esta seguro que desea eliminar este producto de tu detalle?', function () {
@@ -181,6 +182,12 @@ $(function () {
                 });
             })
     })
+        .on('change keyup', 'input[name="cantidad"]', function () {
+            var cantidad = parseInt($(this).val());
+            var tr = tblcompra.cell($(this).closest('td, li')).index();
+            compras.items.productos[tr.row].cantidad = cantidad;
+        });
+
     $('.btnRemoveall').on('click', function () {
         if (compras.items.productos.length === 0) return false;
         borrar_todo_alert('Alerta de Eliminación',
@@ -205,8 +212,8 @@ $(function () {
         compras.items.lote = $('#id_lote').val();
         console.log(compras.items);
         parametros = {'asignaciones': JSON.stringify(compras.items)};
-        parametros['action']='add';
-        parametros['id']='';
+        parametros['action'] = 'add';
+        parametros['id'] = '';
         save_with_ajax('Alerta',
             window.location.pathname, 'Esta seguro que desea guardar esta asignacion?', parametros, function (response) {
                 window.location.replace('/asignacion/lista')
@@ -286,7 +293,7 @@ $(function () {
         minimumInputLength: 1,
     });
 
-     $('#id_maquina').on('select2:select', function (e) {
+    $('#id_maquina').on('select2:select', function (e) {
         $.ajax({
             type: "POST",
             url: '/maquina/lista',

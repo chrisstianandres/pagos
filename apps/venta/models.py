@@ -35,8 +35,8 @@ class Venta(models.Model):
 
 class Detalle_venta(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.PROTECT)
-    inventario = models.ForeignKey(Inventario_producto, on_delete=models.PROTECT, null=True, blank=True, default=None)
-    pvp_actual = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, blank=True, null=True)
+    inventario = models.ForeignKey(Inventario_producto, on_delete=models.PROTECT)
+    pvp_actual = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     cantidad = models.IntegerField(default=0)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
