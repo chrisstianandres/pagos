@@ -28,6 +28,9 @@ class ProduccionForm(forms.ModelForm):
                 'class': 'form-control select2',
             }
             self.fields['asignacion'].queryset = Asig_recurso.objects.none()
+            self.fields['novedades'].widget.attrs = {
+                'class': 'form-control'
+            }
         #     self.fields["cliente"].queryset = Cliente.objects.none()
         # habilitar, desabilitar, y mas
 
@@ -36,17 +39,20 @@ class ProduccionForm(forms.ModelForm):
         fields = [
             'fecha_ingreso',
             'asignacion',
+            'novedades',
 
         ]
         labels = {
             'fecha_ingreso': 'Fecha de Ingreso de Produccion',
             'asignacion': 'Asignacion de Materiales',
+            'novedades': 'Novedades',
         }
         widgets = {
             'fecha_ingreso': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'value': datetime.now().strftime('%Y-%m-%d')},
             ),
+            'novedades': forms.Textarea()
         }
 
 
@@ -62,6 +68,7 @@ class Detalle_perdidas_productosForm(forms.ModelForm):
                 'class': 'form-control select2',
                 'data-live-search': "true",
                 'id': "id_productos_perdida",
+                'style': 'width: 100%'
             }
             self.fields["producto"].queryset = Producto.objects.none()
         # habilitar, desabilitar, y mas
@@ -91,8 +98,7 @@ class Detalle_perdidas_materialesForm(forms.ModelForm):
     class Meta:
         model = Detalle_perdidas_materiales
         fields = [
-            'material',
-            'cantidad'
+            'material'
         ]
 
 
@@ -106,7 +112,8 @@ class Inventario_productosForm(forms.ModelForm):
             })
             self.fields['producto'].widget.attrs = {
                 'class': 'form-control select2',
-                'data-live-search': "true"
+                'data-live-search': "true",
+                'style': 'width: 100%'
             }
             self.fields["producto"].queryset = Producto.objects.none()
         # habilitar, desabilitar, y mas

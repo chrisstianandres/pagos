@@ -1,10 +1,14 @@
-var tblcompra;
-var compras = {
+var tblproductos;
+var tblperdidas_productos;
+var tblperdidas_materiales;
+var produccion = {
     items: {
-        fecha_asig: '',
-        lote: '',
+        fecha_ingreso: '',
+        asignacion: '',
+        novedades: '',
         productos: [],
-        maquinas: [],
+        perdidas_productos: [],
+        perdidas_materiales: [],
     },
     add: function (data) {
         this.items.productos.push(data);
@@ -13,11 +17,11 @@ var compras = {
 
     },
     list: function () {
-        tblcompra = $("#tblinventario").DataTable({
+        tblproductos = $("#tblinventario").DataTable({
             destroy: true,
             autoWidth: false,
             dataSrc: "",
-            scrollX: true,
+           responsive: true,
             language: {
                 "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
             },
@@ -72,22 +76,70 @@ var compras = {
         });
     },
 
-    add_machine: function (data) {
-        this.items.maquinas.push(data);
-        this.items.maquinas = this.exclude_duplicados_machine(this.items.maquinas);
-        this.list_machine();
+    add_perdida_producto: function (data) {
+        this.items.perdidas_productos.push(data);
+        this.items.perdidas_productos = this.exclude_duplicados_perdidas_productos(this.items.perdidas_productos);
+        this.list_perdidas_productos();
 
     },
-    list_machine: function () {
-        tblcompra = $("#tblmaquinas").DataTable({
+    list_perdidas_productos: function () {
+        tblperdidas_productos = $("#tblperdidas_productos").DataTable({
             destroy: true,
             autoWidth: false,
             dataSrc: "",
-            scrollX: true,
+            responsive: true,
             language: {
                 "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
             },
-            data: this.items.maquinas,
+            data: this.items.perdidas_productos,
+            columns: [
+                {data: 'id'},
+                {data: "tipo.nombre"},
+                {data: "tipo.descripcion"},
+                {data: "serie"},
+                {data: "estado"},
+            ],
+            columnDefs: [
+                {
+                    targets: [0],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Insumo"><i class="fa fa-trash-alt"></i></a>';
+                        //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                    }
+                },
+                {
+                    targets: [-1],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span class="badge badge-success"> DISPONIBLE </span>';
+
+                    }
+                },
+                {
+                    targets: '_all',
+                    class: 'text-center'
+                },
+            ]
+        });
+    },
+
+    add_perdida_materiales: function (data) {
+        this.items.perdidas_materiales.push(data);
+        this.items.perdidas_materiales = this.exclude_duplicados_perdidas_materiales(this.items.perdidas_materiales);
+        this.list_perdidas_materiales();
+
+    },
+    list_perdidas_materiales: function () {
+        tblperdidas_materiales = $("#tblperdidas_materiales").DataTable({
+            destroy: true,
+            autoWidth: false,
+            dataSrc: "",
+            responsive: true,
+            language: {
+                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+            },
+            data: this.items.perdidas_materiales,
             columns: [
                 {data: 'id'},
                 {data: "tipo.nombre"},
@@ -127,8 +179,15 @@ var compras = {
         return result;
 
     },
-    exclude_duplicados_machine: function (array) {
-        this.items.maquinas = [];
+    exclude_duplicados_perdidas_productos: function (array) {
+        this.items.perdidas_productos = [];
+        let hash = {};
+        result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
+        return result;
+
+    },
+    exclude_duplicados_perdidas_materiales: function (array) {
+        this.items.perdidas_materiales = [];
         let hash = {};
         result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
         return result;
@@ -157,8 +216,7 @@ $(function () {
             },
             dataType: 'json',
             success: function (data) {
-                // compras.add(data[0]);
-                console.log(data);
+                produccion.add(data[0]);
                 $('#id_producto option:selected').remove();
             },
             error: function (xhr, status, data) {
@@ -202,9 +260,127 @@ $(function () {
             },
 
         },
-        placeholder: 'Busca un material',
+        placeholder: 'Busca un Producto',
         minimumInputLength: 1,
     });
+
+    $('#id_productos_perdida').on('select2:select', function (e) {
+        $.ajax({
+            type: "POST",
+            url: '/producto/lista',
+            data: {
+                "id": $('#id_productos_perdida option:selected').val(),
+                "action": 'get_asig'
+            },
+            dataType: 'json',
+            success: function (data) {
+                 produccion.add_perdida_producto(data[0]);
+                $('#id_producto option:selected').remove();
+            },
+            error: function (xhr, status, data) {
+                menssaje_error('Error', data[0], 'fa fa-times', function () {
+
+                });
+            },
+
+        })
+    })
+        .select2({
+        theme: "classic",
+        language: {
+            inputTooShort: function () {
+                return "Ingresa al menos un caracter...";
+            },
+            "noResults": function () {
+                return "Sin resultados";
+            },
+            "searching": function () {
+                return "Buscando...";
+            }
+        },
+        allowClear: true,
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: '/producto/lista',
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    'action': 'search_rep'
+                };
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+
+            },
+
+        },
+        placeholder: 'Busca un Producto',
+        minimumInputLength: 1,
+    });
+
+    $('#id_material').on('select2:select', function (e) {
+        $.ajax({
+            type: "POST",
+            url: '/material/lista',
+            data: {
+                "id": $('#id_material option:selected').val(),
+                "action": 'get_asig'
+            },
+            dataType: 'json',
+            success: function (data) {
+                 produccion.add_perdida_materiales(data[0]);
+                $('#id_material option:selected').remove();
+            },
+            error: function (xhr, status, data) {
+                menssaje_error('Error', data[0], 'fa fa-times', function () {
+
+                });
+            },
+
+        })
+    })
+        .select2({
+        theme: "classic",
+        language: {
+            inputTooShort: function () {
+                return "Ingresa al menos un caracter...";
+            },
+            "noResults": function () {
+                return "Sin resultados";
+            },
+            "searching": function () {
+                return "Buscando...";
+            }
+        },
+        allowClear: true,
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: '/material/lista',
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    'action': 'search_rep'
+                };
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+
+            },
+
+        },
+        placeholder: 'Busca un Material',
+        minimumInputLength: 1,
+    });
+
+
     //cantidad de productos
     $('#tblinsumos tbody').on('click', 'a[rel="remove"]', function () {
         var tr = tblcompra.cell($(this).closest('td, li')).index();

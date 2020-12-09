@@ -11,6 +11,7 @@ from apps.producto.models import Producto
 class Produccion(models.Model):
     fecha_ingreso = models.DateField(default=datetime.now)
     asignacion = models.ForeignKey(Asig_recurso, on_delete=models.PROTECT)
+    novedades = models.CharField(max_length=100, default='Sin novedad')
 
     def __str__(self):
         return '%s %s' % (self.fecha_ingreso, self.asignacion.lote)

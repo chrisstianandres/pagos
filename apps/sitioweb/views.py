@@ -72,38 +72,38 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = SitiowebForm
-    template_name = 'front-end/sitio/sitio_form.html'
+    template_name = 'front-end/sitio/index.html'
 
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    # @method_decorator(csrf_exempt)
+    # def dispatch(self, request, *args, **kwargs):
+    #     return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        try:
-                web = SitioWeb.objects.first()
-                f = SitiowebForm(request.POST, instance=web)
-                data = self.save_data(f)
-                return HttpResponseRedirect('/')
-        except ObjectDoesNotExist:
-            f = SitiowebForm(request.POST)
-            data = self.save_data(f)
-        return HttpResponse(json.dumps(data), content_type='application/json')
-
-    def save_data(self, f):
-        data = {}
-        if f.is_valid():
-            f.save()
-        else:
-            data['error'] = f.errors
-        return data
-
+    # def post(self, request, *args, **kwargs):
+    #     try:
+    #             web = SitioWeb.objects.first()
+    #             f = SitiowebForm(request.POST, instance=web)
+    #             data = self.save_data(f)
+    #             return HttpResponseRedirect('/')
+    #     except ObjectDoesNotExist:
+    #         f = SitiowebForm(request.POST)
+    #         data = self.save_data(f)
+    #     return HttpResponse(json.dumps(data), content_type='application/json')
+    #
+    # def save_data(self, f):
+    #     data = {}
+    #     if f.is_valid():
+    #         f.save()
+    #     else:
+    #         data['error'] = f.errors
+    #     return data
+    #
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        web = SitioWeb.objects.get(pk=1)
-        if SitioWeb.objects.exists():
-            data['form'] = SitiowebForm(instance=web)
-        else:
-            data['form'] = SitiowebForm(instance=web)
+        # web = SitioWeb.objects.get(pk=1)
+        # if SitioWeb.objects.exists():
+        #     data['form'] = SitiowebForm(instance=web)
+        # else:
+        #     data['form'] = SitiowebForm()
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar'
