@@ -1,4 +1,3 @@
-
 // script del menu responsive Abrir el menu
 var btnMobile = document.getElementById('btn-mobile')
 btnMobile.addEventListener('click', function (e) {
@@ -18,7 +17,7 @@ window.addEventListener('scroll', function () {
         nav.classList.remove('nav-fixed')
     }
 })
- // script del menu responsive effecto accordeon
+// script del menu responsive effecto accordeon
 var submenu = document.getElementsByClassName('link-submenu')
 
 for (var i = 0; i < submenu.length; i++) {
@@ -36,6 +35,7 @@ for (var i = 0; i < submenu.length; i++) {
 
 // script del slider de producto
 let activeImg = 0
+
 function slider(n) {
     let images = document.getElementsByClassName("slider-item")
 
@@ -73,4 +73,20 @@ function previus() {
 let tabs = Array.prototype.slice.apply(document.querySelectorAll('.tabs-item'));
 let panels = Array.prototype.slice.apply(document.querySelectorAll('.tab-panel'));
 
+function insertmapa() {
+    var mat = document.getElementById('mapa').textContent;
+    console.log(mat);
+
+    document.getElementById('mapa2').innerHTML = mat;
+
+}
+
+function container_popular(Array) {
+    var html = '';
+    $.each(Array,function (key, value) {
+        console.log(key);
+        console.log(value);
+    });
+    return html;
+}
 
