@@ -15,11 +15,13 @@ class PresentacionForm(forms.ModelForm):
             })
 
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el nombre de la presentacion', 'class': 'form-control'})
+                attrs={'placeholder': 'Ingrese el nombre de la presentacion', 'class': 'form-control',
+                       'id': 'id_nombre_presentacion'})
             self.fields['abreviatura'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese una Abreviatura', 'class': 'form-control'})
             self.fields['descripcion'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese una Descripcion', 'class': 'form-control'})
+                attrs={'placeholder': 'Ingrese una Descripcion', 'class': 'form-control',
+                       'id': 'id_descripcion_presentacion'})
         # habilitar, desabilitar, y mas
 
     class Meta:

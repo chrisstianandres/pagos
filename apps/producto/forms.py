@@ -17,13 +17,16 @@ class Producto_baseForm(forms.ModelForm):
                 'class': 'form-control'
             })
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el nombre del producto', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese el nombre del producto', 'class': 'form-control form-rounded',
+                       'id': 'id_nombre_producto'})
             self.fields['descripcion'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control form-rounded'})
             self.fields['categoria'].widget.attrs = {
-                'class': 'form-control select2'}
+                'class': 'form-control select2',
+                'id': 'id_despcripcion_producto'}
             self.fields['presentacion'].widget.attrs = {
-                'class': 'form-control select2'}
+                'class': 'form-control select2',
+                'id': 'id_presentacion_producto'}
 
     class Meta:
         model = Producto_base
@@ -49,18 +52,27 @@ class ProductoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.Meta.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
+            # self.fields[field].widget.attrs.update({
+            #     'class': 'form-control'
+            # })
             self.fields['pvp'].widget.attrs = {
+                'class': 'form-control form-control-sm input-sm',
+                'value': 1}
+            self.fields['producto_base'].widget.attrs = {
+                'class': 'form-control select2'}
+            # self.fields['producto_base'].queryset = Producto_base.objects.none()
+            self.fields['pvp_alq'].widget.attrs = {
+                'class': 'form-control form-control-sm input-sm',
+                'value': 1}
+            self.fields['pvp_confec'].widget.attrs = {
                 'class': 'form-control form-control-sm input-sm',
                 'value': 1}
 
     class Meta:
         model = Producto
-        fields = ['pvp']
-        labels = {'pvp': 'P.V.P.'}
-        widgets = {'pvp': forms.TextInput()}
+        fields = ['producto_base', 'pvp', 'pvp_alq', 'pvp_confec', 'imagen']
+        labels = {'producto_base': 'Producto', 'pvp': 'P.V.P.', 'pvp_alq': 'Precio Alquiler.', 'pvp_confec': 'Precio Confeccion.', 'imagen': 'Imagen'}
+        widgets = {'pvp': forms.TextInput(), 'pvp_alq': forms.TextInput(), 'pvp_confec': forms.TextInput()}
 
 
 class GroupForm(forms.ModelForm):

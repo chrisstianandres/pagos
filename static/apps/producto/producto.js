@@ -1,7 +1,8 @@
 $(document).ready(function () {
+    edit_cat();
     var action = '';
     var pk = '';
-    $('input[name="pvp"]').TouchSpin({
+    $('input[name="pvp"], input[name="pvp_alq"], input[name="pvp_confec"]').TouchSpin({
         min: 0.05,
         max: 1000000,
         step: 0.01,
@@ -10,14 +11,6 @@ $(document).ready(function () {
         boostat: 5,
         maxboostedstep: 10,
         prefix: '$'
-    });
-    $('.select2').select2({
-        language: {
-            "noResults": function () {
-                return "Sin resultados";
-            }
-        },
-        theme: "classic"
     });
     $.validator.setDefaults({
         errorClass: 'invalid-feedback',
@@ -84,6 +77,11 @@ $(document).ready(function () {
         $(this).val(changue);
     });
 
+    $('#id_new_producto').on('click', function () {
+        $('#Modal_prod').modal('show');
+        action = 'add';
+        pk = '';
+    });
     $('#id_new_categoria').on('click', function () {
         $('#Modal').modal('show');
         action = 'add';
@@ -94,7 +92,81 @@ $(document).ready(function () {
         action = 'add';
         pk = '';
     });
+    $('#id_producto_base')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/producto/nuevo',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data,
+                    };
+                },
+            },
+            placeholder: 'Busca un Producto',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/producto/nuevo',
+                data: {
+                    "id": $('#id_producto_base option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                  console.log(data[0].descripcion);
+                    $('#id_des').val(data[0].descripcion);
+                    $('#id_cat').val(data[0]['categoria'].nombre);
+                    $('#id_pres').val(data[0]['presentacion'].nombre);
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
 
+            })
+        });
+
+    $('#form_prod').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', 'add_base');
+        parametros.append('id', '');
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                window.location.pathname, 'Esta seguro que desea guardar este producto?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar este producto!', 'far fa-smile-wink', function () {
+                        $('#Modal').modal('hide');
+                        var newOption = new Option(response.producto_base['nombre'], response.producto_base['id'], false, true);
+                        $('#id_producto_base').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
     $('#form_cat').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
@@ -133,3 +205,28 @@ $(document).ready(function () {
     });
 
 });
+
+function edit_cat() {
+
+    if ($('#id_producto_base').val() !== ''){
+        $.ajax({
+                type: "POST",
+                url: '/producto/nuevo',
+                data: {
+                    "id": $('#id_producto_base').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                  console.log(data);
+                    $('#id_des').val(data[0].descripcion);
+                    $('#id_cat').val(data[0]['categoria'].nombre);
+                    $('#id_pres').val(data[0]['presentacion'].nombre);
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+            })
+    }
+
+}

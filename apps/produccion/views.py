@@ -13,6 +13,7 @@ from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.produccion.forms import *
 from apps.produccion.models import Produccion, Detalle_perdidas_materiales, Detalle_perdidas_productos
+from apps.producto_base.models import Producto_base
 
 opc_icono = 'fas fa-toolbox'
 opc_entidad = 'Produccion'
@@ -102,31 +103,44 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         pk = request.POST['id']
         try:
             if action == 'add':
-                datos = json.loads(request.POST['producciones'])
+                datos = json.loads(request.POST['ingresos'])
                 if datos:
                     with transaction.atomic():
                         c = Produccion()
                         c.fecha_ingreso = datos['fecha_ingreso']
                         c.asignacion_id = datos['asignacion']
+                        c.novedades = datos['novedades']
                         c.save()
-                        for i in datos['productos']:
-                            for p in range(0, i['cantidad']):
-                                dv = Inventario_producto()
-                                dv.produccion_id = c.id
-                                dv.producto_id = i['id']
-                                dv.save()
-                        for m in datos['perdida_productos']:
-                            dm = Detalle_perdidas_productos()
-                            dm.produccion = c.id
-                            dm.producto = m['id']
-                            dm.cantidad = m['cantidad']
-                            dm.save()
-                        for p in datos['perdida_material']:
-                            dp = Detalle_perdidas_materiales()
-                            dp.produccion = c.id
-                            dp.material_id = p['id']
-                            dp.cantidad = p['cantidad']
-                            dp.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                for p in range(0, i['cantidad']):
+                                    dv = Inventario_producto()
+                                    dv.produccion_id = c.id
+                                    dv.producto_id = i['id']
+                                    dv.save()
+                                    st = Inventario_producto.objects.filter(producto_id=int(i['id']), estado=1).count()
+                                    pp = Producto.objects.get(id=int(i['id']))
+                                    pb = Producto_base.objects.get(id=pp.id)
+                                    pb.stock = int(st)
+                                    pb.save()
+                            asig = Asig_recurso.objects.get(id=int(datos['asignacion']))
+                            asig.inventariado = 1
+                            asig.save()
+                        if datos['perdidas_productos']:
+                            for m in datos['perdidas_productos']:
+                                dm = Detalle_perdidas_productos()
+                                dm.produccion_id = c.id
+                                dm.producto_id = m['id']
+                                dm.cantidad = m['cantidad']
+                                dm.save()
+                        if datos['perdidas_materiales']:
+                            for p in datos['perdidas_materiales']:
+                                print(p['id'])
+                                dp = Detalle_perdidas_materiales()
+                                dp.produccion_id = c.id
+                                dp.material_id = p['id']
+                                dp.cantidad = p['cantidad']
+                                dp.save()
                         data['id'] = c.id
                         data['resp'] = True
                 else:

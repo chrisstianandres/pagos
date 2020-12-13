@@ -24,13 +24,15 @@ $(function () {
             dataSrc: ""
         },
         columns: [
-            {"data": "id"},
             {"data": "producto_base.nombre"},
             {"data": "producto_base.categoria.nombre"},
             {"data": "producto_base.presentacion.nombre"},
             {"data": "producto_base.stock"},
             {"data": "producto_base.descripcion"},
             {"data": "pvp"},
+            {"data": "pvp_alq"},
+            {"data": "pvp_confec"},
+            {"data": "imagen"},
             {"data": "id"}
         ],
         buttons: {
@@ -141,7 +143,7 @@ $(function () {
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         columnDefs: [
             {
-                targets: [-4],
+                targets: [-7],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -149,7 +151,7 @@ $(function () {
                 }
             },
             {
-                targets: [-2],
+                targets: [-3, -4, -5],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -159,6 +161,14 @@ $(function () {
             {
                 targets: '__all',
                 class: 'text-center'
+            },
+            {
+                targets: [-2],
+                class: 'text-center',
+                orderable: false,
+                render: function (data, type, row) {
+                    return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
+                }
             },
             {
                 targets: [-1],
@@ -177,15 +187,12 @@ $(function () {
         ],
         createdRow: function (row, data, dataIndex) {
             if (data.producto_base.stock >= 51) {
-                $('td', row).eq(4).find('span').addClass('badge badge-success').attr("style", "color: white");
+                $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
             } else if (data.producto_base.stock >= 10) {
-                $('td', row).eq(4).find('span').addClass('badge badge-warning').attr("style", "color: white");
+                $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
             } else if (data.producto_base.stock <= 9) {
-                $('td', row).eq(4).find('span').addClass('badge badge-danger').attr("style", "color: white");
+                $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
-
-            if (data.tipo === 'Producto'){ $('td', row).eq(7).html('<span class="badge badge-success"> Sin precio compra </span>');}
-            else {$('td', row).eq(8).html('<span class="badge badge-success"> Sin precio venta </span>');}
 
         }
 
@@ -204,7 +211,7 @@ $(function () {
     });
 
     $('#nuevo').on('click', function () {
-        window.location.replace('/producto/nuevo')
+        window.location.href = '/producto/nuevo'
 
     })
 });

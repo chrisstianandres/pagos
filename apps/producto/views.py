@@ -1,6 +1,8 @@
 import json
 
-from django.db.models import Q
+from datetime import datetime, timedelta
+from django.db.models import Q, Sum, Max
+from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -15,6 +17,7 @@ from apps.presentacion.forms import PresentacionForm
 from apps.producto.forms import ProductoForm, Producto_baseForm
 from apps.producto.models import Producto
 from apps.producto_base.models import Producto_base
+from apps.venta.models import Detalle_venta
 
 opc_icono = 'fab fa-amazon'
 opc_entidad = 'Productos'
@@ -88,6 +91,25 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     item['subtotal'] = 0.00
                     item['iva_emp'] = empresa.iva
                     data.append(item)
+            elif action == 'sitio':
+                data = []
+                h = datetime.today() - timedelta(days=datetime.today().isoweekday() % 7)
+                query = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__range=[h, h + timedelta(days=6)],
+                                                           venta__estado=1).values('inventario__producto__producto_base_id',
+                                                                                   'inventario__producto_id',
+                                                                                   'inventario__producto__pvp',
+                                                                                   'inventario__producto__pvp_alq',
+                                                                                   'inventario__producto__pvp_confec',
+                                                                                   'inventario__producto__imagen').annotate(total=Sum('cantidad')).order_by('-total')[0:3]
+                for i in query:
+                    px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
+                    pr = Producto.objects.get(id=int(i['inventario__producto_id']))
+                    item = {'info': px.nombre, 'descripcion': px.descripcion}
+                    item['pvp'] = format(i['inventario__producto__pvp'], '.2f')
+                    item['pvp_alq'] = format(i['inventario__producto__pvp_alq'], '.2f')
+                    item['pvp_confec'] = format(i['inventario__producto__pvp_confec'], '.2f')
+                    item['imagen'] = pr.get_image()
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -106,10 +128,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
 
 class Createview(ValidatePermissionRequiredMixin, CreateView):
-    model = Producto_base
-    second_model = Producto
-    form_class = Producto_baseForm
-    second_form_class = ProductoForm
+    model = Producto
+    form_class = ProductoForm
     success_url = 'producto:lista'
     template_name = 'front-end/producto/producto_form.html'
 
@@ -122,40 +142,47 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         action = request.POST['action']
         try:
             if action == 'add':
-                self.object = self.get_object
-                f = self.form_class(request.POST)
-                f2 = self.second_form_class(request.POST)
-                data = self.save_data(f, f2)
-                return HttpResponseRedirect('/producto/lista')
+                f = self.form_class(request.POST or None, request.FILES or None)
+                if f.is_valid():
+                    print(2)
+                    var = f.save()
+                    data['producto_base'] = var.toJSON()
+                    data['resp'] = True
+                    return HttpResponseRedirect('/producto/lista')
+                else:
+                    print(5)
+                    data['error'] = f.errors
+                    data['form'] = f
             elif action == 'delete':
                 pk = request.POST['id']
                 f = Producto.objects.get(pk=pk)
-                f2 = Producto_base.objects.get(id=f.producto_base_id)
                 f.delete()
-                f2.delete()
+            elif action == 'search':
+                data = []
+                term = request.POST['term']
+                query = Producto_base.objects.filter(nombre__icontains=term)[0:10]
+                for a in query:
+                    result = {'id': int(a.id), 'text': 'Nombre: ' + str(a.nombre) + ' / ' + 'Descripcion: ' + str(a.descripcion)}
+                    data.append(result)
+            elif action == 'add_base':
+                f = Producto_baseForm(request.POST)
+                data = self.save_data(f)
+            elif action == 'get':
+                data = []
+                pk = request.POST['id']
+                query = Producto_base.objects.get(id=pk)
+                item = query.toJSON()
+                data.append(item)
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-    def save_data(self, f, f2):
-        data = {}
-        if f.is_valid() and f2.is_valid():
-            base = f2.save(commit=False)
-            base.producto_base = f.save()
-            base.save()
-            data['resp'] = True
-        else:
-            data['error'] = f.errors
-        return data
-
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         if 'form' not in data:
             data['form'] = self.form_class(self.request.GET)
-        if 'form2' not in data:
-            data['form2'] = self.second_form_class(self.request.GET)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Producto'
@@ -165,15 +192,14 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         data['crud'] = crud
         data['form_cat'] = CategoriaForm
         data['form_pres'] = PresentacionForm
+        data['form_prod'] = Producto_baseForm
         data['empresa'] = empresa
         return data
 
 
 class Updateview(ValidatePermissionRequiredMixin, UpdateView):
-    model = Producto_base
-    form_class = Producto_baseForm
-    second_model = Producto
-    second_form_class = ProductoForm
+    model = Producto
+    form_class = ProductoForm
     success_url = 'producto:lista'
     template_name = 'front-end/producto/producto_form.html'
     permission_required = 'producto.change_producto'
@@ -187,38 +213,31 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
         action = request.POST['action']
         try:
             pk = self.kwargs.get('pk', 0)
-            producto = self.second_model.objects.get(id=pk)
-            producto_base = self.model.objects.get(id=producto.producto_base_id)
+            producto = self.model.objects.get(id=pk)
             if action == 'edit':
-                f = self.form_class(request.POST, instance=producto_base)
-                f2 = self.second_form_class(request.POST, instance=producto)
-                data = self.save_data(f, f2)
-                return HttpResponseRedirect('/producto/lista')
+                f = self.form_class(request.POST or None, request.FILES or None, instance=producto)
+                if f.is_valid():
+                    print(2)
+                    var = f.save()
+                    data['producto_base'] = var.toJSON()
+                    data['resp'] = True
+                    return HttpResponseRedirect('/producto/lista')
+                else:
+                    print(25)
+                    data['error'] = f.errors
+                    data['form'] = f
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-    def save_data(self, f, f2):
-        data = {}
-        if f.is_valid() and f2.is_valid():
-            f.save()
-            f2.save()
-            data['resp'] = True
-        else:
-            data['error'] = f.errors
-        return data
-
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         pk = self.kwargs.get('pk', 0)
-        producto = self.second_model.objects.get(id=pk)
-        producto_base = self.model.objects.get(id=producto.producto_base_id)
+        producto = self.model.objects.get(id=pk)
         if 'form' not in data:
-            data['form'] = self.form_class(instance=producto_base)
-        if 'form2' not in data:
-            data['form2'] = self.second_form_class(instance=producto)
+            data['form'] = self.form_class(instance=producto)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Edicion'

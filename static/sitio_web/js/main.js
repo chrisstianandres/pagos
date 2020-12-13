@@ -82,11 +82,35 @@ function insertmapa() {
 }
 
 function container_popular(Array) {
-    var html = '';
-    $.each(Array,function (key, value) {
-        console.log(key);
-        console.log(value);
+    $.ajax({
+        url: '/producto/lista',
+        type: 'POST',
+        data: {'action': 'sitio'},
+        dataSrc: "",
+    }).done(function (data) {
+        var html = '';
+        $.each(data, function (key, value) {
+            html += ' <div class="column is-full">+' +
+                '<div class="separator"></div></div>' +
+                '<div class="column is-half-tablet is-one-third-desktop column-half">' +
+                '<div class="card">' +
+                '<img src="' + value['imagen'] + '" alt="">' +
+                '<div class="card-info">' +
+                '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
+                '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
+                '<p class="has-text-centered"> <strong>Precio de venta:</strong> ' + value['pvp'] + '</p>' +
+                '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> ' + value['pvp_alq'] + '</p>' +
+                '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> ' + value['pvp_confec'] + '</p>' +
+                '<div class="card-buttons">' +
+                '<a href="#" class="btn btn--mini-rounded"><i class="zmdi zmdi-shopping-cart"></i></a>' +
+                '<a href="#" class="btn btn--mini-rounded"><i class="zmdi zmdi-favorite-outline"></i></a>' +
+                '<a href="producto.html" class="btn btn--mini-rounded"><i class="zmdi zmdi-eye"></i></a>' +
+                '</div>' +
+                '</div>' +
+                '</div>'
+        });
+        $('#pop').html(html);
     });
-    return html;
+
 }
 

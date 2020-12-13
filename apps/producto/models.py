@@ -2,6 +2,7 @@ from django.db import models
 from django.forms import model_to_dict
 
 from apps.producto_base.models import Producto_base
+from pagos.settings import STATIC_URL, MEDIA_URL
 
 
 class Producto(models.Model):
@@ -9,6 +10,7 @@ class Producto(models.Model):
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     pvp_alq = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     pvp_confec = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
+    imagen = models.ImageField(upload_to='producto/imagen', blank=True, null=True)
 
     def __str__(self):
         return '%s' % self.producto_base.nombre
@@ -19,7 +21,13 @@ class Producto(models.Model):
         item['pvp'] = format(self.pvp, '.2f')
         item['pvp_alq'] = format(self.pvp_alq, '.2f')
         item['pvp_confec'] = format(self.pvp_confec, '.2f')
+        item['imagen'] = self.get_image()
         return item
+
+    def get_image(self):
+        if self.imagen:
+            return '{}{}'.format(MEDIA_URL, self.imagen)
+        return '{}{}'.format(MEDIA_URL, 'producto/no_imagen.jpg')
 
 
     class Meta:

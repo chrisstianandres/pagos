@@ -48,6 +48,9 @@
                             <label for="id_novedades">{{ form.novedades.label_tag }}</label>
                             <div class="input-group form-group-lg">
                                 {{ form.novedades }}
+                                <label id="id_error" class="invalid-feedback" for="id_novedades">Por favor ingresa una
+                                    novedad</label>
+
                             </div>
                         </div>
                     </div>
@@ -83,7 +86,7 @@
                                             {{ form2.producto }}
                                             <br><br>
                                             <button type="button"
-                                                    class="btn btn-danger btn-sm btn-flat btnRemoveall">
+                                                    class="btn btn-danger btn-sm btn-flat" id="btnRemoveall_inventario">
                                                 <i class="far fa-trash-alt"></i> Quitar todo
                                             </button>
                                             <br><br>
@@ -143,7 +146,8 @@
                                                             {{ form3.producto }}
                                                             <br><br>
                                                             <button type="button"
-                                                                    class="btn btn-danger btn-sm btn-flat btnRemoveall">
+                                                                    class="btn btn-danger btn-sm btn-flat"
+                                                                    id="btnRemoveall_perdidas_productos">
                                                                 <i class="far fa-trash-alt"></i> Quitar todo
                                                             </button>
                                                             <br><br>
@@ -167,40 +171,42 @@
                                                 </div>
                                             </div>
                                             <div class="tab-pane fade show" role="tabpanel" aria-labelledby="mat-tab3"
-                                             id="perd_materiales">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5><i class="fas fa-hat-cowboy-side"></i> Detalle de Materiales perdidos</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="form-group">
-                                                        <label> Buscar Materiales:</label>
-                                                        {{ form4.material }}
-                                                        <br><br>
-                                                        <button type="button"
-                                                                class="btn btn-danger btn-sm btn-flat btnRemoveall">
-                                                            <i class="far fa-trash-alt"></i> Quitar todo
-                                                        </button>
-                                                        <br><br>
-                                                        <div class="table-responsive">
-                                                            <table class="table" id="tblperdidas_materiales">
-                                                                <thead>
-                                                                <tr>
-                                                                    <th><em class="fas fa-trash-alt"></em></th>
-                                                                    <th>Material</th>
-                                                                    <th>Categoria</th>
-                                                                    <th>Presentacion</th>
-                                                                    <th>Cantidad</th>
-                                                                </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                </tbody>
-                                                            </table>
+                                                 id="perd_materiales">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h5><i class="fas fa-hat-cowboy-side"></i> Detalle de Materiales
+                                                            perdidos</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label> Buscar Materiales:</label>
+                                                            {{ form4.material }}
+                                                            <br><br>
+                                                            <button type="button"
+                                                                    class="btn btn-danger btn-sm btn-flat"
+                                                                    id="btnRemoveall_perdidas_materiales">
+                                                                <i class="far fa-trash-alt"></i> Quitar todo
+                                                            </button>
+                                                            <br><br>
+                                                            <div class="table-responsive">
+                                                                <table class="table" id="tblperdidas_materiales">
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th><em class="fas fa-trash-alt"></em></th>
+                                                                        <th>Material</th>
+                                                                        <th>Categoria</th>
+                                                                        <th>Presentacion</th>
+                                                                        <th>Cantidad</th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         </div>
                                     </div>
                                 </div>

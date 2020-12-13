@@ -1,6 +1,6 @@
 import json
 
-from django.db.models import Q
+from django.db.models import Q, Sum, Count
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import JsonResponse
 from django.urls import reverse_lazy
@@ -8,8 +8,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
+from apps.asignar_recursos.models import Detalle_asig_recurso
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
+from apps.inventario_material.models import Inventario_material
 from apps.material.forms import MaterialForm, Producto_baseForm
 from apps.material.models import Material
 from apps.mixins import ValidatePermissionRequiredMixin
@@ -46,18 +48,36 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 for a in query:
                     result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
                     data.append(result)
+            elif action == 'search_perd':
+                data = []
+                term = request.POST['term']
+                asig = request.POST['asig[id]']
+
+                query = Detalle_asig_recurso.\
+                            objects.filter(inventario_material__material__producto_base__nombre__icontains=term, asig_recurso_id=int(asig)).\
+                            values('inventario_material__material__producto_base_id',
+                                   'asig_recurso_id',
+                                   'inventario_material__material_id'
+                                   ).annotate(total=Count('id')).\
+                            order_by('-total')[0:10]
+                for i in query:
+                    px = Producto_base.objects.get(id=int(i['inventario_material__material__producto_base_id']))
+                    result = {'id': int(i['asig_recurso_id']), 'text': str(px.nombre)}
+                    data.append(result)
             elif action == 'get':
                 id = request.POST['id']
-                material = Material.objects.filter(pk=id)
+                asig = request.POST['asig[id]']
+                material = Detalle_asig_recurso.objects.filter(asig_recurso_id=int(asig)).values('inventario_material__material__producto_base')
+                print(material)
                 data = []
-                for i in material:
-                    item = i.toJSON()
-                    item['cantidad'] = 1
-                    item['subtotal'] = 0.00
-                    item['iva_emp'] = 12
-                    cal = format(float((i.p_compra*100)/112), '.2f')
-                    item['p_compra'] = cal
-                    data.append(item)
+                # for i in material:
+                #     item = i.toJSON()
+                #     item['cantidad'] = 1
+                #     item['subtotal'] = 0.00
+                #     item['iva_emp'] = 12
+                #     cal = format(float((i.p_compra*100)/112), '.2f')
+                #     item['p_compra'] = cal
+                #     data.append(item)
             elif action == 'search_asig':
                 data = []
                 term = request.POST['term']
@@ -72,6 +92,25 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 for i in material:
                     item = i.toJSON()
                     item['cantidad'] = 1
+                    data.append(item)
+            elif action == 'get_perd':
+                id = request.POST['id']
+                material = Detalle_asig_recurso.objects.filter(asig_recurso_id=id).\
+                    values('inventario_material__material__producto_base_id').annotate(total=Count('id')).\
+                            order_by('-total')
+                producto = Detalle_asig_recurso.objects.filter(asig_recurso_id=id). \
+                    values('inventario_material__material_id').annotate(total=Count('id')). \
+                    order_by('-total')
+                py = ''
+                for x in producto:
+                    py = int(x['inventario_material__material_id'])
+                data = []
+                for i in material:
+                    px = Producto_base.objects.get(id=int(i['inventario_material__material__producto_base_id']))
+                    item = px.toJSON()
+                    item['id'] = py
+                    item['cantidad'] = 1
+                    item['max'] = int(i['total'])
                     data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'

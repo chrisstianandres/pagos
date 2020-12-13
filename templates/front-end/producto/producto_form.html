@@ -16,7 +16,7 @@
                 </div>
                 <div class="card-body">
                     <div class="form">
-                        <form class="cmxform form-horizontal style-form" id="form" method="POST" action="{{ crud }}">
+                        <form class="cmxform form-horizontal style-form" id="form" method="POST" action="{{ crud }}" enctype="multipart/form-data">
                             {% csrf_token %}
                             {{ form.media }}
                             <input type="hidden" id="action" name="action" value="{{ action }}">
@@ -25,45 +25,64 @@
                             <input type="hidden" name="option" value="{{ option }}">
                             <div class="form-group col-lg-12">
                                 <label style="font-size: 13px;"
-                                       class="col-lg-3 control-label"><strong>{{ form.nombre.label_tag }}</strong></label>
-                                <div class="col-lg-10">
-                                    {{ form.nombre }}
-                                </div>
-                            </div>
-                            <div class="form-group col-lg-12">
-                                <label style="font-size: 13px;"
-                                       class="col-lg-3 control-label"><strong>{{ form.descripcion.label_tag }}</strong></label>
-                                <div class="col-lg-10">
-                                    {{ form.descripcion }}
-                                </div>
-                            </div>
-                            <div class="form-group col-lg-12">
-                                <label for="id_categoria">{{ form.categoria.label_tag }}</label>
+                                       class="col-lg-3 control-label"><strong>{{ form.producto_base.label_tag }}</strong></label>
                                 <div class="input-group form-group-lg col-lg-10">
-                                    {{ form.categoria }}
+                                    {{ form.producto_base }}
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary btn-xs" id="id_new_categoria" type="button"><i
+                                        <button class="btn btn-primary btn-xs" id="id_new_producto" type="button"><i
                                                 class="fas fa-plus"></i></button>
                                     </div>
+                                </div>
+                            </div>
+                             <div class="form-group col-lg-12">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>Descripcion</strong></label>
+                                <div class="input-group form-group-lg col-lg-10">
+                                    <input type="text" name="descr" readonly class="form-control form-control-sm input-sm" id="id_des" aria-invalid="false">
+                                </div>
+                            </div>
+                             <div class="form-group col-lg-12">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>Categoria</strong></label>
+                                <div class="input-group form-group-lg col-lg-10">
+                                    <input type="text" name="cat" readonly class="form-control form-control-sm input-sm" id="id_cat" aria-invalid="false">
+                                </div>
+                            </div>
+                             <div class="form-group col-lg-12">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>Presentacion</strong></label>
+                                <div class="input-group form-group-lg col-lg-10">
+                                    <input type="text" name="pres" readonly class="form-control form-control-sm input-sm" id="id_pres" aria-invalid="false">
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label for="id_imagen">{{ form.imagen.label_tag }}</label>
+                                <div class="input-group form-group-lg col-lg-10">
+                                    {{ form.imagen }}
                                 </div>
 
                             </div>
                             <div class="form-group col-lg-12">
-                                <label for="id_presentacion">{{ form.presentacion.label_tag }}</label>
-                                <div class="input-group form-group-lg col-lg-10">
-                                    {{ form.presentacion }}
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-xs" id="id_new_presentacion" type="button"><i
-                                                class="fas fa-plus"></i></button>
-                                    </div>
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>{{ form.pvp.label_tag }}</strong></label>
+                                <div class="col-lg-10">
+                                    {{ form.pvp }}
                                 </div>
-
                             </div>
+
                             <div class="form-group col-lg-12">
                                 <label style="font-size: 13px;"
-                                       class="col-lg-3 control-label"><strong>{{ form2.pvp.label_tag }}</strong></label>
+                                       class="col-lg-3 control-label"><strong>{{ form.pvp_alq.label_tag }}</strong></label>
                                 <div class="col-lg-10">
-                                    {{ form2.pvp }}
+                                    {{ form.pvp_alq }}
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-12">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>{{ form.pvp_confec.label_tag }}</strong></label>
+                                <div class="col-lg-10">
+                                    {{ form.pvp_confec }}
                                 </div>
                             </div>
 
@@ -89,12 +108,76 @@
     </div>
     <!-- /row -->
 
-        <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="Modal_prod" tabindex="-1" aria-hidden="true">
+        <form method="post" id="form_prod" enctype="multipart/form-data">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus"></i>&nbsp;Nuevo registro
+                            de un Producto</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="form-group">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>{{ form_prod.nombre.label_tag }}</strong></label>
+                                <div class="col-lg-12">
+                                    {{ form_prod.nombre }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 13px;"
+                                       class="col-lg-3 control-label"><strong>{{ form_prod.descripcion.label_tag }}</strong></label>
+                                <div class="col-lg-12">
+                                    {{ form_prod.descripcion }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_categoria">{{ form_prod.categoria.label_tag }}</label>
+                                <div class="input-group form-group-lg col-lg-12">
+                                    {{ form_prod.categoria }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-xs" id="id_new_categoria" type="button"><i
+                                                class="fas fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="id_presentacion">{{ form_prod.presentacion.label_tag }}</label>
+                                <div class="input-group form-group-lg col-lg-12">
+                                    {{ form_prod.presentacion }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-xs" id="id_new_presentacion" type="button"><i
+                                                class="fas fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
+                           style="color: white"><i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <form method="post" id="form_cat" enctype="multipart/form-data" action=".">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus"></i>&nbsp;Nuevo registro de una Cetegoria</h5>
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus"></i>&nbsp;Nuevo registro
+                            de una Cetegoria</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -108,8 +191,8 @@
 
                     </div>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-danger" data-dismiss="modal"  onclick=" reset();"
-                           style="color: white"><i class="fas fa-times" ></i> Cancelar
+                        <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
+                           style="color: white"><i class="fas fa-times"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
                         </button>
@@ -119,12 +202,13 @@
         </form>
 
     </div>
-     <div class="modal fade" id="Modal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="Modal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <form method="post" id="form_pre" enctype="multipart/form-data" action=".">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus"></i>&nbsp;Nuevo registro de una Presentacion</h5>
+                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus"></i>&nbsp;Nuevo registro
+                            de una Presentacion</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -138,8 +222,8 @@
 
                     </div>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-danger" data-dismiss="modal"  onclick=" reset();"
-                           style="color: white"><i class="fas fa-times" ></i> Cancelar
+                        <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
+                           style="color: white"><i class="fas fa-times"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
                         </button>

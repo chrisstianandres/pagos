@@ -29,7 +29,7 @@ class User(AbstractUser):
 
     def get_image(self):
         if self.avatar:
-            return '{}{}'.format(STATIC_URL, self.avatar)
+            return '{}{}'.format(MEDIA_URL, self.avatar)
         return '{}{}'.format(MEDIA_URL, 'user/admin.png')
 
     def toJSON(self):

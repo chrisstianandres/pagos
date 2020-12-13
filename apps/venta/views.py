@@ -544,8 +544,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 #     year = datetime.now().year
 #     data = []
 #     for y in range(1, 13):
-#         total = Venta.objects.filter(fecha_venta__year=year, fecha_venta__month=y, estado=1).aggregate(
-#             r=Coalesce(Sum('total'), 0)).get('r')
+#         total = Venta.objects.filter(fecha_venta__year=year, fecha_venta__month=y, estado=1).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
 #         data.append(float(total))
 #     return data
 #
