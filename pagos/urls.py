@@ -23,7 +23,7 @@ from pagos import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', login_required(backEnd.menu), name='menu'),
+    path('menu', login_required(backEnd.menu), name='menu'),
     path('login/', backEnd.logeo, name='login'),
     path('logout/', backEnd.disconnect, name='logout'),
     path('connect/', backEnd.connect, name='connect'),
@@ -47,7 +47,7 @@ urlpatterns = [
     path('reparacion/', include('apps.reparacion.urls', namespace='reparacion')),
     path('alquiler/', include('apps.alquiler.urls', namespace='alquiler')),
     path('confeccion/', include('apps.confeccion.urls', namespace='confeccion')),
-    path('sitio/', include('apps.sitioweb.urls', namespace='sitio')),
+    path('', include('apps.sitioweb.urls', namespace='sitio')),
     path('produccion/', include('apps.produccion.urls', namespace='produccion')),
     # path('asignacion/', include('apps.asignar_recursos.urls', namespace='asignacion')),
     # path('devolucion/', include('apps.delvoluciones_venta.urls', namespace='devolucion')),

@@ -93,8 +93,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     data.append(item)
             elif action == 'sitio':
                 data = []
-                h = datetime.today() - timedelta(days=datetime.today().isoweekday() % 7)
-                query = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__range=[h, h + timedelta(days=6)],
+                h = datetime.today()
+                query = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,
                                                            venta__estado=1).values('inventario__producto__producto_base_id',
                                                                                    'inventario__producto_id',
                                                                                    'inventario__producto__pvp',
@@ -105,6 +105,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
                     pr = Producto.objects.get(id=int(i['inventario__producto_id']))
                     item = {'info': px.nombre, 'descripcion': px.descripcion}
+                    item['id_venta'] = int(i['inventario__producto_id'])
+                    item['id_reparacion'] = int(pr.id)
+                    item['id_confeccion'] = int(pr.id)
                     item['pvp'] = format(i['inventario__producto__pvp'], '.2f')
                     item['pvp_alq'] = format(i['inventario__producto__pvp_alq'], '.2f')
                     item['pvp_confec'] = format(i['inventario__producto__pvp_confec'], '.2f')

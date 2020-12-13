@@ -109,7 +109,7 @@
 
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="{% url 'menu' %}" class="brand-link">
         <img src="/media/imagen.PNG" alt="AdminLTE Logo" class="brand-image img-circle elevation-4"
              style="opacity: .8">
         <span class="brand-text font-weight-light">{{ empresa.nombre }}</span>
@@ -158,7 +158,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{% url 'user:groups' %}" class="nav-link">
                                 <i class="fas fa-user-lock"></i>
                                 <p>Grupos</p>
                             </a>
@@ -356,7 +356,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{% url 'sitio:configurar' %}" class="nav-link">
                         <i class="far fa-newspaper"></i>
                         <p>
                             Sitio Web

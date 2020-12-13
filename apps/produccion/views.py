@@ -1,6 +1,7 @@
 import json
 
 from django.db import transaction
+from django.db.models import Count
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -49,8 +50,12 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    for p in Inventario_producto.objects.filter(produccion_id=id):
-                        item = p.toJSON()
+                    producto = Inventario_producto.objects.filter(produccion_id=id).values('producto_id').annotate(total=Count('id')).\
+                            order_by('-total')
+                    for p in producto:
+                        px = Producto.objects.get(id=int(p['producto_id']))
+                        item = px.toJSON()
+                        item['total'] = int(p['total'])
                         data.append(item)
                 else:
                     data['error'] = 'Ha ocurrido un error'
@@ -58,7 +63,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    for m in Detalle_perdidas_materiales.objects.filter(asig_recurso_id=id):
+                    material = Detalle_perdidas_materiales.objects.filter(produccion_id=id)
+                    for m in material:
                         item = m.toJSON()
                         data.append(item)
                 else:
@@ -67,11 +73,34 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    for m in Detalle_perdidas_productos.objects.filter(produccion_id=id):
-                        item = m.toJSON()
+                    producto = Detalle_perdidas_productos.objects.filter(produccion_id=id).values(
+                        'producto_id').annotate(
+                        total=Count('id')). \
+                        order_by('-total')
+                    for m in producto:
+                        px = Producto.objects.get(id=int(m['producto_id']))
+                        item = px.toJSON()
+                        item['total'] = int(m['total'])
                         data.append(item)
                 else:
                     data['error'] = 'Ha ocurrido un error'
+            elif action == 'delete':
+                id = request.POST['id']
+                dtpm = Detalle_perdidas_materiales.objects.filter(produccion_id=id)
+                invp = Inventario_producto.objects.filter(produccion_id=id)
+                dtpp = Detalle_perdidas_productos.objects.filter(produccion_id=id)
+                for a in dtpm:
+                    a.delete()
+                for b in invp:
+                    b.delete()
+                for c in dtpp:
+                    c.delete()
+                pr = Produccion.objects.get(id=id)
+                asg = Asig_recurso.objects.get(id=pr.asignacion_id)
+                asg.inventariado = 0
+                asg.save()
+                pr.estado = 1
+                pr.save()
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -100,7 +129,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 datos = json.loads(request.POST['ingresos'])
@@ -155,6 +183,8 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
+        st = Inventario_producto.objects.filter(producto_id=1, estado=1).count()
+        print(st)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Produccion'

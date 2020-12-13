@@ -6,12 +6,17 @@ from django.forms import model_to_dict
 from apps.asignar_recursos.models import Asig_recurso
 from apps.material.models import Material
 from apps.producto.models import Producto
+estado = (
+    (0, 'INVENTARIADA'),
+    (1, 'ANULADA')
+)
 
 
 class Produccion(models.Model):
     fecha_ingreso = models.DateField(default=datetime.now)
     asignacion = models.ForeignKey(Asig_recurso, on_delete=models.PROTECT)
     novedades = models.CharField(max_length=100, default='Sin novedad')
+    estado = models.IntegerField(choices=estado, default=0)
 
     def __str__(self):
         return '%s %s' % (self.fecha_ingreso, self.asignacion.lote)
@@ -19,6 +24,7 @@ class Produccion(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['asignacion'] = self.asignacion.toJSON()
+        item['estado_text'] = self.get_estado_display()
         item['fecha_ingreso'] = self.fecha_ingreso.strftime('%d-%m-%Y')
         return item
 

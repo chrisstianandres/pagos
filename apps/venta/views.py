@@ -145,6 +145,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
+                                print(datos['productos'])
                                 for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[:i['cantidad']]:
                                     dv = Detalle_venta()
                                     dv.venta_id = v.id
