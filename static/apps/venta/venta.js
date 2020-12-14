@@ -1,5 +1,4 @@
 var tblventa;
-var tblservicios;
 var ventas = {
     items: {
         fecha_venta: '',
