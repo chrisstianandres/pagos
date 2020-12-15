@@ -285,3 +285,24 @@ function menssaje_error_form(title, content, icon, callback) {
         }
     });
 }
+
+
+function borrar_producto_carito(callback) {
+    var obj = $.dialog({
+        icon: 'fa fa-spinner fa-spin',
+        title: 'Trabajando!!',
+        content: 'Agregando producto al carrito!',
+        type: 'blue',
+        typeAnimated: true,
+        draggable: true,
+        onClose: function () {
+            callback();
+        },
+    });
+    setTimeout(function () {
+        // some point in future.
+        obj.close();
+    }, 2000);
+
+
+}
