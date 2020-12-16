@@ -38,6 +38,7 @@ def logeo(request):
     data = {}
     if not request.user.is_authenticated:
         data['titulo'] = 'Inicio de Sesion'
+        data['nomb'] = nombre_empresa()
     else:
         return HttpResponseRedirect("/")
     return render(request, 'front-end/login.html', data)

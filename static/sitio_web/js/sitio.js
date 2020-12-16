@@ -29,7 +29,6 @@ var carrito = {
     list: function () {
         this.calculate();
         var numero = this.items.productos.length;
-
         if (numero>=1){
             console.log(numero);
             $('#count').html(numero);
@@ -55,7 +54,8 @@ var carrito = {
                 {data: "producto_base.presentacion.nombre"},
                 {data: "producto_base.stock"},
                 {data: "cantidad"},
-                {data: "pvp"}
+                {data: "pvp"},
+                {data: "subtotal"}
             ],
             destroy: true,
             columnDefs: [
@@ -71,7 +71,7 @@ var carrito = {
                     }
                 },
                 {
-                    targets: [-1],
+                    targets: [-2, -1],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
@@ -79,7 +79,7 @@ var carrito = {
                     }
                 },
                 {
-                    targets: [-2],
+                    targets: [-3],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
@@ -137,6 +137,7 @@ function container_popular() {
                 '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                 '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
                 '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                '<p>Los precios aqui mostrados no incluyen IVA</p>' +
                 '</div>' +
                 '</div>' +
                 '</div>' +
@@ -192,6 +193,11 @@ $(function () {
 
     });
 
+
+    $(document).on('click', 'a[rel="pay"]', function (e) {
+        window.location.href='/venta/online'
+    });
+
     $(document).on('click', 'a[rel="clear_car"]', function (e) {
         if (carrito.items.productos.length === 0) return false;
         e.preventDefault();
@@ -218,11 +224,14 @@ $(function () {
                 })
         })
         .on('change keyup', 'input[name="cantidad"]', function () {
+            localStorage.clear();
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
-            ventas.items.productos[tr.row].cantidad = cantidad;
-            ventas.calculate();
-            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+            carrito.items.productos[tr.row].cantidad = cantidad;
+            carrito.calculate();
+            localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
+            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
+
         });
 
 

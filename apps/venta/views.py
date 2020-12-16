@@ -185,6 +185,92 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['formc'] = ClienteForm()
         return data
 
+
+def CrudView_online(request):
+    data = {}
+    if request.user.is_authenticated:
+        if request.method == 'GET':
+            print(12)
+        return render(request, 'front-end/venta/venta_online.html', data)
+    else:
+        data['key'] = 1
+        data['titulo'] = 'Inicio de Sesion'
+        data['nomb'] = nombre_empresa()
+        return render(request, 'front-end/login.html', data)
+
+
+
+# class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
+#     form_class = Venta
+#     template_name = 'front-end/venta/venta_online.html'
+#
+#     @method_decorator(csrf_exempt)
+#     def dispatch(self, request, *args, **kwargs):
+#         return super().dispatch(request, *args, **kwargs)
+#
+#     def post(self, request, *args, **kwargs):
+#         data = {}
+#         action = request.POST['action']
+#         pk = request.POST['id']
+#         try:
+#             if action == 'add':
+#                 datos = json.loads(request.POST['ventas'])
+#                 if datos:
+#                     with transaction.atomic():
+#                         c = Transaccion()
+#                         c.fecha_trans = datos['fecha_venta']
+#                         c.cliente_id = datos['cliente']
+#                         c.user_id = request.user.id
+#                         c.subtotal = float(datos['subtotal'])
+#                         c.iva = float(datos['iva'])
+#                         c.total = float(datos['total'])
+#                         c.tipo = 0
+#                         c.save()
+#                         v = Venta()
+#                         v.transaccion_id = c.id
+#                         v.save()
+#                         if datos['productos']:
+#                             for i in datos['productos']:
+#                                 print(datos['productos'])
+#                                 for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[:i['cantidad']]:
+#                                     dv = Detalle_venta()
+#                                     dv.venta_id = v.id
+#                                     dv.inventario_id = in_pr.id
+#                                     dv.cantidad = int(i['cantidad'])
+#                                     dv.pvp_actual = float(in_pr.producto.pvp)
+#                                     dv.subtotal = float(i['subtotal'])
+#                                     in_pr.estado = 0
+#                                     in_pr.save()
+#                                     dv.save()
+#                                 stock = Producto_base.objects.get(id=i['producto_base']['id'])
+#                                 stock.stock = int(Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+#                                 stock.save()
+#                         data['id'] = v.id
+#                         data['resp'] = True
+#                 else:
+#                     data['resp'] = False
+#                     data['error'] = "Datos Incompletos"
+#
+#             else:
+#                 data['error'] = 'No ha seleccionado ninguna opción'
+#         except Exception as e:
+#             data['error'] = str(e)
+#         return HttpResponse(json.dumps(data), content_type='application/json')
+#
+#     def get_context_data(self, **kwargs):
+#         data = super().get_context_data(**kwargs)
+#         data['icono'] = opc_icono
+#         data['entidad'] = opc_entidad
+#         data['boton'] = 'Guardar Venta'
+#         data['titulo'] = 'Nueva Venta'
+#         data['nuevo'] = '/venta/nuevo'
+#         data['empresa'] = empresa
+#         data['form'] = TransaccionForm()
+#         data['form2'] = Detalle_VentaForm()
+#         data['detalle'] = []
+#         data['formc'] = ClienteForm()
+#         return data
+
 # @csrf_exempt
 # def data(request):
 #     data = []

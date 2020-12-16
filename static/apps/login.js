@@ -1,4 +1,6 @@
+var key;
 $(function () {
+    key = $('#key').val();
     jQuery.validator.addMethod("lettersonly", function (value, element) {
         return this.optional(element) || /^[a-z," "]+$/i.test(value);
     }, "Letters and spaces only please");
@@ -42,7 +44,40 @@ $(function () {
             }
         },
     });
-    $('#log').on('click', function () {
+    $('#form').on('submit', function (e) {
+        e.preventDefault();
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            var parametros;
+            parametros = {
+                'username': $('input[name="username"]').val(),
+                'password': $('input[name="password"]').val()
+            };
+
+            login('/connect/', parametros, function () {
+                window.$.dialog({
+                    icon: 'fa fa-spinner fa-spin',
+                    title: 'Iniciando Sesion!',
+                    content: 'Estamos iniciando sesion, porfavor espera un momento'
+                });
+                if (key === '1') {
+                     setTimeout(function () {
+                    location.href = '/venta/online';
+                }, 2000);
+                } else {
+                     setTimeout(function () {
+                    location.href = '/';
+                }, 2000);
+                }
+
+
+            }, function () {
+                $('input[name="username"]').val("");
+                $('input[name="password"]').val("");
+                reset();
+
+            });
+        }
 
         if ($('input[name="username"]').val() === "") {
             menssaje_error('Error!', "Debe ingresar un Username", 'far fa-times-circle');
@@ -51,27 +86,7 @@ $(function () {
             menssaje_error('Error!', "Debe ingresar una contraseña", 'far fa-times-circle');
             return false
         }
-        var parametros;
-        parametros = {
-            'username': $('input[name="username"]').val(),
-            'password': $('input[name="password"]').val()
-        };
-        login('/connect/', parametros, function () {
-            window.$.dialog({
-                icon: 'fa fa-spinner fa-spin',
-                title: 'Iniciando Sesion!',
-                content: false
-            });
-            setTimeout(function () {
-                location.href = '/';
-            }, 2000);
 
-        }, function () {
-            $('input[name="username"]').val("");
-            $('input[name="password"]').val("");
-            reset();
-
-        });
     });
 });
 
