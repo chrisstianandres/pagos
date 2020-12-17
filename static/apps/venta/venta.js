@@ -174,7 +174,8 @@ $(function () {
         parametros['action']='add';
         parametros['id']='';
         save_with_ajax('Alerta',
-            '/venta/nuevo', 'Esta seguro que desea guardar esta venta?', parametros, function (response) {
+            '/venta/nuevo', 'Esta seguro que desea guardar esta venta?', parametros,
+            function (response) {
                 printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
                     window.open('/venta/printpdf/' + response['id'], '_blank');
                     // location.href = '/venta/printpdf/' + response['id'];

@@ -64,6 +64,18 @@ function save_with_ajax(title, url, content, parametros, callback) {
     });
 }
 
+function callback (response) {
+                printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+                    window.open('/venta/printpdf/' + response['id'], '_blank');
+                    // location.href = '/venta/printpdf/' + response['id'];
+                    localStorage.clear();
+                    location.href = '/venta/lista';
+                }, function () {
+                    localStorage.clear();
+                    location.href = '/venta/lista';
+                })
+
+            }
 function save_estado(title, url, content, parametros, callback) {
     $.confirm({
         theme: 'modern',

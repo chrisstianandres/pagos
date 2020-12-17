@@ -130,6 +130,56 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         return data
 
 
+class sitio(ListView):
+    model = Producto
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'sitio':
+                data = []
+                h = datetime.today()
+                query = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,
+                                                           venta__estado=1).values('inventario__producto__producto_base_id',
+                                                                                   'inventario__producto_id',
+                                                                                   'inventario__producto__pvp',
+                                                                                   'inventario__producto__pvp_alq',
+                                                                                   'inventario__producto__pvp_confec',
+                                                                                   'inventario__producto__imagen').annotate(total=Sum('cantidad')).order_by('-total')[0:3]
+                for i in query:
+                    px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
+                    pr = Producto.objects.get(id=int(i['inventario__producto_id']))
+                    item = {'info': px.nombre, 'descripcion': px.descripcion}
+                    item['id_venta'] = int(i['inventario__producto_id'])
+                    item['id_reparacion'] = int(pr.id)
+                    item['id_confeccion'] = int(pr.id)
+                    item['pvp'] = format(i['inventario__producto__pvp'], '.2f')
+                    item['pvp_alq'] = format(i['inventario__producto__pvp_alq'], '.2f')
+                    item['pvp_confec'] = format(i['inventario__producto__pvp_confec'], '.2f')
+                    item['imagen'] = pr.get_image()
+                    data.append(item)
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Nuevo Producto'
+        data['titulo'] = 'Listado de Productos'
+        data['nuevo'] = '/producto/nuevo'
+        data['empresa'] = empresa
+        return data
+
+
 class Createview(ValidatePermissionRequiredMixin, CreateView):
     model = Producto
     form_class = ProductoForm

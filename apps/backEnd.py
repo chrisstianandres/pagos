@@ -12,6 +12,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 
 # -----------------------------------------------PAGINA PRINCIPAL-----------------------------------------------------#
+from apps.user.forms import UserForm, UserForm_online
 from apps.user.models import User
 from apps.empresa.models import Empresa
 
@@ -42,6 +43,19 @@ def logeo(request):
     else:
         return HttpResponseRedirect("/")
     return render(request, 'front-end/login.html', data)
+
+
+def signin(request):
+    data = {}
+    if not request.user.is_authenticated:
+        data['titulo'] = 'Registro de usuario'
+        data['nomb'] = nombre_empresa()
+        data['form'] = UserForm_online()
+        data['crud'] = '/user/new_online'
+        data['action'] = 'add'
+    else:
+        return HttpResponseRedirect("/")
+    return render(request, 'front-end/signin.html', data)
 
 
 @csrf_exempt

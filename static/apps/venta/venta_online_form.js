@@ -1,6 +1,7 @@
 var carrito = {
     items: {
         fecha_venta: '',
+        cliente: '',
         subtotal: 0.00,
         total: 0.00,
         productos: [],
@@ -29,13 +30,14 @@ var carrito = {
     list: function () {
         this.calculate();
         var numero = this.items.productos.length;
-        if (numero>=1){
+        if (numero >= 1) {
+            console.log(numero);
             $('#count').html(numero);
         } else {
-             $('#count').html('');
+            $('#count').html('');
         }
 
-        tblventa = $("#datatable").DataTable({
+        tblventa = $("#tblproductos").DataTable({
 
             autoWidth: false,
             dataSrc: "",
@@ -64,7 +66,7 @@ var carrito = {
                     width: '5%',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat rounded-pill" style="color: white" data-toggle="tooltip" title="Quitar Producto"><i class="zmdi zmdi-delete"></i></a>';
+                        return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat rounded-pill" style="color: white" data-toggle="tooltip" title="Quitar Producto"><i class="fa fa-trash"></i></a>';
                         //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
 
                     }
@@ -107,47 +109,6 @@ var carrito = {
     }
 };
 
-function container_popular() {
-    $.ajax({
-        url: '/producto/sitio',
-        type: 'POST',
-        data: {'action': 'sitio'},
-        dataSrc: "",
-    }).done(function (data) {
-
-        var html = '<div class="columns is-centered is-multiline">' +
-            '<div class="column is-full">' +
-            '<div class="separator"></div>' +
-            '</div>';
-
-        $.each(data, function (key, value) {
-            html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
-                '<div class="card">' +
-                '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
-                '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
-                '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
-                '<img src="' + value['imagen'] + '" alt="">' +
-                '<div class="card-info">' +
-                '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
-                '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
-                '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
-                '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
-                '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
-                '<div class="card-buttons">' +
-                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
-                '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
-                '<p>Los precios aqui mostrados no incluyen IVA</p>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '</div>'
-        });
-        $('#pop').html(html);
-    });
-
-}
-
 $(function () {
 
     if (localStorage.getItem('carrito')) {
@@ -155,64 +116,11 @@ $(function () {
         carrito.items.productos = carro_respaldo;
         carrito.list();
     } else {
-       carrito.list();
+        carrito.list();
     }
 
-    $(document).on('click', 'button[name="vender"]', function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $(this).val(),
-                'action': 'get'
-            },
-            dataType: 'json',
-            success: function (data) {
-                carrito.add(data);
-                borrar_producto_carito(function () {
-                    menssaje_ok('Correcto!', 'Producto agregado al carrito!',
-                        'fas fa-cart-plus', function () {
 
-                        })
-
-                })
-            },
-            error: function (xhr, status, data) {
-                alert(data);
-            },
-
-        })
-    });
-
-
-    $(document).on('click', 'a[rel="btn_carrito"]', function (e) {
-        e.preventDefault();
-        $('#myModal').css("display", "block")
-
-    });
-
-
-    $(document).on('click', 'a[rel="pay"]', function (e) {
-        window.location.href='/venta/online'
-    });
-
-    $(document).on('click', 'a[rel="clear_car"]', function (e) {
-        if (carrito.items.productos.length === 0) return false;
-        e.preventDefault();
-        borrar_todo_alert('Atencion!', 'Esta seguro que desea vaciar el carrito?', function () {
-            carrito.items.productos = [];
-            localStorage.clear();
-            carrito.list();
-        });
-    });
-    $('.close').on('click', function () {
-        $('#myModal').css("display", "none")
-
-    });
-
-
-    $('#datatable tbody')
+    $('#tblproductos tbody')
         .on('click', 'a[rel="remove"]', function () {
             var tr = tblventa.cell($(this).closest('td, li')).index();
             borrar_todo_alert('Alerta de Eliminación',
@@ -233,5 +141,49 @@ $(function () {
 
         });
 
+    paypal.Buttons({
+        createOrder: function (data, actions) {
+            // This function sets up the details of the transaction, including the amount and line item details.
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: $('#id_total').val()
+                    }
+                }]
+            });
+        },
+        onApprove: function (data, actions) {
+            // This function captures the funds from the transaction.
+            return actions.order.capture().then(function (details) {
+                // This function shows a transaction success message to your buyer.
+                if (carrito.items.productos.length === 0) {
+                    menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
+                    return false
+                }
+                var parametros;
+                carrito.items.fecha_venta = $('input[name="fecha_trans"]').val();
+                carrito.items.cliente = 1;
+                console.log($('input[name="cliente_id"]').val());
+                parametros = {'ventas': JSON.stringify(carrito.items)};
+                parametros['action'] = 'add';
+                parametros['id'] = '';
+                $.ajax({
+                    dataType: 'JSON',
+                    type: 'POST',
+                    url: '/venta/nuevo',
+                    data: parametros,
+                }).done(function (data) {
+                    if (!data.hasOwnProperty('error')) {
+                        callback(data);
+                        return false;
+                    }
+                    menssaje_error('Error', data.error, 'fas fa-exclamation-circle');
 
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert(textStatus + ': ' + errorThrown);
+                });
+            });
+        }
+    }).render('#paypal-button-container');
+    //This function displays Smart Payment Buttons on your web page.
 });

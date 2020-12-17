@@ -102,13 +102,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         if f.is_valid():
             f.save(commit=False)
             if int(f.data['tipo']) == 0:
-                if User.objects.filter(cedula=f.data['num_doc']):
-                    f.add_error("num_doc", "Numero de Documento ya exitente en los Empleados")
-                    data['error'] = f.errors
-                elif Cliente.objects.filter(cedula=f.data['num_doc']):
-                    f.add_error("num_doc", "Numero de Documento ya exitente en los Clientes")
-                    data['error'] = f.errors
-                elif verificar(f.data['num_doc']):
+                if verificar(f.data['num_doc']):
                     prod = f.save()
                     data['resp'] = True
                     data['proveedor'] = prod.toJSON()

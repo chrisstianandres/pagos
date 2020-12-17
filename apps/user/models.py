@@ -18,11 +18,11 @@ ESTADO = (
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='user/%Y/%m/%d', blank=True, null=True)
     cedula = models.CharField(max_length=10, unique=True)
-    celular = models.CharField(max_length=10, unique=True)
-    telefono = models.CharField(max_length=9, unique=True)
+    celular = models.CharField(max_length=10, unique=True, blank=True, null=True)
+    telefono = models.CharField(max_length=9, unique=True, blank=True, null=True)
     direccion = models.CharField(max_length=500, blank=True, null=True)
     sexo = models.IntegerField(choices=SEXO, default=1)
-    estado = models.IntegerField(choices=ESTADO, default=0)
+    estado = models.IntegerField(choices=ESTADO, default=1)
 
     def __str__(self):
         return '%s %s' % (self.username, self.first_name)

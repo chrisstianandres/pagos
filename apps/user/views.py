@@ -11,7 +11,7 @@ from apps.backEnd import nombre_empresa
 from apps.cliente.models import Cliente
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.producto.forms import GroupForm
-from apps.user.forms import UserForm
+from apps.user.forms import UserForm, UserForm_online
 from apps.user.models import User
 from apps.proveedor.models import Proveedor
 
@@ -97,13 +97,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 f = UserForm(request.POST, request.FILES)
                 if f.is_valid():
                     f.save(commit=False)
-                    if Proveedor.objects.filter(tipo=0, num_doc=f.data['cedula']):
-                        f.add_error("cedula", "Numero de Cedula ya exitente en los Proveedores")
-                        data['form'] = f
-                    elif Cliente.objects.filter(cedula=f.data['cedula']):
-                        f.add_error("cedula", "Numero de Cedula ya exitente en los Clientes")
-                        data['form'] = f
-                    elif verificar(f.data['cedula']):
+                    if verificar(f.data['cedula']):
                         f.save()
                         return HttpResponseRedirect('/empleado/lista')
                     else:
@@ -134,6 +128,50 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         return data
 
 
+class CrudView_online(TemplateView):
+    form_class = UserForm_online
+    template_name = 'front-end/signin.html'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+
+        try:
+            if action == 'add':
+                f = UserForm_online(request.POST, request.FILES)
+                if f.is_valid():
+                    f.save(commit=False)
+                    if verificar(f.data['cedula']):
+                        f.save()
+                        return HttpResponseRedirect('/login')
+                    else:
+                        f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
+                        data['form'] = f
+                else:
+                    data['error'] = f.errors
+                    data['form'] = f
+                    print(f.errors)
+                    return render(request, 'front-end/signin.html', data)
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['titulo'] = 'Registro de usuario'
+        data['nomb'] = nombre_empresa()
+        data['form'] = UserForm_online()
+        data['crud'] = 'user/new_online'
+        data['action'] = 'add'
+        return data
+
+
 class Updateview(ValidatePermissionRequiredMixin, UpdateView):
     model = User
     form_class = UserForm
@@ -160,15 +198,7 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
                 f = self.form_class(request.POST, request.FILES, instance=user)
                 if f.is_valid():
                     f.save(commit=False)
-                    if Proveedor.objects.filter(tipo=0, num_doc=f.data['cedula']):
-                        f.add_error("cedula", "Numero de Cedula ya exitente en los Proveedores")
-                        data['form'] = f
-                        return render(request, 'front-end/empleado/empleado_form.html', data)
-                    elif Cliente.objects.filter(cedula=f.data['cedula']):
-                        f.add_error("cedula", "Numero de Cedula ya exitente en los Clientes")
-                        data['form'] = f
-                        return render(request, 'front-end/empleado/empleado_form.html', data)
-                    elif verificar(f.data['cedula']):
+                    if verificar(f.data['cedula']):
                         f.save()
                         data['resp'] = True
                     else:

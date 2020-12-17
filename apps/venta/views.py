@@ -1,5 +1,6 @@
 from django.utils.decorators import method_decorator
 
+from apps.cliente.models import Cliente
 from apps.delvoluciones_venta.models import Devolucion
 from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
@@ -16,7 +17,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
-from apps.cliente.forms import ClienteForm
 # from apps.compra.models import Compra
 # from apps.delvoluciones_venta.models import Devolucion
 # from apps.inventario.models import Inventario
@@ -26,6 +26,8 @@ from apps.producto_base.models import Producto_base
 from apps.proveedor.forms import ProveedorForm
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
+from apps.user.forms import UserForm
+from apps.user.models import User
 from apps.venta.forms import Detalle_VentaForm
 from apps.venta.models import Venta, Detalle_venta
 from apps.empresa.models import Empresa
@@ -117,6 +119,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Venta
     template_name = 'front-end/venta/venta_form.html'
+    permission_required = 'venta.add_venta'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -127,6 +130,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         action = request.POST['action']
         pk = request.POST['id']
         try:
+
             if action == 'add':
                 datos = json.loads(request.POST['ventas'])
                 if datos:
@@ -182,7 +186,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['form'] = TransaccionForm()
         data['form2'] = Detalle_VentaForm()
         data['detalle'] = []
-        data['formc'] = ClienteForm()
+        data['formc'] = UserForm()
         return data
 
 
@@ -190,8 +194,18 @@ def CrudView_online(request):
     data = {}
     if request.user.is_authenticated:
         if request.method == 'GET':
-            print(12)
-        return render(request, 'front-end/venta/venta_online.html', data)
+            data['icono'] = opc_icono
+            data['entidad'] = 'Compras'
+            data['boton'] = 'Pagar'
+            data['titulo'] = 'Pagar Compra'
+            data['nuevo'] = '/'
+            data['empresa'] = empresa
+            data['form'] = TransaccionForm()
+            data['form2'] = Detalle_VentaForm()
+            data['detalle'] = []
+            user = Cliente.objects.get(cedula=request.user.cedula)
+            data['user'] = user
+            return render(request, 'front-end/venta/venta_online.html', data)
     else:
         data['key'] = 1
         data['titulo'] = 'Inicio de Sesion'
