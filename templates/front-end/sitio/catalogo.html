@@ -1,0 +1,64 @@
+{% extends 'front-end/sitio/header.html' %}
+{% load static %}
+{% block container %}
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="popular" role="tabpanel" aria-labelledby="popular-tab">
+            <div class="container container-full" id="popular">
+            </div>
+        </div>
+        <div class="tab-pane fade" id="moreven" role="tabpanel" aria-labelledby="moreven-tab">
+            <div class="container container-full" id="masvendidos">
+            </div>
+        </div>
+    </div>
+    <div class="container container-full">
+        <div class="columns is-centered is-multiline">
+            <div class="column is-full">
+                <div class="separator"></div>
+            </div>
+            <div class="column is-half-tablet is-one-third-desktop column-half">
+                <div class="card card-second">
+                    <img class="card-second-image" src="{% static 'sitio_web/img/lookbook-men.png' %}" alt="">
+                    <div class="card-second-body --text-right">
+                        <h1 class="has-text-right is-size-4 has-text-weight-semibold-bold">Catálogo para hombres</h1>
+                        <p class="has-text-right">Las mejores prendas para caballero, para que puedan sacar lo mejor de
+                            si mismos
+                        </p>
+                        <div>
+                            <a href="#" class="btn btn-default is-size-7">Ver ahora</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-half-tablet is-one-third-desktop column-half">
+                <div class="card card-second">
+                    <img class="card-second-image" src="{% static 'sitio_web/img/lookbook-women.png' %}" alt="">
+                    <div class="card-second-body --text-right">
+                        <h1 class="has-text-right is-size-4 has-text-weight-semibold-bold">Catálogo para Mujeres</h1>
+                        <p class="has-text-right">Las mejores prendas para mujer que puedes encontrar a niel nacional
+                        </p>
+                        <div>
+                            <a href="#" class="btn btn-default is-size-7">Ver ahora</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="column is-half-tablet is-one-third-desktop">
+                <div class="card card-second">
+                    <img class="card-second-image" src="{% static 'sitio_web/img/lookbook-child.png' %}" alt="">
+                    <div class="card-second-body --text-right">
+                        <h1 class="has-text-right is-size-4 has-text-weight-semibold-bold">Catálogo para Niños</h1>
+                        <p class="has-text-right">Explora nuestros productos para niños y niñas
+                        </p>
+                        <div>
+                            <a href="#" class="btn btn-default is-size-7">Ver ahora</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+

@@ -98,6 +98,13 @@ var ventas = {
     }
 };
 $(function () {
+        if (localStorage.getItem('carrito')) {
+        carro_respaldo = JSON.parse(localStorage.getItem('carrito'));
+        ventas.items.productos = carro_respaldo;
+        ventas.list();
+    } else {
+        carrito.list();
+    }
     var action = '';
     var pk = '';
     //texto de los selects
@@ -169,13 +176,13 @@ $(function () {
         var parametros;
         ventas.items.fecha_venta = $('input[name="fecha_trans"]').val();
         ventas.items.cliente = $('#id_cliente option:selected').val();
-
         parametros = {'ventas': JSON.stringify(ventas.items)};
         parametros['action']='add';
         parametros['id']='';
         save_with_ajax('Alerta',
             '/venta/nuevo', 'Esta seguro que desea guardar esta venta?', parametros,
             function (response) {
+            localStorage.clear();
                 printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
                     window.open('/venta/printpdf/' + response['id'], '_blank');
                     // location.href = '/venta/printpdf/' + response['id'];

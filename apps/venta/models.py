@@ -9,7 +9,8 @@ from apps.empresa.models import Empresa
 
 estado = (
     (0, 'DEVUELTA'),
-    (1, 'FINALIZADA')
+    (1, 'FINALIZADA'),
+    (2, 'RESERVADA')
 )
 
 

@@ -38,7 +38,7 @@ def menu(request):
 def logeo(request):
     data = {}
     if not request.user.is_authenticated:
-        data['titulo'] = 'Inicio de Sesion'
+        data['title'] = 'Inicio de Sesion'
         data['nomb'] = nombre_empresa()
     else:
         return HttpResponseRedirect("/")
@@ -48,7 +48,7 @@ def logeo(request):
 def signin(request):
     data = {}
     if not request.user.is_authenticated:
-        data['titulo'] = 'Registro de usuario'
+        data['title'] = 'Registro de usuario'
         data['nomb'] = nombre_empresa()
         data['form'] = UserForm_online()
         data['crud'] = '/user/new_online'

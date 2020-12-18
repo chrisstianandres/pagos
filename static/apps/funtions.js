@@ -64,18 +64,19 @@ function save_with_ajax(title, url, content, parametros, callback) {
     });
 }
 
-function callback (response) {
-                printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
-                    window.open('/venta/printpdf/' + response['id'], '_blank');
-                    // location.href = '/venta/printpdf/' + response['id'];
-                    localStorage.clear();
-                    location.href = '/venta/lista';
-                }, function () {
-                    localStorage.clear();
-                    location.href = '/venta/lista';
-                })
+function callback(response) {
+    printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+        window.open('/venta/printpdf/' + response['id'], '_blank');
+        // location.href = '/venta/printpdf/' + response['id'];
+        localStorage.clear();
+        location.href = '/venta/lista';
+    }, function () {
+        localStorage.clear();
+        location.href = '/venta/lista';
+    })
 
-            }
+}
+
 function save_estado(title, url, content, parametros, callback) {
     $.confirm({
         theme: 'modern',
@@ -148,7 +149,7 @@ function printpdf(title, content, callback, cancel) {
 }
 
 function menssaje_error(title, content, icon, callback) {
-    $.confirm({
+    var obj = $.confirm({
         theme: 'modern',
         icon: icon,
         title: title,
@@ -162,6 +163,10 @@ function menssaje_error(title, content, icon, callback) {
             },
         }
     });
+    setTimeout(function () {
+        // some point in future.
+        obj.close();
+    }, 3000);
 }
 
 function error_login(title, content, icon, callback) {

@@ -24,6 +24,7 @@ empresa = nombre_empresa()
 class lista(ValidatePermissionRequiredMixin, ListView):
     model = Produccion
     template_name = 'front-end/produccion/produccion_list.html'
+    permission_required = 'produccion.view_produccion'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -121,6 +122,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Produccion
     template_name = 'front-end/Produccion/produccion_form.html'
+    permission_required = 'produccion.add_produccion'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -174,7 +176,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
-
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:

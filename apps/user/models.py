@@ -14,6 +14,11 @@ ESTADO = (
     (0, 'INACTIVO'),
 )
 
+tipo = (
+    (1, 'USER'),
+    (0, 'CLIENTE'),
+)
+
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='user/%Y/%m/%d', blank=True, null=True)
@@ -23,6 +28,7 @@ class User(AbstractUser):
     direccion = models.CharField(max_length=500, blank=True, null=True)
     sexo = models.IntegerField(choices=SEXO, default=1)
     estado = models.IntegerField(choices=ESTADO, default=1)
+    tipo = models.IntegerField(choices=tipo, default=1)
 
     def __str__(self):
         return '%s %s' % (self.username, self.first_name)

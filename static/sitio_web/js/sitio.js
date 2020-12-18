@@ -21,7 +21,31 @@ var carrito = {
         $('input[name="total"]').val(this.items.total.toFixed(2));
     },
     add: function (data) {
-        this.items.productos.push(data[0]);
+        var array = this.items.productos;
+        if (array.length === 0) {
+            array.push(data[0]);
+            borrar_producto_carito(function () {
+                menssaje_ok('Correcto!', 'Producto agregado al carrito!',
+                    'fas fa-cart-plus', function () {
+                    })
+            })
+        } else {
+            var key = this.verify(array, data);
+            if (key === 1) {
+                borrar_producto_carito(function () {
+                    menssaje_error('Atencion!', 'Este producto ya esta en tu carrito agrega mas cantidad desde este',
+                        'fas fa-exclamation-circle', function () {
+                        })
+                })
+            } else {
+                array.push(data[0]);
+                borrar_producto_carito(function () {
+                    menssaje_ok('Correcto!', 'Producto agregado al carrito!',
+                        'fas fa-cart-plus', function () {
+                        })
+                })
+            }
+        }
         this.items.productos = this.exclude_duplicados(this.items.productos);
         localStorage.setItem('carrito', JSON.stringify(this.items.productos));
         this.list();
@@ -29,10 +53,10 @@ var carrito = {
     list: function () {
         this.calculate();
         var numero = this.items.productos.length;
-        if (numero>=1){
+        if (numero >= 1) {
             $('#count').html(numero);
         } else {
-             $('#count').html('');
+            $('#count').html('');
         }
 
         tblventa = $("#datatable").DataTable({
@@ -103,7 +127,16 @@ var carrito = {
         let hash = {};
         result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
         return result;
-
+    },
+    verify: function (array, data) {
+        ok = 0;
+        $.each(array, function (key, value) {
+                if (data[0].id === value.id) {
+                    ok = 1;
+                }
+            }
+        );
+        return ok;
     }
 };
 
@@ -114,13 +147,11 @@ function container_popular() {
         data: {'action': 'sitio'},
         dataSrc: "",
     }).done(function (data) {
-
         var html = '<div class="columns is-centered is-multiline">' +
             '<div class="column is-full">' +
-            '<div class="separator"></div>' +
             '</div>';
 
-        $.each(data, function (key, value) {
+        $.each(data['masvendidos'], function (key, value) {
             html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
                 '<div class="card">' +
                 '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
@@ -143,19 +174,100 @@ function container_popular() {
                 '</div>' +
                 '</div>'
         });
-        $('#pop').html(html);
+        $('#masvendidos').html(html);
+
+        var html2 = '<div class="columns is-centered is-multiline">' +
+            '<div class="column is-full">' +
+            '</div>';
+
+        $.each(data['popular'], function (key, value) {
+            html2 += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
+                '<div class="card">' +
+                '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
+                '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
+                '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
+                '<img src="' + value['imagen'] + '" alt="">' +
+                '<div class="card-info">' +
+                '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
+                '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
+                '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
+                '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
+                '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                '<div class="card-buttons">' +
+                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
+                '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
+                '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                '<p>Los precios aqui mostrados no incluyen IVA</p>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>'
+        });
+        $('#popular').html(html2);
     });
 
 }
 
-$(function () {
+function catalogo(tipo) {
+    $.ajax({
+        url: '/producto/sitio',
+        type: 'POST',
+        data: {'action': 'categoria', 'tipo': tipo},
+        dataSrc: "",
+    }).done(function (data) {
 
+        if (tipo === 'mujer') {
+            console.log(tipo);
+            $('#cat_niños-tab').addClass('active');
+            $('#cat_niños').addClass('active show');
+            $('#moreven-tab').removeClass('active');
+            $('#cat_hombres-tab').removeClass('active');
+            $('#cat_mujeres-tab').removeClass('active');
+            $('#popular-tab').removeClass('active');
+            $('#popular').removeClass('active show');
+            var html = '<div class="columns is-centered is-multiline">' +
+                '<div class="column is-full">' +
+                '</div>';
+
+            $.each(data['result'], function (key, value) {
+                html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
+                    '<div class="card">' +
+                    '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
+                    '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
+                    '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
+                    '<img src="' + value['imagen'] + '" alt="">' +
+                    '<div class="card-info">' +
+                    '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
+                    '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                    '<div class="card-buttons">' +
+                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
+                    '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
+                    '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                    '<p>Los precios aqui mostrados no incluyen IVA</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+            });
+
+            $('#catalogo_niños').html(html);
+        }
+
+
+    });
+}
+
+$(function () {
+    var superuser = $('input[name="superuser"]').val();
     if (localStorage.getItem('carrito')) {
         carro_respaldo = JSON.parse(localStorage.getItem('carrito'));
         carrito.items.productos = carro_respaldo;
         carrito.list();
     } else {
-       carrito.list();
+        carrito.list();
     }
 
     $(document).on('click', 'button[name="vender"]', function (e) {
@@ -170,13 +282,6 @@ $(function () {
             dataType: 'json',
             success: function (data) {
                 carrito.add(data);
-                borrar_producto_carito(function () {
-                    menssaje_ok('Correcto!', 'Producto agregado al carrito!',
-                        'fas fa-cart-plus', function () {
-
-                        })
-
-                })
             },
             error: function (xhr, status, data) {
                 alert(data);
@@ -194,7 +299,13 @@ $(function () {
 
 
     $(document).on('click', 'a[rel="pay"]', function (e) {
-        window.location.href='/venta/online'
+        console.log(superuser);
+        if (superuser === 'USER') {
+            window.location.href = '/venta/nuevo'
+        } else {
+            window.location.href = '/venta/online'
+        }
+
     });
 
     $(document).on('click', 'a[rel="clear_car"]', function (e) {
@@ -206,6 +317,25 @@ $(function () {
             carrito.list();
         });
     });
+
+    $(document).on('click', 'a[rel="cat_hombre"]', function (e) {
+        e.preventDefault();
+        catalogo('hombre');
+
+    });
+
+    $(document).on('click', 'a[rel="cat_mujer"]', function (e) {
+        e.preventDefault();
+        catalogo('mujer');
+
+    });
+
+    $(document).on('click', 'a[rel="cat_niño"]', function (e) {
+        $('html, #cat_niños').animate({scrollTop: 0}, 1250);
+        catalogo('mujer');
+
+    });
+
     $('.close').on('click', function () {
         $('#myModal').css("display", "none")
 

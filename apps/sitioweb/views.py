@@ -158,7 +158,11 @@ class report(ListView):
 
 
 def sitio(request):
-    data = {'empresa': empresa, 'sitio': SitioWeb.objects.first()}
+    data = {'empresa': empresa, 'sitio': SitioWeb.objects.first(), 'title': empresa.nombre}
+    if request.user.is_authenticated:
+        data['group'] = request.user.get_tipo_display
+    else:
+        data['group'] = 'NONE'
     return render(request,  'front-end/sitio/index.html', data)
 
 
