@@ -162,8 +162,7 @@ $(function () {
                 }
                 var parametros;
                 carrito.items.fecha_venta = $('input[name="fecha_trans"]').val();
-                carrito.items.cliente = 1;
-                console.log($('input[name="cliente_id"]').val());
+                carrito.items.cliente = $('input[name="cliente_id"]').val();
                 parametros = {'ventas': JSON.stringify(carrito.items)};
                 parametros['action'] = 'add';
                 parametros['id'] = '';
@@ -186,4 +185,31 @@ $(function () {
         }
     }).render('#paypal-button-container');
     //This function displays Smart Payment Buttons on your web page.
+
+
+    $('#save').on('click', function () {
+        if (carrito.items.productos.length === 0) {
+            menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
+            return false
+        }
+        var parametros;
+        carrito.items.fecha_venta = $('input[name="fecha_trans"]').val();
+        carrito.items.cliente = $('input[name="cliente_id"]').val();
+        parametros = {'ventas': JSON.stringify(carrito.items)};
+        parametros['action'] = 'reserva';
+        parametros['id'] = '';
+        save_with_ajax('Alerta',
+            '/venta/nuevo', 'Esta seguro que desea reservar esta venta?', parametros,
+            function (response) {
+                localStorage.clear();
+                printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+                    window.open('/venta/printpdf/' + response['id'], '_blank');
+                    // location.href = '/venta/printpdf/' + response['id'];
+                    location.href = '/venta/lista';
+                }, function () {
+                    location.href = '/venta/lista';
+                })
+
+            });
+    });
 });

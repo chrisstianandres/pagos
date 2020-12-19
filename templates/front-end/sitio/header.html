@@ -70,7 +70,7 @@
                         <li class="nav-menu-item"><a class="nav-menu-link"> </a> </li>
                         <li class="nav-menu-item"><a class="nav-menu-link"> </a> </li>
                         <li class="nav-menu-item"><a class="nav-menu-link"> </a> </li>
-                        <li class="nav-menu-item"><a class="nav-menu-link"> </a> </li>
+                        <li class="nav-menu-item"><a href="{% url 'menu' %}" class="nav-menu-link"> Menu Principal &nbsp; <i class="fas fa-tachometer-alt"></i></a> </li>
                     {% else %}
                         <li class="nav-menu-item"><a href="{% url 'signin' %}" class="nav-menu-link">Registro</a></li>
                         <li class="nav-menu-item"><a href="{% url 'login' %}" class="nav-menu-link">Iniciar Sesión</a></li>
@@ -158,7 +158,6 @@
                 <br>
                 <div class="border border-light p-3 mb-4">
                     <div class="text-center">
-                        <a type="button" rel="reserv" class="btn btn-info"><i class="far fa-clock"></i> Reservar</a>
                         <a type="button" rel="pay" class="btn btn-success"><i class="fas fa-hand-holding-usd"></i> Pagar</a>
                     </div>
                 </div>

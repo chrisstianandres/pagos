@@ -64,11 +64,8 @@ class signin(TemplateView):
                     f.save(commit=False)
                     if verificar(f.data['cedula']):
                         user = f.save()
-                        print(user)
-                        grupo = Group.objects.get(name__icontains='cliente')
-                        usersave = User.objects.get(id=user.id)
-                        usersave.groups.add(grupo)
-                        usersave.save()
+                        # print(user.id)
+
                         return HttpResponseRedirect('/login')
                     else:
                         f.add_error("cedula", "Numero de Cedula no valido para Ecuador")

@@ -210,7 +210,12 @@ class UserForm_online(forms.ModelForm):
                 )
                 cliente.save()
                 u.save()
-
+                print(u.id)
+                grupo = Group.objects.get(name__icontains='cliente')
+                usersave = User.objects.get(id=u.id)
+                usersave.groups.add(grupo)
+                usersave.tipo = 0
+                usersave.save()
             else:
                 data['error'] = form.errors
         except Exception as e:

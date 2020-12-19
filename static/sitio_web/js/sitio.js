@@ -359,13 +359,12 @@ $(function () {
     });
 
     $(document).on('click', 'a[rel="pay"]', function (e) {
-        console.log(superuser);
+        if (carrito.items.productos.length === 0) return false;
         if (superuser === 'USER') {
             window.location.href = '/venta/nuevo'
         } else {
             window.location.href = '/venta/online'
         }
-
     });
 
     $(document).on('click', 'a[rel="clear_car"]', function (e) {

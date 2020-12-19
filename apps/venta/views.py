@@ -149,7 +149,43 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                print(datos['productos'])
+                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[:i['cantidad']]:
+                                    dv = Detalle_venta()
+                                    dv.venta_id = v.id
+                                    dv.inventario_id = in_pr.id
+                                    dv.cantidad = int(i['cantidad'])
+                                    dv.pvp_actual = float(in_pr.producto.pvp)
+                                    dv.subtotal = float(i['subtotal'])
+                                    in_pr.estado = 0
+                                    in_pr.save()
+                                    dv.save()
+                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock.stock = int(Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock.save()
+                        data['id'] = v.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            if action == 'reserva':
+                datos = json.loads(request.POST['ventas'])
+                if datos:
+                    with transaction.atomic():
+                        c = Transaccion()
+                        c.fecha_trans = datos['fecha_venta']
+                        c.cliente_id = datos['cliente']
+                        c.user_id = request.user.id
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.tipo = 0
+                        c.save()
+                        v = Venta()
+                        v.transaccion_id = c.id
+                        v.estado = 2
+                        v.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
                                 for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[:i['cantidad']]:
                                     dv = Detalle_venta()
                                     dv.venta_id = v.id

@@ -177,7 +177,7 @@ $(function () {
 
             },
             {
-                targets: [3],
+                targets: [-4, -5, -6],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -197,15 +197,18 @@ $(function () {
                 class: 'text-center',
                 width: "15%",
                 render: function (data, type, row) {
-                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-sm btn-round" ' +
+                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" ' +
                         'style="color: white" data-toggle="tooltip" title="Detalle de Productos" >' +
                         '<i class="fa fa-search"></i></a>' + ' ';
-                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-sm btn-round" ' +
+                    var pagar = row.estado === "RESERVADA" ? '<a type="button" rel="pagar" class="btn btn-warning btn-xs btn-round" ' +
+                        'style="color: white" data-toggle="tooltip" title="Realizar pago" >' +
+                        '<i class="fas fa-hand-holding-usd"></i></a>' : ' ';
+                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" ' +
                         'style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ';
                     var pdf = '<a type="button" href= "/venta/printpdf/' + data + '" rel="pdf" ' +
-                        'class="btn btn-primary btn-sm btn-round" style="color: white" data-toggle="tooltip" ' +
+                        'class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" ' +
                         'title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
-                    return detalle + devolver + pdf;
+                    return pagar +' '+ detalle + devolver + pdf;
                 }
             },
             {
@@ -221,7 +224,10 @@ $(function () {
             } else if (data.estado === 'DEVUELTA') {
                 $('td', row).eq(7).find('span').addClass('badge bg-danger').attr("style", "color: white");
                 $('td', row).eq(8).find('a[rel="devolver"]').hide();
+                $('td', row).eq(8).find('a[rel="detalle"]').hide();
                 $('td', row).eq(8).find('a[rel="pdf"]').hide();
+            } else if (data.estado === 'RESERVADA') {
+                $('td', row).eq(7).find('span').addClass('badge bg-warning').attr("style", "color: white");
             }
 
         }
@@ -235,6 +241,21 @@ $(function () {
         var parametros = {'id': data.id, 'action': 'estado'};
         save_estado('Alerta',
             window.location.pathname, 'Esta seguro que desea devolver esta venta?', parametros,
+            function () {
+                menssaje_ok('Exito!', 'Exito al devolver la venta', 'far fa-smile-wink', function () {
+                    datatable.ajax.reload(null, false);
+                })
+            });
+
+    })
+        .on('click', 'a[rel="pagar"]', function () {
+        $('.tooltip').remove();
+        var tr = datatable.cell($(this).closest('td, li')).index();
+        var data = datatable.row(tr.row).data();
+        var parametros = {'id': data.id, 'action': 'pagar'};
+        console.log(data);
+        save_estado('Alerta',
+            window.location.pathname, 'Esta seguro que desea realizar el pago de esta venta de $ <strong>'+ data.transaccion.total+'</strong>?', parametros,
             function () {
                 menssaje_ok('Exito!', 'Exito al devolver la venta', 'far fa-smile-wink', function () {
                     datatable.ajax.reload(null, false);
