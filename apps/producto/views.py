@@ -152,7 +152,7 @@ class sitio(ListView):
                                                                                    'inventario__producto__pvp',
                                                                                    'inventario__producto__pvp_alq',
                                                                                    'inventario__producto__pvp_confec',
-                                                                                   'inventario__producto__imagen').annotate(total=Sum('cantidad')).order_by('-total')[0:3]
+                                                                                   'inventario__producto__imagen').annotate(total=Sum('cantidad')).order_by('-total')[0:6]
                 for i in query:
                     px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
                     pr = Producto.objects.get(id=int(i['inventario__producto_id']))
@@ -174,7 +174,7 @@ class sitio(ListView):
                                                                              'inventario__producto__pvp_alq',
                                                                              'inventario__producto__pvp_confec',
                                                                              'inventario__producto__imagen').annotate(
-                    total=Sum('cantidad')).order_by('-total')[0:3]
+                    total=Sum('cantidad')).order_by('-total')[0:6]
                 for i in query2:
                     px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
                     pr = Producto.objects.get(id=int(i['inventario__producto_id']))
@@ -249,6 +249,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
     form_class = ProductoForm
     success_url = 'producto:lista'
     template_name = 'front-end/producto/producto_form.html'
+    permission_required = 'producto.add_producto'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -257,11 +258,11 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
+        print(action)
         try:
             if action == 'add':
                 f = self.form_class(request.POST or None, request.FILES or None)
                 if f.is_valid():
-                    print(2)
                     var = f.save()
                     data['producto_base'] = var.toJSON()
                     data['resp'] = True
@@ -295,6 +296,17 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def save_data(self, f):
+        data = {}
+        if f.is_valid():
+            var = f.save()
+            data['producto_base'] = var.toJSON()
+            data['resp'] = True
+        else:
+            data['error'] = f.errors
+        return data
+
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)

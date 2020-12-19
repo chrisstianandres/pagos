@@ -22,10 +22,12 @@
           <a href="{% url 'user:profile' %}" class="dropdown-item">
             <i class="fa fa-user"></i> Perfil de Usuario
           </a>
+            {% if request.user.tipo == 1 %}
           <div class="dropdown-divider"></div>
           <a href="{% url 'empresa:editar' %}" class="dropdown-item">
              <i class="fa fa-cogs"></i> Configuracion de datos de empresa
           </a>
+            {% endif %}
           <div class="dropdown-divider"></div>
           <a href="{% url 'logout' %}" class="dropdown-item">
             <i class="fas fa-sign-out-alt"></i> Salir

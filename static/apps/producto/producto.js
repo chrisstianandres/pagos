@@ -160,7 +160,7 @@ $(document).ready(function () {
                 window.location.pathname, 'Esta seguro que desea guardar este producto?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este producto!', 'far fa-smile-wink', function () {
-                        $('#Modal').modal('hide');
+                        $('#Modal_prod').modal('hide');
                         var newOption = new Option(response.producto_base['nombre'], response.producto_base['id'], false, true);
                         $('#id_producto_base').append(newOption).trigger('change');
                     });

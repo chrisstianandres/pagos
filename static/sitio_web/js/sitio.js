@@ -24,22 +24,23 @@ var carrito = {
         var array = this.items.productos;
         if (array.length === 0) {
             array.push(data[0]);
-            borrar_producto_carito(function () {
+            borrar_producto_carito('Trabajando!!', 'Agregando producto al carrito!', function () {
                 menssaje_ok('Correcto!', 'Producto agregado al carrito!',
                     'fas fa-cart-plus', function () {
                     })
             })
         } else {
             var key = this.verify(array, data);
+
             if (key === 1) {
-                borrar_producto_carito(function () {
+                borrar_producto_carito('Trabajando!!', 'Agregando producto al carrito!', function () {
                     menssaje_error('Atencion!', 'Este producto ya esta en tu carrito agrega mas cantidad desde este',
                         'fas fa-exclamation-circle', function () {
                         })
                 })
             } else {
                 array.push(data[0]);
-                borrar_producto_carito(function () {
+                borrar_producto_carito('Trabajando!!', 'Agregando producto al carrito!', function () {
                     menssaje_ok('Correcto!', 'Producto agregado al carrito!',
                         'fas fa-cart-plus', function () {
                         })
@@ -131,8 +132,10 @@ var carrito = {
     verify: function (array, data) {
         ok = 0;
         $.each(array, function (key, value) {
+                console.log(value.id);
                 if (data[0].id === value.id) {
                     ok = 1;
+                    return false;
                 }
             }
         );
@@ -215,20 +218,63 @@ function catalogo(tipo) {
         data: {'action': 'categoria', 'tipo': tipo},
         dataSrc: "",
     }).done(function (data) {
-
+        var html = '<div class="columns is-centered is-multiline">' +
+            '<div class="column is-full">' +
+            '</div>';
         if (tipo === 'mujer') {
-            console.log(tipo);
-            $('#cat_niños-tab').addClass('active');
-            $('#cat_niños').addClass('active show');
-            $('#moreven-tab').removeClass('active');
-            $('#cat_hombres-tab').removeClass('active');
-            $('#cat_mujeres-tab').removeClass('active');
-            $('#popular-tab').removeClass('active');
-            $('#popular').removeClass('active show');
-            var html = '<div class="columns is-centered is-multiline">' +
-                '<div class="column is-full">' +
-                '</div>';
+            $.each(data['result'], function (key, value) {
+                html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
+                    '<div class="card">' +
+                    '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
+                    '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
+                    '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
+                    '<img src="' + value['imagen'] + '" alt="">' +
+                    '<div class="card-info">' +
+                    '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
+                    '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                    '<div class="card-buttons">' +
+                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
+                    '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
+                    '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                    '<p>Los precios aqui mostrados no incluyen IVA</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+            });
+            $('#catalogo_mujeres').html(html);
+        }
+        if (tipo === 'hombre') {
+            $.each(data['result'], function (key, value) {
+                html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
+                    '<div class="card">' +
+                    '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
+                    '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
+                    '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
+                    '<img src="' + value['imagen'] + '" alt="">' +
+                    '<div class="card-info">' +
+                    '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
+                    '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                    '<div class="card-buttons">' +
+                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
+                    '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
+                    '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                    '<p>Los precios aqui mostrados no incluyen IVA</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+            });
 
+            $('#catalogo_hombres').html(html);
+        }
+        if (tipo === 'niño') {
             $.each(data['result'], function (key, value) {
                 html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
                     '<div class="card">' +
@@ -293,10 +339,24 @@ $(function () {
 
     $(document).on('click', 'a[rel="btn_carrito"]', function (e) {
         e.preventDefault();
-        $('#myModal').css("display", "block")
+        $('#myModal').animate({
+                height: "toggle"
+            }, 1200).css("display", "block")
 
     });
 
+    $(document).on('click', '#carrito_bajo', function (e) {
+        e.preventDefault();
+        $('html, body').animate({scrollTop: 0}, 1250);
+        setTimeout(function () {
+            // some point in future.
+            $('#myModal').animate({
+                height: "toggle"
+            }, 1200).css("display", "block")
+        }, 1300);
+
+
+    });
 
     $(document).on('click', 'a[rel="pay"]', function (e) {
         console.log(superuser);
@@ -312,33 +372,34 @@ $(function () {
         if (carrito.items.productos.length === 0) return false;
         e.preventDefault();
         borrar_todo_alert('Atencion!', 'Esta seguro que desea vaciar el carrito?', function () {
-            carrito.items.productos = [];
-            localStorage.clear();
-            carrito.list();
+            borrar_producto_carito('Trabajando!!', 'Vaciando carrito', function () {
+                menssaje_ok('Correcto!', 'El carrito fue vaciado!',
+                    'fas fa-shopping-cart', function () {
+                        carrito.items.productos = [];
+                        localStorage.clear();
+                        carrito.list();
+                    })
+            })
         });
     });
 
     $(document).on('click', 'a[rel="cat_hombre"]', function (e) {
         e.preventDefault();
         catalogo('hombre');
-
     });
 
     $(document).on('click', 'a[rel="cat_mujer"]', function (e) {
         e.preventDefault();
         catalogo('mujer');
-
     });
 
     $(document).on('click', 'a[rel="cat_niño"]', function (e) {
         $('html, #cat_niños').animate({scrollTop: 0}, 1250);
         catalogo('mujer');
-
     });
 
     $('.close').on('click', function () {
         $('#myModal').css("display", "none")
-
     });
 
 
@@ -362,6 +423,4 @@ $(function () {
             $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
 
         });
-
-
 });

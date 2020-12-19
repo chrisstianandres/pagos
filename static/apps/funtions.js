@@ -304,11 +304,11 @@ function menssaje_error_form(title, content, icon, callback) {
 }
 
 
-function borrar_producto_carito(callback) {
+function borrar_producto_carito(title, content, callback) {
     var obj = $.dialog({
         icon: 'fa fa-spinner fa-spin',
-        title: 'Trabajando!!',
-        content: 'Agregando producto al carrito!',
+        title: title,
+        content: content,
         type: 'blue',
         typeAnimated: true,
         draggable: true,
