@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('menu', login_required(backEnd.menu), name='menu'),
     path('login/', backEnd.logeo, name='login'),
-    path('signin/', backEnd.signin, name='signin'),
+    path('signin/', backEnd.signin.as_view(), name='signin'),
     path('accounts/login/', backEnd.logeo, name='login'),
     path('logout/', backEnd.disconnect, name='logout'),
     path('connect/', backEnd.connect, name='connect'),

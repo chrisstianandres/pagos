@@ -47,12 +47,13 @@ $(document).ready(function () {
             },
             telefono: {
                 required: true,
-                minlength: 9,
+                maxlength: 9,
                 digits: true
             },
             celular: {
                 required: true,
                 minlength: 10,
+                maxlength: 10,
                 digits: true
             },
             password: {
@@ -94,7 +95,8 @@ $(document).ready(function () {
                 minlength: "Tu contraseña debe tener al menos 5 digitos"
             },
              password2: {
-                equalTo: "La contraseñas deben coincidir"
+                equalTo: "La contraseñas deben coincidir",
+                 required: "Debe verificar su contraseña",
             },
             telefono: {
                 required: "Por favor ingresa tu numero convencional",
@@ -123,4 +125,6 @@ $(document).ready(function () {
         });
         $(this).val(changue);
     });
+
+    $('.errorlist').attr('style',  'color:red');
 });

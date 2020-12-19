@@ -40,12 +40,15 @@ class User(AbstractUser):
 
     def toJSON(self):
         item = model_to_dict(self)
-        item['last_login'] = self.last_login.strftime('%d-%m-%Y')
+        if self.last_login:
+            item['last_login'] = self.last_login.strftime('%d-%m-%Y')
         item['date_joined'] = self.date_joined.strftime('%d-%m-%Y')
         item['avatar'] = self.get_image()
         item['full_name'] = self.get_full_name()
         item['sexo'] = self.get_sexo_display()
         item['estado'] = self.get_estado_display()
+        if self.groups:
+            item['groups'] = [{'id': g.id, 'name': g.name} for g in self.groups.all()]
         return item
 
     class Meta:

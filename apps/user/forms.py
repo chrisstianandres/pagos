@@ -1,10 +1,12 @@
 from datetime import *
 
 from django import forms
+from django.db import transaction
 from django.forms import TextInput, EmailInput, SelectMultiple
 
 from .models import User
 from ..cliente.models import Cliente
+from django.contrib.auth.models import Group
 
 
 class UserForm(forms.ModelForm):
@@ -177,6 +179,7 @@ class UserForm_online(forms.ModelForm):
             'password': forms.PasswordInput(attrs={'class': 'form-control'}, render_value=True)
         }
 
+    @transaction.atomic()
     def save(self, commit=True):
         data = {}
         form = super()
@@ -207,9 +210,9 @@ class UserForm_online(forms.ModelForm):
                 )
                 cliente.save()
                 u.save()
+
             else:
                 data['error'] = form.errors
-                print(form.errors)
         except Exception as e:
             data['error'] = str(e)
         return data
