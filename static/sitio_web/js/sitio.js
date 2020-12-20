@@ -167,6 +167,7 @@ function container_popular() {
                 '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
                 '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
                 '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                 '<div class="card-buttons">' +
                 '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                 '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
@@ -196,6 +197,7 @@ function container_popular() {
                 '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
                 '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
                 '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                 '<div class="card-buttons">' +
                 '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                 '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
@@ -223,6 +225,7 @@ function catalogo(tipo) {
             '</div>';
         if (tipo === 'mujer') {
             $.each(data['result'], function (key, value) {
+                console.log(value);
                 html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
                     '<div class="card">' +
                     '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
@@ -235,6 +238,7 @@ function catalogo(tipo) {
                     '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
                     '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
                     '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                     '<div class="card-buttons">' +
                     '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                     '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
@@ -261,6 +265,7 @@ function catalogo(tipo) {
                     '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
                     '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
                     '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                     '<div class="card-buttons">' +
                     '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                     '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
@@ -288,6 +293,7 @@ function catalogo(tipo) {
                     '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
                     '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
                     '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
+                    '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                     '<div class="card-buttons">' +
                     '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                     '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
@@ -327,7 +333,13 @@ $(function () {
             },
             dataType: 'json',
             success: function (data) {
-                carrito.add(data);
+                if(data[0].producto_base.stock===0){
+                    menssaje_error('Error', 'Lo sentimos este producto no tiene stok disponible', 'far fa-sad-tear', function () {
+                    })
+                } else {
+                     carrito.add(data);
+                }
+
             },
             error: function (xhr, status, data) {
                 alert(data);

@@ -3,16 +3,6 @@
 {% block elements %}
     <br>
         <div class="row">
-            <div class="col-lg-3">
-            <label for="tipo_pro"><strong>Seleciona el Tipo:</strong>
-                <select class="tipo_prod form-control" id="tipo_pro" style="width: 100%">
-                    <option value="0">Todo</option>
-                    <option value="1">Producto</option>
-                    <option value="2">Servicio</option>
-                </select>
-            </label>
-
-        </div>
         <div class="col-lg-4">
             <label for="fecha"><strong>Rango de Fechas:</strong></label>
             <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm"></div>
@@ -24,7 +14,6 @@
     <tr>
         <th>Fecha</th>
         <th>Nombre</th>
-        <th>Tipo</th>
         <th>Cantidad</th>
         <th>Pvp</th>
         <th>Total (sin Iva)</th>
@@ -37,7 +26,6 @@
     <tfoot>
     <tr>
         <th></th>
-        <th></th>
         <th style="text-align:center" ><strong>Cantidad:</strong></th>
         <th style="text-align:center"></th>
         <th style="text-align:center"><strong>Totales:</strong></th>
@@ -46,6 +34,11 @@
         <th style="text-align:center"></th>
     </tr>
     </tfoot>
+{% endblock %}
+{% block botones %}
+<a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
+        <i class="fas fa-sync-alt"></i> Actualizar
+    </a>
 {% endblock %}
 
 {% block extra %}

@@ -13,7 +13,7 @@
                         <div class="col-lg-2">
                             <div class="btn-toolbar" role="toolbar">
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-primary btn-lg">
+                                    <button type="button" class="btn btn-primary btn-lg" href="/venta/lista">
                                         <span class="fas fa-shopping-cart fa-4x"></span>
                                         <h1>Ventas</h1>
                                     </button>
@@ -62,7 +62,7 @@
 
 
 
-
+  {% if request.user.tipo == 1 %}
         <br><br>
         <div class="row">
             <div class="col-xl-4 col-md-6">
@@ -187,6 +187,7 @@
                 </div>
             </div>
         </div>
+    {% endif %}
 {% endblock %}
 {% block script %}
     <script src="https://code.highcharts.com/highcharts.js"></script>

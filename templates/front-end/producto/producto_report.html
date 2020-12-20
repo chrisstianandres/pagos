@@ -1,0 +1,29 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block table %}
+    <thead>
+    <tr>
+        <th style="width: 18%">Nombre</th>
+        <th style="width: 10%">Categoria</th>
+        <th style="width: 10%;">Presentacion</th>
+        <th style="width: 8%">Stock</th>
+        <th style="width: 13%">Descripcion</th>
+        <th style="width: 8%">Pvp</th>
+        <th style="width: 8%">Alquiler</th>
+        <th style="width: 8%">Confeccion</th>
+        <th style="width: 8%">Imagen</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+{% endblock %}
+{% block botones %}
+    <a type="button" class="btn btn-default btn-sm" id="reload"
+       onclick=" location.reload();">
+        <i class="fas fa-sync-alt"></i> Actualizar
+    </a>
+{% endblock %}
+{% block extra %}
+    <script src="{% static 'apps/producto/producto_report.js' %}"></script>
+{% endblock %}

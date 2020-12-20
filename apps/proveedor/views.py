@@ -311,12 +311,36 @@ def data_report(request):
     return JsonResponse(data, safe=False)
 
 
-class report(ListView):
+class report(ValidatePermissionRequiredMixin, ListView):
     model = Proveedor
     template_name = 'front-end/proveedor/proveedor_report.html'
+    permission_required = 'proveedor.view_proveedor'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Proveedor.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        if action == 'report':
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            try:
+                if start_date == '' and end_date == '':
+                    query = Proveedor.objects.all()
+                else:
+                    query = Proveedor.objects.filter(fecha__range=[start_date, end_date])
+                for p in query:
+                    data.append(p.toJSON())
+                print(data)
+            except:
+                pass
+            return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)

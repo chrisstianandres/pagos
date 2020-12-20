@@ -169,7 +169,7 @@ $(function () {
                 $.ajax({
                     dataType: 'JSON',
                     type: 'POST',
-                    url: '/venta/nuevo',
+                    url: '/venta/nuevo_online',
                     data: parametros,
                 }).done(function (data) {
                     if (!data.hasOwnProperty('error')) {
@@ -199,7 +199,7 @@ $(function () {
         parametros['action'] = 'reserva';
         parametros['id'] = '';
         save_with_ajax('Alerta',
-            '/venta/nuevo', 'Esta seguro que desea reservar esta venta?', parametros,
+            '/venta/nuevo_oline', 'Esta seguro que desea reservar esta venta?', parametros,
             function (response) {
                 localStorage.clear();
                 printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
@@ -211,5 +211,61 @@ $(function () {
                 })
 
             });
+    });
+
+     $('#id_inventario').on('select2:select', function (e) {
+        $.ajax({
+            type: "POST",
+            url: '/producto/lista',
+            data: {
+                "id": $('#id_inventario option:selected').val(),
+                'action': 'get'
+            },
+            dataType: 'json',
+            success: function (data) {
+                carrito.add(data);
+            },
+            error: function (xhr, status, data) {
+                alert(data);
+            },
+
+        })
+    })
+         .select2({
+        theme: "classic",
+        language: {
+            inputTooShort: function () {
+                return "Ingresa al menos un caracter...";
+            },
+            "noResults": function () {
+                return "Sin resultados";
+            },
+            "searching": function () {
+                return "Buscando...";
+            }
+        },
+        allowClear: true,
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: '/producto/lista',
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    'action': 'search',
+                    'id': ''
+                };
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+
+            },
+
+        },
+        placeholder: 'Busca un Producto',
+        minimumInputLength: 1,
     });
 });

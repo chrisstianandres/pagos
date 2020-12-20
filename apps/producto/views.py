@@ -131,6 +131,40 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         return data
 
 
+class report(ValidatePermissionRequiredMixin, ListView):
+        model = Producto
+        template_name = 'front-end/producto/producto_report.html'
+        permission_required = 'producto.view_producto'
+
+        @csrf_exempt
+        def dispatch(self, request, *args, **kwargs):
+            return super().dispatch(request, *args, **kwargs)
+
+        def post(self, request, *args, **kwargs):
+            data = {}
+            try:
+                action = request.POST['action']
+                if action == 'report':
+                    data = []
+                    for c in Producto.objects.all():
+                        data.append(c.toJSON())
+                else:
+                    data['error'] = 'No ha seleccionado una opcion'
+            except Exception as e:
+                data['error'] = 'No ha seleccionado una opcion'
+            return JsonResponse(data, safe=False)
+
+        def get_context_data(self, **kwargs):
+            data = super().get_context_data(**kwargs)
+            data['icono'] = opc_icono
+            data['entidad'] = opc_entidad
+            data['boton'] = 'Nuevo Producto'
+            data['titulo'] = 'Listado de Productos'
+            data['nuevo'] = '/producto/nuevo'
+            data['empresa'] = empresa
+            return data
+
+
 class sitio(ListView):
     model = Producto
 
@@ -164,6 +198,7 @@ class sitio(ListView):
                     item['pvp_alq'] = format(i['inventario__producto__pvp_alq'], '.2f')
                     item['pvp_confec'] = format(i['inventario__producto__pvp_confec'], '.2f')
                     item['imagen'] = pr.get_image()
+                    item['stock'] = px.stock
                     mas.append(item)
                 data['masvendidos'] = mas
 
@@ -186,6 +221,7 @@ class sitio(ListView):
                     item['pvp_alq'] = format(i['inventario__producto__pvp_alq'], '.2f')
                     item['pvp_confec'] = format(i['inventario__producto__pvp_confec'], '.2f')
                     item['imagen'] = pr.get_image()
+                    item['stock'] = px.stock
                     pop.append(item)
                 data['popular'] = pop
             if action == 'categoria':
@@ -204,6 +240,7 @@ class sitio(ListView):
                     item['pvp_alq'] = format(i['pvp_alq'], '.2f')
                     item['pvp_confec'] = format(i['pvp_confec'], '.2f')
                     item['imagen'] = pb.get_image()
+                    item['stock'] = pb.producto_base.stock
                     mas.append(item)
                 data['result'] = mas
                 # query2 = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,

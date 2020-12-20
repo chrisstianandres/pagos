@@ -113,10 +113,14 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         return data
 
 
-@csrf_exempt
-class report(ListView):
+class report(ValidatePermissionRequiredMixin, ListView):
     model = Cliente
     template_name = 'front-end/cliente/cliente_report.html'
+    permission_required = 'cliente.view_cliente'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Cliente.objects.none()
@@ -135,16 +139,7 @@ class report(ListView):
                     query = Cliente.objects.filter(fecha__range=[start_date, end_date])
 
                 for p in query:
-                    data.append([
-                        p.id,
-                        p.fecha.strftime("%d/%m/%Y"),
-                        p.nombres + " " + p.apellidos,
-                        p.cedula,
-                        p.correo,
-                        p.get_sexo_display(),
-                        p.direccion,
-                        p.telefono
-                    ])
+                    data.append(p.toJSON())
             except:
                 pass
             return JsonResponse(data, safe=False)

@@ -1,4 +1,5 @@
 var datatable;
+var user_tipo= $('input[name="user_tipo"]').val();
 var logotipo;
 const toDataURL = url => fetch(url).then(response => response.blob())
     .then(blob => new Promise((resolve, reject) => {
@@ -217,8 +218,10 @@ $(function () {
                    return pad(data, 10);
                 }
             }
+
         ],
         createdRow: function (row, data, dataIndex) {
+            console.log(data);
             if (data.estado === 'FINALIZADA') {
                 $('td', row).eq(7).find('span').addClass('badge bg-success').attr("style", "color: white");
             } else if (data.estado === 'DEVUELTA') {
@@ -227,12 +230,16 @@ $(function () {
                 $('td', row).eq(8).find('a[rel="detalle"]').hide();
                 $('td', row).eq(8).find('a[rel="pdf"]').hide();
             } else if (data.estado === 'RESERVADA') {
+                if (user_tipo ==='0') {
+                    $('td', row).eq(8).find('a[rel="pagar"]').hide();
+                }
                 $('td', row).eq(7).find('span').addClass('badge bg-warning').attr("style", "color: white");
             }
-
+        },
+        hide: function () {
+            hidecolum();
         }
     });
-
     $('#datatable tbody')
         .on('click', 'a[rel="devolver"]', function () {
         $('.tooltip').remove();
@@ -253,11 +260,10 @@ $(function () {
         var tr = datatable.cell($(this).closest('td, li')).index();
         var data = datatable.row(tr.row).data();
         var parametros = {'id': data.id, 'action': 'pagar'};
-        console.log(data);
         save_estado('Alerta',
             window.location.pathname, 'Esta seguro que desea realizar el pago de esta venta de $ <strong>'+ data.transaccion.total+'</strong>?', parametros,
             function () {
-                menssaje_ok('Exito!', 'Exito al devolver la venta', 'far fa-smile-wink', function () {
+                menssaje_ok('Exito!', 'Exito al realizar el pago de esta venta', 'far fa-smile-wink', function () {
                     datatable.ajax.reload(null, false);
                 })
             });
@@ -347,7 +353,12 @@ $(function () {
         });
 
     $('#nuevo').on('click', function () {
-        window.location.replace('/venta/nuevo')
+        if (user_tipo==='1'){
+        window.location.href ='/venta/online'
+    } else {
+             window.location.replace('/venta/nuevo')
+        }
+
 
     })
 });
@@ -368,9 +379,14 @@ function daterange() {
     }).on('cancel.daterangepicker', function (ev, picker) {
         picker['key'] = 0;
         datos.add(picker);
-
     });
 
+}
+
+function hidecolum() {
+    if (user_tipo==='0'){
+        datatable.columns([2]).visible( false );
+    }
 }
 
 function pad(str, max) {

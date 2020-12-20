@@ -14,7 +14,8 @@ toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
 var datos = {
     fechas: {
         'start_date': '',
-        'end_date': ''
+        'end_date': '',
+        'action': 'report'
     },
     add: function (data) {
         if (data.key === 1) {
@@ -26,7 +27,7 @@ var datos = {
         }
 
         $.ajax({
-            url: '/venta/data_report_total',
+            url: window.location.pathname,
             type: 'POST',
             data: this.fechas,
             success: function (data) {
@@ -41,46 +42,36 @@ $(function () {
     daterange();
     datatable = $("#datatable").DataTable({
         destroy: true,
-        scrollX: true,
+        responsive: true,
         autoWidth: false,
         order: [[2, "asc"]],
         ajax: {
-            url: '/venta/data_report_total',
+            url: window.location.pathname,
             type: 'POST',
             data: datos.fechas,
             dataSrc: ""
         },
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
-            searchPanes: {
-                clearMessage: 'Limpiar Filtros',
-                collapse: {
-                    0: 'Filtros de Busqueda',
-                    _: 'Filtros seleccionados (%d)'
-                },
-                title: {
-                    _: 'Filtros seleccionados - %d',
-                    0: 'Ningun Filtro seleccionado',
-                },
-                activeMessage: 'Filtros activos (%d)',
-                emptyPanes: 'There are no panes to display. :/',
-                sZeroRecords: "No se encontraron resultados",
-
-            }
         },
 
-        dom: 'l<"toolbar">' + "<br>" + 'Bfrtip ',
+       dom: "<'row'<'col-sm-12 col-md-12'B>>" +
+            "<'row'<'col-sm-12 col-md-3'l>>" +
+            "<'row'<'col-sm-12 col-md-12'f>>"+
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         //"<'row'<'col-md-6'l><'col-md-6'Bf>>"
-        buttons: [
-            {
-                className: 'btn-default my_class',
-                extend: 'searchPanes',
-                config: {
-                    cascadePanes: true,
-                    viewTotal: true,
-                    layout: 'columns-5'
+        buttons: {
+             dom: {
+                button: {
+                    className: '',
+
+                },
+                container: {
+                    className: 'buttons-container float-right'
                 }
             },
+            buttons: [
             {
                 text: '<i class="far fa-file-pdf"></i> Reporte PDF',
                 className: 'btn btn-danger',
@@ -173,200 +164,14 @@ $(function () {
             },
             {
                 text: '<i class="fab fa-amazon"></i> Reporte por Productos/Servicios',
-                className: 'btn-warning my_class',
+                className: 'btn btn-warning',
                 action: function (e, dt, node, config) {
                     window.location.href = '/venta/report_by_product'
                 }
             },
-        ],
+        ]
+        },
         columnDefs: [
-            {
-                searchPanes: {
-                    show: false,
-                },
-                targets: [0],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                },
-                targets: [1],
-            },
-
-            {
-                searchPanes: {
-                    show: true,
-                },
-                targets: [2],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                    options: [
-                        {
-                            label: 'Menos de $ 10',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] < 10;
-                            }
-                        },
-                        {
-                            label: '$ 10 a $ 50',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 50 && rowData[3] >= 10;
-                            }
-                        },
-                        {
-                            label: '$ 50 a $ 100',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 100 && rowData[3] >= 50;
-                            }
-                        },
-                        {
-                            label: '$ 100 a $ 200',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 200 && rowData[3] >= 100;
-                            }
-                        },
-                        {
-                            label: '$ 200 a $ 300',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 300 && rowData[3] >= 200;
-                            }
-                        },
-                        {
-                            label: '$ 300 a $ 400',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 400 && rowData[3] >= 300;
-                            }
-                        },
-                        {
-                            label: '$ 400 a $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 500 && rowData[3] >= 400;
-                            }
-                        },
-                        {
-                            label: 'Mas de $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] > 500;
-                            }
-                        },
-                    ]
-                },
-                targets: [3],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                    options: [
-                        {
-                            label: 'Menos de $ 10',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] < 10;
-                            }
-                        },
-                        {
-                            label: '$ 10 a $ 50',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 50 && rowData[4] >= 10;
-                            }
-                        },
-                        {
-                            label: '$ 50 a $ 100',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 100 && rowData[4] >= 50;
-                            }
-                        },
-                        {
-                            label: '$ 100 a $ 200',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 200 && rowData[4] >= 100;
-                            }
-                        },
-                        {
-                            label: '$ 200 a $ 300',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 300 && rowData[4] >= 200;
-                            }
-                        },
-                        {
-                            label: '$ 300 a $ 400',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 400 && rowData[4] >= 300;
-                            }
-                        },
-                        {
-                            label: '$ 400 a $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] <= 500 && rowData[4] >= 400;
-                            }
-                        },
-                        {
-                            label: 'Mas de $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[4] > 500;
-                            }
-                        },
-                    ]
-                },
-                targets: [4],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                    options: [
-                        {
-                            label: 'Menos de $ 10',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] < 10;
-                            }
-                        },
-                        {
-                            label: '$ 10 a $ 50',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] <= 50 && rowData[5] >= 10;
-                            }
-                        },
-                        {
-                            label: '$ 50 a $ 100',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] <= 100 && rowData[5] >= 50;
-                            }
-                        },
-                        {
-                            label: '$ 100 a $ 200',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] <= 200 && rowData[5] >= 100;
-                            }
-                        },
-                        {
-                            label: '$ 200 a $ 300',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] <= 300 && rowData[5] >= 200;
-                            }
-                        },
-                        {
-                            label: '$ 300 a $ 400',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] <= 400 && rowData[5] >= 300;
-                            }
-                        },
-                        {
-                            label: '$ 400 a $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] <= 500 && rowData[5] >= 400;
-                            }
-                        },
-                        {
-                            label: 'Mas de $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] > 500;
-                            }
-                        },
-                    ]
-                },
-                targets: [5],
-            },
             {
                 targets: '_all',
                 class: 'text-center',

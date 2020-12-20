@@ -129,6 +129,38 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         return data
 
 
+class report(ValidatePermissionRequiredMixin, ListView):
+    model = Material
+    template_name = 'front-end/material/material_report.html'
+    permission_required = 'material.view_material'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'report':
+                data = []
+                for c in Material.objects.all():
+                    data.append(c.toJSON())
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Reporte de Materiales'
+        data['empresa'] = empresa
+        return data
+
+
 class Createview(ValidatePermissionRequiredMixin, CreateView):
     model = Producto_base
     second_model = Material
