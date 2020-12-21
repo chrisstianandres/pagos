@@ -5,6 +5,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.db import transaction
+from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.template.loader import get_template
 from django.urls import reverse_lazy
@@ -19,6 +20,7 @@ from apps.confeccion.forms import ConfeccionForm, Detalle_confeccionform
 from apps.confeccion.models import Confeccion, Detalle_confeccion
 from apps.empresa.models import Empresa
 from apps.mixins import ValidatePermissionRequiredMixin
+from apps.producto_base.models import Producto_base
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
 
@@ -224,3 +226,224 @@ class printpdf(View):
         except:
             pass
         return HttpResponseRedirect(reverse_lazy('confeccion:lista'))
+
+
+class report(ValidatePermissionRequiredMixin, ListView):
+    model = Confeccion
+    template_name = 'front-end/confeccion/confeccion_report_product.html'
+    permission_required = 'confeccion.view_confeccion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Confeccion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            empresa = Empresa.objects.first()
+            iva = float(empresa.iva / 100)
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Detalle_confeccion.objects.values('confeccion__transaccion__fecha_trans',
+                                                         'producto__producto_base_id',
+                                                         'pvp_by_confec').order_by().annotate(
+                        Sum('cantidad')).filter(confeccion__estado=1)
+                else:
+                    query = Detalle_confeccion.objects.values('confeccion__transaccion__fecha_trans',
+                                                         'producto__producto_base_id',
+                                                         'pvp_by_confec') \
+                        .filter(confeccion__transaccion__fecha_trans__range=[start_date, end_date],
+                                confeccion__estado=1).order_by().annotate(
+                        Sum('cantidad'))
+                for p in query:
+                    total = p['pvp_by_confec'] * p['cantidad__sum']
+                    pr = Producto_base.objects.get(id=int(p['producto__producto_base_id']))
+                    data.append([
+                        p['confeccion__transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        pr.nombre,
+                        int(p['cantidad__sum']),
+                        format(p['pvp_by_confec'], '.2f'),
+                        format(total, '.2f'),
+                        format((float(total) * iva), '.2f'),
+                        format(((float(total) * iva) + float(total)), '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Reporte de Confeccion de prendas'
+        data['empresa'] = empresa
+        return data
+
+
+class report_total(ValidatePermissionRequiredMixin, ListView):
+    model = Confeccion
+    template_name = 'front-end/confeccion/confeccion_report_total.html'
+    permission_required = 'confeccion.view_confeccion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Confeccion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Confeccion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                        .annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=1)
+                else:
+                    query = Confeccion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos',
+                                                 'transaccion__user__username').filter(
+                        transaccion__fecha_trans__range=[start_date, end_date], estado=1). \
+                        annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                for p in query:
+                    data.append([
+                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
+                        p['transaccion__user__username'],
+                        format(p['transaccion__subtotal__sum'], '.2f'),
+                        format((p['transaccion__iva__sum']), '.2f'),
+                        format(p['transaccion__total__sum'], '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Confeccion de prendas'
+        data['titulo'] = 'Reporte de confeccion de prendas'
+        data['empresa'] = empresa
+        return data
+
+
+class report_total_alquilada(ValidatePermissionRequiredMixin, ListView):
+    model = Confeccion
+    template_name = 'front-end/confeccion/confeccion_report_total_alquiladas.html'
+    permission_required = 'confeccion.view_confeccion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Confeccion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Confeccion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                        .annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=0)
+                else:
+                    query = Confeccion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos',
+                                                 'transaccion__user__username').filter(
+                        transaccion__fecha_trans__range=[start_date, end_date], estado=0). \
+                        annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                for p in query:
+                    data.append([
+                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
+                        p['transaccion__user__username'],
+                        format(p['transaccion__subtotal__sum'], '.2f'),
+                        format((p['transaccion__iva__sum']), '.2f'),
+                        format(p['transaccion__total__sum'], '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Confeccion de prendas/No entregadas'
+        data['titulo'] = 'Reporte de Alquiler de prendas'
+        data['empresa'] = empresa
+        return data
+
+
+class report_total_reservada(ValidatePermissionRequiredMixin, ListView):
+    model = Confeccion
+    template_name = 'front-end/confeccion/confeccion_report_total_reservadas.html'
+    permission_required = 'confeccion.view_confeccion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Confeccion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Confeccion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                        .annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=3)
+                else:
+                    query = Confeccion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos',
+                                                 'transaccion__user__username').filter(
+                        transaccion__fecha_trans__range=[start_date, end_date], estado=3). \
+                        annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                for p in query:
+                    data.append([
+                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
+                        p['transaccion__user__username'],
+                        format(p['transaccion__subtotal__sum'], '.2f'),
+                        format((p['transaccion__iva__sum']), '.2f'),
+                        format(p['transaccion__total__sum'], '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Confeccion de prendas/Reservadas'
+        data['titulo'] = 'Reporte de confeccion de prendas'
+        data['empresa'] = empresa
+        return data

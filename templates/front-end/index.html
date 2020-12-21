@@ -57,15 +57,10 @@
         </div>
     {% endif %}
 
-
-
-
-
-
   {% if request.user.tipo == 1 %}
         <br><br>
         <div class="row">
-            <div class="col-xl-4 col-md-6">
+            <div class="col-xl-3 col-md-6">
                 <div class="card bg-primary text-white mb-4">
                     <div class="card-header"> Ventas realizadas en el Año</div>
                     <div class="card-body"> <div class="text-center"><h1 id="venta_tarjet"> &nbsp;</h1></div></div>
@@ -75,7 +70,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-6">
+            <div class="col-xl-3 col-md-6">
                 <div class="card bg-warning text-white mb-4">
                     <div class="card-header"> Compras realizadas en el Año</div>
                     <div class="card-body"><div class="text-center"><h1 id="compra_tarjet"></h1></div></div>
@@ -85,10 +80,20 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-6">
+            <div class="col-xl-3 col-md-6">
                 <div class="card bg-success text-white mb-4">
                     <div class="card-header"> Productos en Inventario</div>
                     <div class="card-body"><div class="text-center"><h1 id="inv_tarjet"></h1></div></div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="{% url 'producto:lista' %}">Ver más</a>
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-danger text-white mb-4">
+                    <div class="card-header"> Productos Agotados</div>
+                    <div class="card-body"><div class="text-center"><h1 id="inv_tarjet_agot"></h1></div></div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
                         <a class="small text-white stretched-link" href="{% url 'producto:lista' %}">Ver más</a>
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
@@ -148,11 +153,11 @@
                         <table class="table" id="datatable">
                             <thead>
                             <tr>
-                                <th>Id</th>
                                 <th>Producto</th>
                                 <th>Categoria</th>
                                 <th>Presentacion</th>
                                 <th>Stock</th>
+                                <th>Imagen</th>
                             </tr>
                             </thead>
                             <tbody>

@@ -38,6 +38,7 @@ empresa = nombre_empresa()
 class lista(ValidatePermissionRequiredMixin, ListView):
     model = Compra
     template_name = 'front-end/compra/compra_list.html'
+    permission_required = 'compra.view_compra'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -66,7 +67,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     data = []
                     for p in Detalle_compra.objects.all():
                         item = p.toJSON()
-                        item['p_compra'] = float((p.p_compra_actual * 100) / (100 + 12))
+                        item['p_compra'] = p.p_compra_actual
                         item['subtotal'] = float(p.subtotal)
                         data.append(item)
                 else:
@@ -83,7 +84,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Nueva Compra'
         data['titulo'] = 'Listado de Compras'
-        data['nuevo'] = '/compra/nuevo'
         data['empresa'] = empresa
         return data
 
@@ -91,6 +91,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Compra
     template_name = 'front-end/compra/compra_form.html'
+    permission_required = 'compra.add_compra'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -159,239 +160,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         return data
 
 
-
-@csrf_exempt
-def data(request):
-    data = []
-    start_date = request.POST.get('start_date', '')
-    end_date = request.POST.get('end_date', '')
-    try:
-        if start_date == '' and end_date == '':
-            compra = Compra.objects.all()
-            for c in compra:
-                data.append([
-                    c.fecha_compra.strftime('%d-%m-%Y'),
-                    c.proveedor.nombres,
-                    c.empleado.get_full_name(),
-                    format(c.total, '.2f'),
-                    c.id,
-                    c.get_estado_display(),
-                    c.id
-                ])
-        else:
-            compra = Compra.objects.filter(fecha_compra__range=[start_date, end_date])
-            for c in compra:
-                data.append([
-                    c.fecha_compra.strftime('%d-%m-%Y'),
-                    c.proveedor.nombres,
-                    c.empleado.get_full_name(),
-                    format(c.total, '.2f'),
-                    c.id,
-                    c.get_estado_display(),
-                    c.id
-                ])
-    except:
-        pass
-    return JsonResponse(data, safe=False)
-
-
-def nuevo(request):
-    data = {
-        'icono': opc_icono, 'entidad': opc_entidad, 'crud': '../compra/get_producto', 'empresa': empresa,
-        'boton': 'Guardar Compra', 'action': 'add', 'titulo': 'Nueva Compra',
-        'key': ''
-    }
-    if request.method == 'GET':
-        data['form'] = CompraForm()
-        data['form2'] = Detalle_CompraForm()
-        data['detalle'] = []
-        data['formp'] = ProveedorForm()
-    return render(request, 'front-end/compra/compra_form.html', data)
-
-
-@csrf_exempt
-def crear(request):
-    data = {}
-    if request.method == 'POST':
-        datos = json.loads(request.POST['compras'])
-        if datos:
-            pr = []
-            with transaction.atomic():
-                c = Compra()
-                c.fecha_compra = datos['fecha_compra']
-                c.proveedor_id = datos['proveedor']
-                c.empleado_id = request.user.id
-                c.subtotal = float(datos['subtotal'])
-                c.iva = float(datos['iva'])
-                c.total = float(datos['total'])
-                c.save()
-                for i in datos['productos']:
-                    dv = Detalle_compra()
-                    dv.compra_id = c.id
-                    dv.producto_id = i['id']
-                    dv.cantidad = int(i['cantidad'])
-                    dv.subtotal = float(i['subtotal'])
-                    x = Producto.objects.get(pk=i['id'])
-                    x.stock = x.stock + int(i['cantidad'])
-                    dv.p_compra_actual = float(x.p_compra)
-                    x.save()
-                    dv.save()
-                    for p in range(0, i['cantidad']):
-                        item = c.toJSON()
-                        item['producto'] = x.toJSON()
-                        item['serie'] = 0
-                        item['fecha_salida'] = ''
-                        item['estado'] = 1
-                        pr.append(item)
-                data['productos'] = pr
-                data['id'] = c.id
-                data['resp'] = True
-        else:
-            data['resp'] = False
-            data['error'] = "Datos Incompletos"
-    return HttpResponse(json.dumps(data), content_type="application/json")
-
-
-def editar(request, id):
-    data = {
-        'icono': opc_icono, 'entidad': opc_entidad, 'crud': '../../compra/get_producto', 'empresa': empresa,
-        'boton': 'Editar Compra', 'action': 'edit', 'titulo': 'Editar Registro de una Compra',
-        'key': id
-    }
-    compra = Compra.objects.get(id=id)
-    if request.method == 'GET':
-        data['form'] = CompraForm(instance=compra)
-        data['form2'] = Detalle_CompraForm()
-        data['detalle'] = json.dumps(get_detalle_productos(id))
-    return render(request, 'front-end/compra/compra_form.html', data)
-
-
-@csrf_exempt
-def editar_save(request):
-    data = {}
-    datos = json.loads(request.POST['compras'])
-    if request.POST['action'] == 'edit':
-        with transaction.atomic():
-            c = Compra.objects.get(pk=request.POST['key'])
-            c.fecha_compra = datos['fecha_compra']
-            c.proveedor_id = datos['proveedor']
-            c.subtotal = float(datos['subtotal'])
-            c.iva = float(datos['iva'])
-            c.total = float(datos['total'])
-            c.save()
-            c.detalle_compra_set.all().delete()
-            for i in datos['insumos']:
-                dv = Detalle_compra()
-                dv.compra_id = c.id
-                dv.insumo_id = i['id']
-                dv.cantidad = int(i['cantidad'])
-                dv.save()
-                data['resp'] = True
-    else:
-        data['resp'] = False
-        data['error'] = "Datos Incompletos"
-    return HttpResponse(json.dumps(data), content_type="application/json")
-
-
-def get_detalle_productos(id):
-    data = []
-    try:
-        for i in Detalle_compra.objects.filter(compra_id=id):
-            iva_emp = Empresa.objects.get(pk=1)
-            item = i.producto.toJSON()
-            item['cantidad'] = i.cantidad
-            item['iva_emp'] = format(iva_emp.iva, '.2f')
-            data.append(item)
-    except:
-        pass
-    return data
-
-
-@csrf_exempt
-def get_producto(request):
-    data = {}
-    try:
-        id = request.POST['id']
-        if id:
-            producto = Producto.objects.filter(pk=id)
-            iva_emp = Empresa.objects.get(pk=1)
-            data = []
-            for i in producto:
-                item = i.toJSON()
-                item['cantidad'] = 1
-                item['subtotal'] = 0.00
-                item['iva_emp'] = iva_emp.iva
-                cal = float(item['p_compra']) / (item['iva_emp'] + 100)
-                item['p_compra'] = cal
-                data.append(item)
-        else:
-            data['error'] = 'No ha selecionado ningun Insumo'
-    except Exception as e:
-        data['error'] = 'Ha ocurrido un error'
-    return JsonResponse(data, safe=False)
-
-
-@csrf_exempt
-def get_detalle(request):
-    data = {}
-    try:
-        id = request.POST['id']
-        if id:
-            data = []
-            for p in Detalle_compra.objects.filter(compra_id=id):
-                item = p.toJSON()
-                item['p_compra'] = float((p.p_compra_actual*100)/(100+empresa.iva))
-                item['subtotal'] = float(p.compra.subtotal)
-                data.append(item)
-        else:
-            data['error'] = 'Ha ocurrido un error'
-    except Exception as e:
-        data['error'] = str(e)
-    return JsonResponse(data, safe=False)
-
-
-@csrf_exempt
-def estado(request):
-    data = {}
-    try:
-        id = request.POST['id']
-        if id:
-            with transaction.atomic():
-                es = Compra.objects.get(pk=id)
-                es.estado = 0
-                for i in Inventario.objects.filter(compra_id=id):
-                    ch = Producto.objects.get(id=i.producto.id)
-                    if i.venta != None:
-                        data['error'] = 'No se puede devolver esta compra porque los productos ya fueron vendidos'
-                        data['content'] = 'Prueba con otra venta'
-                    else:
-                        for d in Detalle_compra.objects.filter(compra_id=id):
-                            ch.stock = int(ch.stock) - int(d.cantidad)
-                        i.delete()
-                        es.save()
-                        ch.save()
-        else:
-            data['error'] = 'Ha ocurrido un error'
-    except Exception as e:
-        data['error'] = str(e)
-    return JsonResponse(data)
-
-
-@csrf_exempt
-def eliminar(request):
-    data = {}
-    try:
-        id = request.POST['id']
-        if id:
-            es = Compra.objects.get(id=id)
-            es.delete()
-        else:
-            data['error'] = 'Ha ocurrido un error'
-    except Exception as e:
-        data['error'] = str(e)
-    return JsonResponse(data)
-
-
 @csrf_exempt
 def index(request):
     data = {}
@@ -406,7 +174,7 @@ def index(request):
     return JsonResponse(data, safe=False)
 
 
-class printpdf(View):
+class printpdf(ValidatePermissionRequiredMixin, View):
     def link_callback(self, uri, rel):
         """
         Convert HTML URIs to absolute system paths so xhtml2pdf can access those
@@ -438,7 +206,6 @@ class printpdf(View):
             )
         return path
 
-
     def pvp_cal(self, *args, **kwargs):
         data = []
         try:
@@ -446,7 +213,7 @@ class printpdf(View):
             for i in Detalle_compra.objects.filter(compra_id=self.kwargs['pk']):
                 item = i.compra.toJSON()
                 item['producto'] = i.producto.toJSON()
-                item['pvp'] = format(((i.p_compra_actual * 100) / (iva_emp.iva + 100)), '.2f')
+                item['pvp'] = format(i.p_compra_actual, '.2f')
                 item['cantidad'] = i.cantidad
                 item['subtotal'] = format(i.subtotal, '.2f')
                 data.append(item)
@@ -473,46 +240,47 @@ class printpdf(View):
         return HttpResponseRedirect(reverse_lazy('compra:lista'))
 
 
-@csrf_exempt
-def data_report(request):
-    data = []
-    start_date = request.POST.get('start_date', '')
-    end_date = request.POST.get('end_date', '')
-    try:
-        if start_date == '' and end_date == '':
-            query = Detalle_compra.objects.values('compra__fecha_compra', 'producto__nombre',
-                                                 'p_compra_actual').order_by().annotate(Sum('cantidad'))
-            for p in query:
-                data.append([
-                    p['compra__fecha_compra'].strftime("%d/%m/%Y"),
-                    p['producto__nombre'],
-                    int(p['cantidad__sum']),
-                    format(p['p_compra_actual'], '.2f'),
-                    format(p['p_compra_actual'] * p['cantidad__sum'], '.2f'),
-                ])
-
-        else:
-            query = Detalle_compra.objects.values('compra__fecha_compra', 'producto__nombre', 'producto__pvp') \
-                .filter(compra__fecha_compra__range=[start_date, end_date]).order_by().annotate(Sum('cantidad'))
-            for p in query:
-                data.append([
-                    p['compra__fecha_compra'].strftime("%d/%m/%Y"),
-                    p['producto__nombre'],
-                    int(p['cantidad__sum']),
-                    format(p['producto__pvp'], '.2f'),
-                    format(p['producto__pvp'] * p['cantidad__sum'], '.2f'),
-                ])
-    except:
-        pass
-    return JsonResponse(data, safe=False)
-
-
-class report(ListView):
+class report(ValidatePermissionRequiredMixin, ListView):
     model = Compra
     template_name = 'front-end/compra/compra_report_product.html'
+    permission_required = 'compra.view_compra'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Compra.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'report':
+                data = []
+                start_date = request.POST.get('start_date', '')
+                end_date = request.POST.get('end_date', '')
+                if start_date == '' and end_date == '':
+                    query = Detalle_compra.objects.values('compra__fecha_compra', 'material__producto_base__nombre',
+                                                           'p_compra_actual').\
+                        order_by().annotate(Sum('cantidad')).annotate(Sum('compra__total')).annotate(Sum('subtotal'))
+                else:
+                    query = (Detalle_compra.objects.values('compra__fecha_compra', 'material__producto_base__nombre',
+                                                           'p_compra_actual').
+                        filter(compra__fecha_compra__range=[start_date, end_date]).order_by().annotate(
+                        Sum('cantidad'))). annotate(Sum('compra__total'))
+                for p in query:
+                    data.append([
+                        p['compra__fecha_compra'].strftime("%d/%m/%Y"),
+                        p['material__producto_base__nombre'],
+                        int(p['cantidad__sum']),
+                        format(p['p_compra_actual'], '.2f'),
+                        format(p['compra__total__sum'], '.2f')])
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -520,58 +288,54 @@ class report(ListView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Nueva Compra'
         data['titulo'] = 'Reporte de Compras'
-        data['nuevo'] = '/compra/nuevo'
         data['empresa'] = empresa
-        data['filter_prod'] = '/compra/report_total'
         return data
 
 
-@csrf_exempt
-def data_report_total(request):
-    data = []
-    start_date = request.POST.get('start_date', '')
-    end_date = request.POST.get('end_date', '')
-    try:
-        if start_date == '' and end_date == '':
-            query = Compra.objects.values('fecha_compra', 'proveedor__nombres', 'empleado__first_name',
-                                          'empleado__last_name').order_by().annotate(Sum('total'))
-            for p in query:
-                data.append([
-                    p['fecha_compra'].strftime("%d/%m/%Y"),
-                    p['proveedor__nombres'],
-                    p['empleado__first_name'] + " " + p['empleado__last_name'],
-                    format(p['total__sum'], '.2f')
-                ])
-        else:
-            query = Compra.objects.values('fecha_compra', 'proveedor__nombres', 'empleado__first_name',
-                                          'empleado__last_name', 'total').filter(
-                fecha_compra__range=[start_date, end_date])
-            for p in query:
-                data.append([
-                    p['fecha_compra'].strftime("%d/%m/%Y"),
-                    p['proveedor__nombres'],
-                    p['empleado__first_name'] + " " + p['empleado__last_name'],
-                    format(p['total'], '.2f')
-                ])
-    except:
-        pass
-    return JsonResponse(data, safe=False)
-
-
-class report_total(ListView):
+class report_total(ValidatePermissionRequiredMixin, ListView):
     model = Compra
     template_name = 'front-end/compra/compra_report_total.html'
+    permission_required = 'compra.view_compra'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Compra.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                data = []
+                if start_date == '' and end_date == '':
+                    query = Compra.objects.values('fecha_compra', 'proveedor__nombre', 'user__username',).order_by().\
+                        annotate(Sum('total'))
+                else:
+                    query = Compra.objects.values('fecha_compra', 'proveedor__nombre', 'user__username').filter(
+                        fecha_compra__range=[start_date, end_date]).order_by().\
+                        annotate(Sum('total'))
+                for p in query:
+                    data.append([
+                        p['fecha_compra'].strftime("%d/%m/%Y"),
+                        p['proveedor__nombre'],
+                        p['user__username'],
+                        format(p['total__sum'], '.2f')
+                    ])
+            else:
+                data['error'] = 'No ha seccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nueva Compra'
         data['titulo'] = 'Reporte de Compras Totales'
-        data['nuevo'] = '/compra/nuevo'
         data['empresa'] = empresa
-        data['filter_prod'] = '/compra/report_by_product'
         return data

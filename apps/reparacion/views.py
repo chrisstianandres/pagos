@@ -19,6 +19,7 @@ from apps.cliente.forms import ClienteForm
 # from apps.delvoluciones_venta.models import Devolucion
 # from apps.inventario.models import Inventario
 # from apps.servicio.models import Servicio
+from apps.producto_base.models import Producto_base
 from apps.reparacion.forms import ReparacionForm, Detalle_reparacionform
 from apps.reparacion.models import Reparacion, Detalle_reparacion
 from apps.empresa.models import Empresa
@@ -276,6 +277,227 @@ class printpdf(View):
         except:
             pass
         return HttpResponseRedirect(reverse_lazy('reparacion:lista'))
+
+
+class report(ValidatePermissionRequiredMixin, ListView):
+    model = Reparacion
+    template_name = 'front-end/reparacion/reparacion_report_product.html'
+    permission_required = 'reparacion.view_reparacion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Reparacion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            empresa = Empresa.objects.first()
+            iva = float(empresa.iva / 100)
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Detalle_reparacion.objects.values('reparacion__transaccion__fecha_trans',
+                                                         'producto__producto_base_id',
+                                                         'pvp_rep_by_prod').order_by().annotate(
+                        Sum('cantidad')).filter(reparacion__estado=1)
+                else:
+                    query = Detalle_reparacion.objects.values('reparacion__transaccion__fecha_trans',
+                                                         'producto__producto_base_id',
+                                                         'pvp_rep_by_prod') \
+                        .filter(reparacion__transaccion__fecha_trans__range=[start_date, end_date],
+                                reparacion__estado=1).order_by().annotate(
+                        Sum('cantidad'))
+                for p in query:
+                    total = p['pvp_rep_by_prod'] * p['cantidad__sum']
+                    pr = Producto_base.objects.get(id=int(p['producto__producto_base_id']))
+                    data.append([
+                        p['reparacion__transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        pr.nombre,
+                        int(p['cantidad__sum']),
+                        format(p['pvp_rep_by_prod'], '.2f'),
+                        format(total, '.2f'),
+                        format((float(total) * iva), '.2f'),
+                        format(((float(total) * iva) + float(total)), '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Reporte de Reparacion de prendas'
+        data['empresa'] = empresa
+        return data
+
+
+class report_total(ValidatePermissionRequiredMixin, ListView):
+    model = Reparacion
+    template_name = 'front-end/reparacion/reparacion_report_total.html'
+    permission_required = 'reparacion.view_reparacion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Reparacion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                        .annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=1)
+                else:
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos',
+                                                 'transaccion__user__username').filter(
+                        transaccion__fecha_trans__range=[start_date, end_date], estado=1). \
+                        annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                for p in query:
+                    data.append([
+                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
+                        p['transaccion__user__username'],
+                        format(p['transaccion__subtotal__sum'], '.2f'),
+                        format((p['transaccion__iva__sum']), '.2f'),
+                        format(p['transaccion__total__sum'], '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Reparacion de prendas'
+        data['titulo'] = 'Reporte de reparacion de prendas'
+        data['empresa'] = empresa
+        return data
+
+
+class report_total_alquilada(ValidatePermissionRequiredMixin, ListView):
+    model = Reparacion
+    template_name = 'front-end/reparacion/reparacion_report_total_alquiladas.html'
+    permission_required = 'reparacion.view_reparacion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Reparacion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                        .annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=0)
+                else:
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos',
+                                                 'transaccion__user__username').filter(
+                        transaccion__fecha_trans__range=[start_date, end_date], estado=0). \
+                        annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                for p in query:
+                    data.append([
+                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
+                        p['transaccion__user__username'],
+                        format(p['transaccion__subtotal__sum'], '.2f'),
+                        format((p['transaccion__iva__sum']), '.2f'),
+                        format(p['transaccion__total__sum'], '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Reparacion de prendas/No entregadas'
+        data['titulo'] = 'Reporte de reparacion de prendas'
+        data['empresa'] = empresa
+        return data
+
+
+class report_total_reservada(ValidatePermissionRequiredMixin, ListView):
+    model = Reparacion
+    template_name = 'front-end/reparacion/reparacion_report_total_reservadas.html'
+    permission_required = 'reparacion.view_reparacion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Reparacion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                        .annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=3)
+                else:
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos',
+                                                 'transaccion__user__username').filter(
+                        transaccion__fecha_trans__range=[start_date, end_date], estado=3). \
+                        annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                for p in query:
+                    data.append([
+                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
+                        p['transaccion__user__username'],
+                        format(p['transaccion__subtotal__sum'], '.2f'),
+                        format((p['transaccion__iva__sum']), '.2f'),
+                        format(p['transaccion__total__sum'], '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Reparacion de prendas/Reservadas'
+        data['titulo'] = 'Reporte de reparacion de prendas'
+        data['empresa'] = empresa
+        return data
 
 # class report_total(ListView):
 #     model = Venta

@@ -457,400 +457,6 @@ class printpdf(View):
         return HttpResponseRedirect(reverse_lazy('venta:lista'))
 
 
-# class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
-#     form_class = Venta
-#     template_name = 'front-end/venta/venta_online.html'
-#
-#     @method_decorator(csrf_exempt)
-#     def dispatch(self, request, *args, **kwargs):
-#         return super().dispatch(request, *args, **kwargs)
-#
-#     def post(self, request, *args, **kwargs):
-#         data = {}
-#         action = request.POST['action']
-#         pk = request.POST['id']
-#         try:
-#             if action == 'add':
-#                 datos = json.loads(request.POST['ventas'])
-#                 if datos:
-#                     with transaction.atomic():
-#                         c = Transaccion()
-#                         c.fecha_trans = datos['fecha_venta']
-#                         c.cliente_id = datos['cliente']
-#                         c.user_id = request.user.id
-#                         c.subtotal = float(datos['subtotal'])
-#                         c.iva = float(datos['iva'])
-#                         c.total = float(datos['total'])
-#                         c.tipo = 0
-#                         c.save()
-#                         v = Venta()
-#                         v.transaccion_id = c.id
-#                         v.save()
-#                         if datos['productos']:
-#                             for i in datos['productos']:
-#                                 print(datos['productos'])
-#                                 for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[:i['cantidad']]:
-#                                     dv = Detalle_venta()
-#                                     dv.venta_id = v.id
-#                                     dv.inventario_id = in_pr.id
-#                                     dv.cantidad = int(i['cantidad'])
-#                                     dv.pvp_actual = float(in_pr.producto.pvp)
-#                                     dv.subtotal = float(i['subtotal'])
-#                                     in_pr.estado = 0
-#                                     in_pr.save()
-#                                     dv.save()
-#                                 stock = Producto_base.objects.get(id=i['producto_base']['id'])
-#                                 stock.stock = int(Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
-#                                 stock.save()
-#                         data['id'] = v.id
-#                         data['resp'] = True
-#                 else:
-#                     data['resp'] = False
-#                     data['error'] = "Datos Incompletos"
-#
-#             else:
-#                 data['error'] = 'No ha seleccionado ninguna opción'
-#         except Exception as e:
-#             data['error'] = str(e)
-#         return HttpResponse(json.dumps(data), content_type='application/json')
-#
-#     def get_context_data(self, **kwargs):
-#         data = super().get_context_data(**kwargs)
-#         data['icono'] = opc_icono
-#         data['entidad'] = opc_entidad
-#         data['boton'] = 'Guardar Venta'
-#         data['titulo'] = 'Nueva Venta'
-#         data['nuevo'] = '/venta/nuevo'
-#         data['empresa'] = empresa
-#         data['form'] = TransaccionForm()
-#         data['form2'] = Detalle_VentaForm()
-#         data['detalle'] = []
-#         data['formc'] = ClienteForm()
-#         return data
-
-# @csrf_exempt
-# def data(request):
-#     data = []
-#     start_date = request.POST.get('start_date', '')
-#     end_date = request.POST.get('end_date', '')
-#     try:
-#         if start_date == '' and end_date == '':
-#             venta = Venta.objects.all()
-#         else:
-#             venta = Venta.objects.filter(fecha_venta__range=[start_date, end_date])
-#         for c in venta:
-#             data.append([
-#                 c.fecha_venta.strftime('%d-%m-%Y'),
-#                 c.cliente.nombres + " " + c.cliente.apellidos,
-#                 c.empleado.get_full_name(),
-#                 format(c.total, '.2f'),
-#                 c.id,
-#                 c.get_estado_display(),
-#                 c.id
-#             ])
-#
-#     except:
-#         pass
-#     return JsonResponse(data, safe=False)
-#
-#
-# def nuevo(request):
-#     data = {
-#         'icono': opc_icono, 'entidad': opc_entidad, 'crud': '../venta/get_producto',
-#         'crudserv': '../venta/get_servicio',
-#         'empresa': empresa,
-#         'boton': 'Guardar Venta', 'action': 'add', 'titulo': 'Nuevo Registro de una Venta',
-#         'key': ''
-#     }
-#     if request.method == 'GET':
-#         data['form'] = VentaForm()
-#         data['form2'] = Detalle_VentaForm()
-#         data['formc'] = ClienteForm()
-#         data['detalle'] = []
-#     return render(request, 'front-end/venta/venta_form.html', data)
-#
-#
-# @csrf_exempt
-# def crear(request):
-#     data = {}
-#     if request.method == 'POST':
-#         datos = json.loads(request.POST['ventas'])
-#         if datos:
-#             dtp = []
-#             with transaction.atomic():
-#                 c = Venta()
-#                 c.fecha_venta = datos['fecha_venta']
-#                 c.cliente_id = datos['cliente']
-#                 c.empleado_id = request.user.id
-#                 c.subtotal = float(datos['subtotal'])
-#                 c.iva = float(datos['iva'])
-#                 c.total = float(datos['total'])
-#                 c.save()
-#                 if datos['productos'] and datos['servicios']:
-#                     for i in datos['productos']:
-#                         dv = Detalle_venta()
-#                         dv.venta_id = c.id
-#                         dv.producto_id = i['producto']['id']
-#                         dv.cantidadp = int(i['cantidad'])
-#                         x = Producto.objects.get(pk=i['producto']['id'])
-#                         dv.pvp_actual = float(x.pvp)
-#                         x.stock = x.stock - int(i['cantidad'])
-#                         dv.subtotalp = float(i['subtotal'])
-#                         x.save()
-#                         inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[:i['cantidad']]
-#                         for itr in inv:
-#                             x = Inventario.objects.get(pk=itr.id)
-#                             x.estado = 0
-#                             x.venta_id = c.id
-#                             x.save()
-#                         for s in datos['servicios']:
-#                             dv.servicio_id = s['id']
-#                             dv.cantidads = int(s['cantidad'])
-#                             dv.subtotals = float(s['subtotal'])
-#                             dv.pvp_actual_s = float(s['pvp'])
-#                             dv.save()
-#                         data['id'] = c.id
-#                         data['resp'] = True
-#                 elif datos['productos']:
-#                     for i in datos['productos']:
-#                         dv = Detalle_venta()
-#                         dv.venta_id = c.id
-#                         dv.producto_id = i['producto']['id']
-#                         dv.cantidadp = int(i['cantidad'])
-#                         dv.subtotalp = float(i['subtotal'])
-#                         x = Producto.objects.get(pk=i['producto']['id'])
-#                         dv.pvp_actual = float(x.pvp)
-#                         x.stock = x.stock - int(i['cantidad'])
-#                         x.save()
-#                         inv = Inventario.objects.filter(producto_id=i['producto']['id'], estado=1)[:i['cantidad']]
-#                         for itr in inv:
-#                             x = Inventario.objects.get(pk=itr.id)
-#                             x.estado = 0
-#                             x.venta_id = c.id
-#                             x.save()
-#                             dv.save()
-#                     data['id'] = c.id
-#                     data['resp'] = True
-#                 else:
-#                     for i in datos['servicios']:
-#                         dv = Detalle_venta()
-#                         dv.venta_id = c.id
-#                         dv.servicio_id = i['id']
-#                         dv.cantidads = int(i['cantidad'])
-#                         dv.subtotals = float(i['subtotal'])
-#                         dv.pvp_actual_s = float(i['pvp'])
-#                         dv.save()
-#                     data['id'] = c.id
-#                     data['resp'] = True
-#         else:
-#             data['resp'] = False
-#             data['error'] = "Datos Incompletos"
-#     return HttpResponse(json.dumps(data), content_type="application/json")
-#
-#
-# def editar(request, id):
-#     data = {
-#         'icono': opc_icono, 'entidad': opc_entidad, 'crud': '../../venta/get_producto', 'empresa': empresa,
-#         'boton': 'Editar Venta', 'action': 'edit', 'titulo': 'Editar Registro de una Venta',
-#         'key': id
-#     }
-#     venta = Venta.objects.get(id=id)
-#     if request.method == 'GET':
-#         data['form'] = VentaForm(instance=venta)
-#         data['form2'] = Detalle_VentaForm()
-#         data['detalle'] = json.dumps(get_detalle_productos(id))
-#     return render(request, 'front-end/venta/venta_form.html', data)
-#
-#
-# @csrf_exempt
-# def editar_save(request):
-#     data = {}
-#     datos = json.loads(request.POST['ventas'])
-#     if request.POST['action'] == 'edit':
-#
-#         with transaction.atomic():
-#             # c = Compra.objects.get(pk=self.get_object().id)
-#             c = Venta.objects.get(pk=request.POST['key'])
-#             c.fecha_venta = datos['fecha_venta']
-#             c.cliente_id = datos['cliente']
-#             c.subtotal = float(datos['subtotal'])
-#             c.iva = float(datos['iva'])
-#             c.total = float(datos['total'])
-#             c.save()
-#             c.detalle_venta_set.all().delete()
-#             for i in datos['productos']:
-#                 dv = Detalle_venta()
-#                 dv.venta_id = c.id
-#                 dv.producto_id = i['id']
-#                 dv.cantidad = int(i['cantidad'])
-#                 dv.save()
-#                 data['resp'] = True
-#     else:
-#         data['resp'] = False
-#         data['error'] = "Datos Incompletos"
-#     return HttpResponse(json.dumps(data), content_type="application/json")
-#
-#
-# def get_detalle_productos(id):
-#     data = []
-#     try:
-#         for i in Detalle_venta.objects.filter(venta_id=id):
-#             iva_emp = Empresa.objects.get(pk=1)
-#             item = i.producto.toJSON()
-#             item['cantidad'] = i.cantidad
-#             item['iva_emp'] = format(iva_emp.iva, '.2f')
-#             data.append(item)
-#     except:
-#         pass
-#     return data
-#
-#
-# @csrf_exempt
-# def get_producto(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             query = Inventario.objects.filter(producto_id=id, estado=1, select=0)[0:1]
-#             iva_emp = Empresa.objects.get(pk=1)
-#             data = []
-#             for i in query:
-#                 item = i.toJSON()
-#                 item['producto'] = i.producto.toJSON()
-#                 item['pvp'] = (i.producto.pvp * 100) / (iva_emp.iva + 100)
-#                 item['cantidad'] = 1
-#                 item['subtotal'] = 0.00
-#                 item['iva_emp'] = iva_emp.iva / 100
-#                 data.append(item)
-#                 i.select = 1
-#                 i.save()
-#         else:
-#             data['error'] = 'No ha selecionado ningun Producto'
-#     except Exception as e:
-#         data['error'] = 'Ha ocurrido un error'
-#     return JsonResponse(data, safe=False)
-#
-#
-# @csrf_exempt
-# def get_servicio(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             servicio = Servicio.objects.filter(pk=id)
-#             iva_emp = Empresa.objects.get(pk=1)
-#             data = []
-#             for i in servicio:
-#                 item = i.toJSON()
-#                 item['pvp'] = 1.00
-#                 item['cantidad'] = 1
-#                 item['subtotal'] = 0.00
-#                 item['iva_emp'] = iva_emp.iva / 100
-#                 data.append(item)
-#         else:
-#             data['error'] = 'No ha selecionado ningun Servicio'
-#     except Exception as e:
-#         data['error'] = 'Ha ocurrido un error'
-#     return JsonResponse(data, safe=False)
-#
-#
-# @csrf_exempt
-# def get_detalle(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             data = []
-#             result = Detalle_venta.objects.filter(venta_id=id)
-#             empresa = Empresa.objects.get(pk=1)
-#             for p in result:
-#                 if p.producto != None:
-#                     data.append({
-#                         'producto': p.producto.nombre,
-#                         'categoria': p.producto.categoria.nombre,
-#                         'presentacion': p.producto.presentacion.nombre,
-#                         'cantidad': p.cantidadp,
-#                         'pvp': (p.pvp_actual * 100) / (empresa.iva + 100),
-#                         'subtotal': p.subtotalp
-#                     })
-#         else:
-#             data['error'] = 'Ha ocurrido un error'
-#     except Exception as e:
-#         data['error'] = str(e)
-#     return JsonResponse(data, safe=False)
-#
-#
-# @csrf_exempt
-# def get_detalle_serv(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             data = []
-#             result = Detalle_venta.objects.filter(venta_id=id)
-#             for p in result:
-#                 if p.servicio != None:
-#                     data.append({
-#                         'servicio': p.servicio.nombre,
-#                         'cantidad': p.cantidads,
-#                         'pvp': (p.pvp_actual_s),
-#                         'subtotal': p.subtotals
-#                     })
-#         else:
-#             data['error'] = 'Ha ocurrido un error'
-#     except Exception as e:
-#         data['error'] = str(e)
-#     return JsonResponse(data, safe=False)
-#
-#
-# @csrf_exempt
-# def estado(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             with transaction.atomic():
-#                 es = Venta.objects.get(id=id)
-#                 es.estado = 0
-#                 dev = Devolucion()
-#                 dev.venta_id = id
-#                 dev.fecha = datetime.now()
-#                 dev.save()
-#                 for i in Detalle_venta.objects.filter(venta_id=id):
-#                     if i.producto==None:
-#                         es.save()
-#                     else:
-#                         ch = Producto.objects.get(id=i.producto.id)
-#                         ch.stock = int(ch.stock) + int(i.cantidadp)
-#                         ch.save()
-#                         for a in Inventario.objects.filter(venta_id=id):
-#                             a.estado = 1
-#                             a.select = 0
-#                             a.venta_id = None
-#                             a.save()
-#                             es.save()
-#         else:
-#             data['error'] = 'Ha ocurrido un error'
-#     except Exception as e:
-#         data['error'] = str(e)
-#     return JsonResponse(data)
-#
-#
-# @csrf_exempt
-# def eliminar(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             es = Venta.objects.get(id=id)
-#             es.delete()
-#         else:
-#             data['error'] = 'Ha ocurrido un error'
-#     except Exception as e:
-#         data['error'] = str(e)
-#     return JsonResponse(data)
-
-
 @csrf_exempt
 def grap(request):
     data = {}
@@ -901,10 +507,12 @@ def data_tarjets():
     compras = Compra.objects.filter(fecha_compra__year=year, estado=1).aggregate(r=Coalesce(Count('id'), 0)).get('r')
     inventario = Inventario_producto.objects.filter(produccion__fecha_ingreso__year=year, estado=1).aggregate(
         r=Coalesce(Count('id'), 0)).get('r')
+    agotados = Producto.objects.filter(producto_base__stock__lte=0).count()
     data = {
         'ventas': int(ventas),
         'compras': int(compras),
         'inventario': int(inventario),
+        'agotados': int(agotados),
     }
     return data
 
@@ -1020,15 +628,13 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 if start_date == '' and end_date == '':
                     query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__first_name'
-                                                 , 'transaccion__user__last_name').annotate(
-                        Sum('transaccion__subtotal')). \
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                        .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=1)
                 else:
                     query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
                                                  'transaccion__cliente__apellidos',
-                                                 'transaccion__user__first_name',
-                                                 'transaccion__user__last_name').filter(
+                                                 'transaccion__user__username').filter(
                         transaccion__fecha_trans__range=[start_date, end_date], estado=1). \
                         annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
@@ -1036,7 +642,7 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
                     data.append([
                         p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
                         p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
-                        p['transaccion__user__first_name'] + " " + p['transaccion__user__last_name'],
+                        p['transaccion__user__username'],
                         format(p['transaccion__subtotal__sum'], '.2f'),
                         format((p['transaccion__iva__sum']), '.2f'),
                         format(p['transaccion__total__sum'], '.2f')
@@ -1048,41 +654,62 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
-        data['entidad'] = opc_entidad
+        data['entidad'] = 'Ventas Finalizadas'
         data['titulo'] = 'Reporte de Ventas'
         data['empresa'] = empresa
         data['filter_prod'] = '/venta/lista'
         return data
 
-#
-# @csrf_exempt
-# def data_report_total(request):
-#     data = []
-#     start_date = request.POST.get('start_date', '')
-#     end_date = request.POST.get('end_date', '')
-#     try:
-#         if start_date == '' and end_date == '':
-#             query = Venta.objects.values('fecha_venta', 'cliente__nombres', 'cliente__apellidos', 'empleado__first_name'
-#                                          , 'empleado__last_name').annotate(Sum('subtotal')). \
-#                 annotate(Sum('iva')).annotate(Sum('total')).filter(estado=1)
-#         else:
-#             query = Venta.objects.values('fecha_venta', 'cliente__nombres', 'cliente__apellidos',
-#                                          'empleado__first_name',
-#                                          'empleado__last_name').filter(
-#                 fecha_venta__range=[start_date, end_date], estado=1).annotate(Sum('subtotal')). \
-#                 annotate(Sum('iva')).annotate(Sum('total'))
-#         for p in query:
-#             data.append([
-#                 p['fecha_venta'].strftime("%d/%m/%Y"),
-#                 p['cliente__nombres'] + " " + p['cliente__apellidos'],
-#                 p['empleado__first_name'] + " " + p['empleado__last_name'],
-#                 format(p['subtotal__sum'], '.2f'),
-#                 format((p['iva__sum']), '.2f'),
-#                 format(p['total__sum'], '.2f')
-#             ])
-#     except:
-#         pass
-#     return JsonResponse(data, safe=False)
-#
-#
-#
+
+class report_total_reserva(ValidatePermissionRequiredMixin, ListView):
+    model = Venta
+    template_name = 'front-end/venta/venta_report_total_reserva.html'
+    permission_required = 'venta.view_venta'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Venta.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                        .annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=2)
+                else:
+                    query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
+                                                 'transaccion__cliente__apellidos',
+                                                 'transaccion__user__username').filter(
+                        transaccion__fecha_trans__range=[start_date, end_date], estado=2). \
+                        annotate(Sum('transaccion__subtotal')). \
+                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                for p in query:
+                    data.append([
+                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
+                        p['transaccion__user__username'],
+                        format(p['transaccion__subtotal__sum'], '.2f'),
+                        format((p['transaccion__iva__sum']), '.2f'),
+                        format(p['transaccion__total__sum'], '.2f')
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Ventas Reservadas'
+        data['titulo'] = 'Reporte de Pedidos'
+        data['empresa'] = empresa
+        return data

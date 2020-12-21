@@ -9,6 +9,7 @@ estado = (
     (0, 'PENDIENTE'),
     (1, 'ENTREGADA'),
     (2, 'ANULADA'),
+    (3, 'RESERVADA'),
 )
 
 

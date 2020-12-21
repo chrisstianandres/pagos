@@ -163,7 +163,14 @@ $(function () {
                 footer: true
             },
             {
-                text: '<i class="fab fa-amazon"></i> Reporte por Productos/Servicios',
+                text: '<i class="fas fa-tags"></i> Ventas Reservadas',
+                className: 'btn btn-secondary',
+                action: function (e, dt, node, config) {
+                    window.location.href = '/venta/report_total_pedidos'
+                }
+            },
+            {
+                text: '<i class="fab fa-amazon"></i> Reporte por Productos',
                 className: 'btn btn-warning',
                 action: function (e, dt, node, config) {
                     window.location.href = '/venta/report_by_product'

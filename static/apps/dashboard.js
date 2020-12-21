@@ -112,6 +112,7 @@ function cahrtventas() {
        $('#venta_tarjet').html(parseInt(tarjets['data'].ventas)+ '&nbsp;'+'<i class="fas fa-cart-arrow-down"></i>');
        $('#compra_tarjet').html(parseInt(tarjets['data'].compras)+ '&nbsp;'+'<i class="fab fa-shopify"></i>');
        $('#inv_tarjet').html(parseInt(tarjets['data'].inventario)+ '&nbsp;'+'<i class="fab fa-amazon"></i>');
+       $('#inv_tarjet_agot').html(parseInt(tarjets['data'].agotados)+ '&nbsp;'+'<i class="fas fa-battery-empty"></i>');
         console.log(tarjets['data'].ventas)
     });
 }
@@ -130,24 +131,32 @@ function datatbles() {
             dataSrc: "",
         },
         columns: [
-            {data: 'id'},
-            {data: "nombre"},
-            {data: "categoria.nombre"},
-            {data: "presentacion.nombre"},
-            {data: "stock"}
+            {data: "producto_base.nombre"},
+            {data: "producto_base.categoria.nombre"},
+            {data: "producto_base.presentacion.nombre"},
+            {data: "producto_base.stock"},
+            {data: "imagen"}
         ],
         columnDefs: [
             {
-                targets: [-1],
+                targets: [-2],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
                     return '<span>' + data + '</span>';
                 }
+            },
+            {
+                targets: [-1],
+                class: 'text-center',
+                orderable: false,
+                render: function (data, type, row) {
+                    return '<img src="'+data+'" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
+                }
             }
         ],
         createdRow: function (row, data, dataIndex) {
-            $('td', row).eq(4).find('span').addClass('badge bg-danger').attr("style", "color: white");
+            $('td', row).eq(3).find('span').addClass('badge bg-danger').attr("style", "color: white");
         }
     });
     $("#datatable2").DataTable({

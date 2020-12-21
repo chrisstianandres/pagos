@@ -22,8 +22,10 @@ urlpatterns = [
     # path('chart', login_required(views.grap), name='chart'),
     # path('data', login_required(views.data), name='data'),
 
-    # path('report_by_product', login_required(report.as_view()), name='report_by_product'),
-    # path('report_total', login_required(report_total.as_view()), name='report_total'),
+    path('report_by_product', login_required(report.as_view()), name='report_by_product'),
+    path('report_total', login_required(report_total.as_view()), name='report_total'),
+    path('report_total_pendientes', login_required(report_total_alquilada.as_view()), name='report_total_pendientes'),
+    path('report_total_reservadas', login_required(report_total_reservada.as_view()), name='report_total_reservadas'),
     # path('data_report', login_required(views.data_report), name='data_report'),
     # path('data_report_total', login_required(views.data_report_total), name='data_report_total'),
     # path('data_tarjets', login_required(views.data_tarjets), name='data_tarjets'),

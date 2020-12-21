@@ -10,6 +10,7 @@ estado = (
     (0, 'ALQUILADA'),
     (1, 'ENTREGADA'),
     (2, 'ANULADA'),
+    (3, 'RESERVADA'),
 
 )
 

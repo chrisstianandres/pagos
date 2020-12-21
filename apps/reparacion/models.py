@@ -11,6 +11,7 @@ estado = (
     (0, 'POR ENTREGAR'),
     (1, 'ENTREGADA'),
     (2, 'ANULADA'),
+    (3, 'RESERVADA'),
 )
 
 

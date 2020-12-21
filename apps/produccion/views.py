@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
+from apps.empresa.models import Empresa
 from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.produccion.forms import *
@@ -51,8 +52,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    producto = Inventario_producto.objects.filter(produccion_id=id).values('producto_id').annotate(total=Count('id')).\
-                            order_by('-total')
+                    producto = Inventario_producto.objects.filter(produccion_id=id).values('producto_id').annotate(
+                        total=Count('id')). \
+                        order_by('-total')
                     for p in producto:
                         px = Producto.objects.get(id=int(p['producto_id']))
                         item = px.toJSON()
@@ -197,6 +199,227 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['form3'] = Detalle_perdidas_productosForm()
         data['form4'] = Detalle_perdidas_materialesForm()
         data['detalle'] = []
+        return data
+
+
+class report_total(ValidatePermissionRequiredMixin, ListView):
+    model = Produccion
+    template_name = 'front-end/produccion/produccion_report.html'
+    permission_required = 'produccion.view_produccion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Produccion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Produccion.objects.values('fecha_ingreso', 'asignacion__lote', 'novedades', 'estado') \
+                        .filter(estado=0)
+                else:
+                    query = Produccion.objects.values('fecha_ingreso', 'asignacion__lote', 'novedades',
+                                                      'estado').filter(
+                        fecha_ingreso__range=[start_date, end_date], estado=0)
+                for p in query:
+                    data.append([
+                        p['fecha_ingreso'].strftime("%d/%m/%Y"),
+                        p['asignacion__lote'],
+                        p['novedades']
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Produccion'
+        data['titulo'] = 'Reporte de produccion'
+        data['empresa'] = empresa
+        return data
+
+
+class report(ValidatePermissionRequiredMixin, ListView):
+    model = Produccion
+    template_name = 'front-end/produccion/produccion_report_product.html'
+    permission_required = 'produccion.view_produccion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Produccion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            empresa = Empresa.objects.first()
+            iva = float(empresa.iva / 100)
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Inventario_producto.objects.values('produccion__fecha_ingreso',
+                                                               'produccion__asignacion__lote',
+                                                               'producto__producto_base_id').filter(
+                        produccion__estado=0) \
+                        .order_by().annotate(Count('id'))
+                else:
+                    query = Inventario_producto.objects.values('produccion__fecha_ingreso',
+                                                               'produccion__asignacion__lote',
+                                                               'producto__producto_base_id') \
+                        .filter(produccion__fecha_ingreso__range=[start_date, end_date],
+                                produccion__estado=0).order_by().annotate(
+                        Count('id'))
+                for p in query:
+                    pr = Producto_base.objects.get(id=int(p['producto__producto_base_id']))
+                    data.append([
+                        p['produccion__fecha_ingreso'].strftime("%d/%m/%Y"),
+                        pr.nombre,
+                        pr.categoria.nombre,
+                        pr.presentacion.nombre,
+                        p['produccion__asignacion__lote'],
+                        int(p['id__count']),
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Reporte de Produccion por Producto'
+        data['empresa'] = empresa
+        return data
+
+
+class report_perdida(ValidatePermissionRequiredMixin, ListView):
+    model = Produccion
+    template_name = 'front-end/produccion/produccion_report_product_perdido.html'
+    permission_required = 'produccion.view_produccion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Produccion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            empresa = Empresa.objects.first()
+            iva = float(empresa.iva / 100)
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Detalle_perdidas_productos.objects.values('produccion__fecha_ingreso',
+                                                                      'produccion__asignacion__lote',
+                                                                      'producto__producto_base_id').filter(
+                        produccion__estado=0) \
+                        .order_by().annotate(Count('id'))
+                    print(query.query)
+                else:
+                    query = Detalle_perdidas_productos.objects.values('produccion__fecha_ingreso',
+                                                                      'produccion__asignacion__lote',
+                                                                      'producto__producto_base_id') \
+                        .filter(produccion__fecha_ingreso__range=[start_date, end_date],
+                                produccion__estado=0).order_by().annotate(
+                        Count('id'))
+                for p in query:
+                    pr = Producto_base.objects.get(id=int(p['producto__producto_base_id']))
+                    data.append([
+                        p['produccion__fecha_ingreso'].strftime("%d/%m/%Y"),
+                        pr.nombre,
+                        pr.categoria.nombre,
+                        pr.presentacion.nombre,
+                        p['produccion__asignacion__lote'],
+                        int(p['id__count']),
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = 'fas fa-book-dead'
+        data['entidad'] = 'Perdidas en productos'
+        data['titulo'] = 'Reporte de Productos Perdido '
+        data['empresa'] = empresa
+        return data
+
+
+class report_perdida_materiales(ValidatePermissionRequiredMixin, ListView):
+    model = Produccion
+    template_name = 'front-end/produccion/produccion_report_material_perdido.html'
+    permission_required = 'produccion.view_produccion'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Produccion.objects.none()
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            start_date = request.POST.get('start_date', '')
+            end_date = request.POST.get('end_date', '')
+            empresa = Empresa.objects.first()
+            iva = float(empresa.iva / 100)
+            action = request.POST['action']
+            if action == 'report':
+                if start_date == '' and end_date == '':
+                    query = Detalle_perdidas_materiales.objects.values('produccion__fecha_ingreso',
+                                                                       'produccion__asignacion__lote',
+                                                                       'material__producto_base_id').filter(
+                        produccion__estado=0) \
+                        .order_by().annotate(Count('id'))
+                else:
+                    query = Detalle_perdidas_materiales.objects.values('produccion__fecha_ingreso',
+                                                                       'produccion__asignacion__lote',
+                                                                       'material__producto_base_id') \
+                        .filter(produccion__fecha_ingreso__range=[start_date, end_date],
+                                produccion__estado=0).order_by().annotate(
+                        Count('id'))
+                for p in query:
+                    pr = Producto_base.objects.get(id=int(p['material__producto_base_id']))
+                    data.append([
+                        p['produccion__fecha_ingreso'].strftime("%d/%m/%Y"),
+                        pr.nombre,
+                        pr.categoria.nombre,
+                        pr.presentacion.nombre,
+                        p['produccion__asignacion__lote'],
+                        int(p['id__count']),
+                    ])
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = 'fas fa-book-dead'
+        data['entidad'] = 'Perdidas en Materiales'
+        data['titulo'] = 'Reporte de Materiales Perdidos '
+        data['empresa'] = empresa
         return data
 
 
