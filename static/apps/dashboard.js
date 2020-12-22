@@ -1,4 +1,7 @@
-var grapie = Highcharts.chart('grapie', {
+var user_tipo = parseInt($('input[name="user_tipo"]').val());
+var grapie, chart, graph;
+function graficos() {
+grapie = Highcharts.chart('grapie', {
     chart: {
         plotBackgroundColor: null,
         plotBorderWidth: 0,
@@ -32,7 +35,7 @@ var grapie = Highcharts.chart('grapie', {
         }
     },
 });
-var chart = Highcharts.chart('container2', {
+chart = Highcharts.chart('container2', {
     chart: {
         inverted: true,
         polar: false
@@ -51,8 +54,7 @@ var chart = Highcharts.chart('container2', {
     },
 
 });
-
-var graph = Highcharts.chart('container3', {
+graph = Highcharts.chart('container3', {
     chart: {
         type: 'line'
     },
@@ -79,9 +81,7 @@ var graph = Highcharts.chart('container3', {
         }
     },
 });
-
-function cahrtventas() {
-    $.ajax({
+$.ajax({
         url: '/venta/chart',
         type: 'POST',
         data: {'action': 'chart'},
@@ -113,9 +113,9 @@ function cahrtventas() {
        $('#compra_tarjet').html(parseInt(tarjets['data'].compras)+ '&nbsp;'+'<i class="fab fa-shopify"></i>');
        $('#inv_tarjet').html(parseInt(tarjets['data'].inventario)+ '&nbsp;'+'<i class="fab fa-amazon"></i>');
        $('#inv_tarjet_agot').html(parseInt(tarjets['data'].agotados)+ '&nbsp;'+'<i class="fas fa-battery-empty"></i>');
-        console.log(tarjets['data'].ventas)
     });
 }
+
 
 function datatbles() {
     $("#datatable").DataTable({
@@ -202,17 +202,17 @@ function datatbles() {
     });
 }
 
-function check(){
-     $.ajax({
-        url: '/inventario/check',
-        type: 'POST',
-        dataSrc: "",
-    });
-}
-
 
 $(function () {
-    datatbles();
-    cahrtventas();
-    check();
+    if (user_tipo === 1) {
+        datatbles();
+         graficos();
+    } else {
+        $('#venta_client').on('click', function () {
+            window.location.href = '/venta/lista'
+
+        })
+    }
+
+
 });

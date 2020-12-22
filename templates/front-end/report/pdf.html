@@ -65,7 +65,6 @@
     <b class="n">{{ sale.transaccion.id|stringformat:"010d" }}</b>
 </p>
 <p>
-    <b>VENDEDOR:</b> {{ sale.transaccion.user.get_full_name|upper }}<br>
     <b>FECHA DE VENTA:</b> {{ sale.transaccion.fecha_trans }}<br>
     {% if sale.transaccion.fecha_ingreso != None %}<b>FECHA DE RECEPCION:</b> {{ sale.fecha_ingreso }}<br>{% endif %}
     {% if sale.transaccion.fecha_entrega != None %}<b>FECHA DE ENTREGA:</b> {{ sale.transaccion.fecha_entrega }}<br>{% endif %}

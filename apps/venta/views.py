@@ -132,7 +132,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Nueva Venta'
         data['titulo'] = 'Listado de Ventas'
-        data['nuevo'] = '/transsacion/nuevo'
+        data['nuevo'] = '/transacion/nuevo'
         data['empresa'] = empresa
         return data
 
@@ -151,7 +151,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         action = request.POST['action']
         pk = request.POST['id']
         try:
-
             if action == 'add':
                 datos = json.loads(request.POST['ventas'])
                 if datos:
@@ -190,7 +189,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
-            if action == 'reserva':
+            elif action == 'reserva':
                 datos = json.loads(request.POST['ventas'])
                 if datos:
                     with transaction.atomic():
@@ -229,9 +228,8 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
-
             else:
-                data['error'] = 'No ha seleccionado ninguna opción'
+                data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
@@ -254,7 +252,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Venta
     template_name = 'front-end/venta/venta_form.html'
-    permission_required = ('venta.add_venta')
+    permission_required = 'venta.add_venta'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -262,10 +260,8 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         data = {}
-
+        action = request.POST['action']
         try:
-            action = request.POST['action']
-            pk = request.POST['id']
             if action == 'add':
                 datos = json.loads(request.POST['ventas'])
                 if datos:
@@ -299,12 +295,12 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                                 stock.stock = int(
                                     Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
                                 stock.save()
-                        data['id'] = v.id
-                        data['resp'] = True
+                    data['id'] = v.id
+                    data['resp'] = True
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
-            if action == 'reserva':
+            elif action == 'reserva':
                 datos = json.loads(request.POST['ventas'])
                 if datos:
                     with transaction.atomic():
@@ -559,14 +555,13 @@ class report(ValidatePermissionRequiredMixin, ListView):
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            data = []
             start_date = request.POST.get('start_date', '')
             end_date = request.POST.get('end_date', '')
             empresa = Empresa.objects.first()
             iva = float(empresa.iva / 100)
             action = request.POST['action']
-            print(action)
             if action == 'report':
+                data = []
                 if start_date == '' and end_date == '':
                     query = Detalle_venta.objects.values('venta__transaccion__fecha_trans',
                                                          'inventario__producto__producto_base_id',
@@ -592,6 +587,8 @@ class report(ValidatePermissionRequiredMixin, ListView):
                         format((float(total) * iva), '.2f'),
                         format(((float(total) * iva) + float(total)), '.2f')
                     ])
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
             data['error'] = 'No ha seleccionado una opcion'
         return JsonResponse(data, safe=False)
@@ -621,11 +618,11 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            data = []
             start_date = request.POST.get('start_date', '')
             end_date = request.POST.get('end_date', '')
             action = request.POST['action']
             if action == 'report':
+                data = []
                 if start_date == '' and end_date == '':
                     query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
                                                  'transaccion__cliente__apellidos', 'transaccion__user__username')\
@@ -647,6 +644,8 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
                         format((p['transaccion__iva__sum']), '.2f'),
                         format(p['transaccion__total__sum'], '.2f')
                     ])
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
             data['error'] = 'No ha seleccionado una opcion'
         return JsonResponse(data, safe=False)
@@ -676,11 +675,12 @@ class report_total_reserva(ValidatePermissionRequiredMixin, ListView):
     def post(self, request, *args, **kwargs):
         data = {}
         try:
-            data = []
+
             start_date = request.POST.get('start_date', '')
             end_date = request.POST.get('end_date', '')
             action = request.POST['action']
             if action == 'report':
+                data = []
                 if start_date == '' and end_date == '':
                     query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
                                                  'transaccion__cliente__apellidos', 'transaccion__user__username')\
@@ -702,6 +702,8 @@ class report_total_reserva(ValidatePermissionRequiredMixin, ListView):
                         format((p['transaccion__iva__sum']), '.2f'),
                         format(p['transaccion__total__sum'], '.2f')
                     ])
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
             data['error'] = 'No ha seleccionado una opcion'
         return JsonResponse(data, safe=False)

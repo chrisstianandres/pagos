@@ -15,6 +15,9 @@ class DatabaseBackups(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
+        item['fecha'] = self.fecha.strftime('%d-%m-%Y')
+        item['archive'] = str(self.archive)
+        item['archive_path'] = self.archive.url
         return item
 
     class Meta:

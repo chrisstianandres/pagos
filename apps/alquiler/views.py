@@ -166,9 +166,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
-
-            else:
-                data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')

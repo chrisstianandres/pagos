@@ -1,5 +1,5 @@
 var datatable;
-var user_tipo= $('input[name="user_tipo"]').val();
+var user_tipo = $('input[name="user_tipo"]').val();
 var logotipo;
 const toDataURL = url => fetch(url).then(response => response.blob())
     .then(blob => new Promise((resolve, reject) => {
@@ -54,7 +54,7 @@ $(function () {
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
         },
-        order: [[0, "desc"]],
+        order: [[6, "desc"]],
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
             "<'row'<'col-sm-12 col-md-12'f>>" +
@@ -209,77 +209,77 @@ $(function () {
                     var pdf = '<a type="button" href= "/venta/printpdf/' + data + '" rel="pdf" ' +
                         'class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" ' +
                         'title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
-                    return pagar +' '+ detalle + devolver + pdf;
+                    return pagar + ' ' + detalle + devolver + pdf;
                 }
             },
             {
                 targets: [-3],
                 render: function (data, type, row) {
-                   return pad(data, 10);
+                    return pad(data, 10);
                 }
             }
 
         ],
+        drawCallback: draw,
         createdRow: function (row, data, dataIndex) {
-            console.log(data);
             if (data.estado === 'FINALIZADA') {
                 $('td', row).eq(7).find('span').addClass('badge bg-success').attr("style", "color: white");
-            } else if (data.estado === 'DEVUELTA') {
+                 $('td', row).eq(8).find('a[rel="devolver"]').hide();
+            }
+            else if (data.estado === 'DEVUELTA') {
                 $('td', row).eq(7).find('span').addClass('badge bg-danger').attr("style", "color: white");
                 $('td', row).eq(8).find('a[rel="devolver"]').hide();
                 $('td', row).eq(8).find('a[rel="detalle"]').hide();
                 $('td', row).eq(8).find('a[rel="pdf"]').hide();
-            } else if (data.estado === 'RESERVADA') {
-                if (user_tipo ==='0') {
+            }
+            else if (data.estado === 'RESERVADA') {
+                if (user_tipo === '0') {
                     $('td', row).eq(8).find('a[rel="pagar"]').hide();
                 }
                 $('td', row).eq(7).find('span').addClass('badge bg-warning').attr("style", "color: white");
             }
         },
-        hide: function () {
-            hidecolum();
-        }
     });
     $('#datatable tbody')
         .on('click', 'a[rel="devolver"]', function () {
-        $('.tooltip').remove();
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var parametros = {'id': data.id, 'action': 'estado'};
-        save_estado('Alerta',
-            window.location.pathname, 'Esta seguro que desea devolver esta venta?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al devolver la venta', 'far fa-smile-wink', function () {
-                    datatable.ajax.reload(null, false);
-                })
-            });
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'estado'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea devolver esta venta?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al devolver la venta', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    })
+                });
 
-    })
+        })
         .on('click', 'a[rel="pagar"]', function () {
-        $('.tooltip').remove();
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var parametros = {'id': data.id, 'action': 'pagar'};
-        save_estado('Alerta',
-            window.location.pathname, 'Esta seguro que desea realizar el pago de esta venta de $ <strong>'+ data.transaccion.total+'</strong>?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al realizar el pago de esta venta', 'far fa-smile-wink', function () {
-                    datatable.ajax.reload(null, false);
-                })
-            });
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'pagar'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea realizar el pago de esta venta de $ <strong>' + data.transaccion.total + '</strong>?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al realizar el pago de esta venta', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    })
+                });
 
-    })
+        })
         .on('click', 'a[rel="borrar"]', function () {
-        $('.tooltip').remove();
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var parametros = {'id': data.id};
-        save_estado('Alerta',
-            '/venta/eliminar', 'Esta seguro que desea eliminar esta venta?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al Eliminar la venta', 'far fa-smile-wink')
-            });
-    })
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id};
+            save_estado('Alerta',
+                '/venta/eliminar', 'Esta seguro que desea eliminar esta venta?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al Eliminar la venta', 'far fa-smile-wink')
+                });
+        })
         .on('click', 'a[rel="detalle"]', function () {
             $('.tooltip').remove();
             var tr = datatable.cell($(this).closest('td, li')).index();
@@ -353,10 +353,10 @@ $(function () {
         });
 
     $('#nuevo').on('click', function () {
-        if (user_tipo==='1'){
-        window.location.href ='/venta/online'
-    } else {
-             window.location.replace('/venta/nuevo')
+        if (user_tipo === '0') {
+            window.location.href = '/venta/online'
+        } else {
+            window.location.replace('/venta/nuevo')
         }
 
 
@@ -383,12 +383,11 @@ function daterange() {
 
 }
 
-function hidecolum() {
-    if (user_tipo==='0'){
-        datatable.columns([2]).visible( false );
+var draw = function () {
+  if (user_tipo === '0') {
+        datatable.columns([2]).visible(false);
     }
-}
-
+};
 function pad(str, max) {
     str = str.toString();
     return str.length < max ? pad("0" + str, max) : str;

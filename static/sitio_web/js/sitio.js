@@ -61,14 +61,14 @@ var carrito = {
         }
 
         tblventa = $("#datatable").DataTable({
-
             autoWidth: false,
             dataSrc: "",
             responsive: true,
             dom:
                 "<'row'<'col-sm-12'tr>>",
             language: {
-                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+                // "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                "emptyTable": "<strong>El carrito esta Vacio :´(</strong>"
             },
             data: carrito.items.productos,
             columns: [
@@ -169,9 +169,7 @@ function container_popular() {
                 '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
                 '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                 '<div class="card-buttons">' +
-                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
-                '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                 '<p>Los precios aqui mostrados no incluyen IVA</p>' +
                 '</div>' +
                 '</div>' +
@@ -199,9 +197,7 @@ function container_popular() {
                 '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
                 '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                 '<div class="card-buttons">' +
-                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
-                '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                 '<p>Los precios aqui mostrados no incluyen IVA</p>' +
                 '</div>' +
                 '</div>' +
@@ -225,7 +221,6 @@ function catalogo(tipo) {
             '</div>';
         if (tipo === 'mujer') {
             $.each(data['result'], function (key, value) {
-                console.log(value);
                 html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
                     '<div class="card">' +
                     '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
@@ -240,9 +235,7 @@ function catalogo(tipo) {
                     '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
                     '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                     '<div class="card-buttons">' +
-                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                    '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
-                    '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                     '<p>Los precios aqui mostrados no incluyen IVA</p>' +
                     '</div>' +
                     '</div>' +
@@ -267,9 +260,7 @@ function catalogo(tipo) {
                     '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
                     '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                     '<div class="card-buttons">' +
-                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                    '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
-                    '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                     '<p>Los precios aqui mostrados no incluyen IVA</p>' +
                     '</div>' +
                     '</div>' +
@@ -295,9 +286,7 @@ function catalogo(tipo) {
                     '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
                     '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
                     '<div class="card-buttons">' +
-                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Comprar"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                    '<a class="btn btn--mini-rounded alquilar" data-toggle="tooltip" title="Alquilar"><i class="zmdi zmdi-label"></i></a>' +
-                    '<a class="btn btn--mini-rounded confeccionar" data-toggle="tooltip" title="Confeccion"><i class="zmdi zmdi-money-box"></i></a>' +
+                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                     '<p>Los precios aqui mostrados no incluyen IVA</p>' +
                     '</div>' +
                     '</div>' +

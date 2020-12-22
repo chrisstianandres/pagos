@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DeleteView, TemplateView
 
+from apps.mixins import ValidatePermissionRequiredMixin
 from pagos.settings import BASE_DIR
 # from core.security.mixins import AccessModuleMixin, PermissionModuleMixin
 from apps.DatabaseBackups.models import DatabaseBackups
@@ -24,7 +25,7 @@ crud = '/database_backup/nuevo'
 empresa = nombre_empresa()
 
 
-class DatabaseBackupsListView(ListView):
+class DatabaseBackupsListView(ValidatePermissionRequiredMixin, ListView):
     model = DatabaseBackups
     template_name = 'front-end/databasebackups/backup_list.html'
     permission_required = 'view_databasebackups'
@@ -38,10 +39,12 @@ class DatabaseBackupsListView(ListView):
         action = request.POST['action']
         try:
             if action == 'delete_access_all':
-                for d in DatabaseBackups.objects.all():
-                    d.delete()
-            else:
-                data['error'] = 'No ha ingresado una opción'
+                DatabaseBackups.objects.all().delete()
+            if action == 'list':
+                data = []
+                query = DatabaseBackups.objects.all()
+                for d in query:
+                    data.append(d.toJSON())
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')

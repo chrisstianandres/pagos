@@ -31,7 +31,6 @@ var carrito = {
         this.calculate();
         var numero = this.items.productos.length;
         if (numero >= 1) {
-            console.log(numero);
             $('#count').html(numero);
         } else {
             $('#count').html('');
@@ -199,7 +198,7 @@ $(function () {
         parametros['action'] = 'reserva';
         parametros['id'] = '';
         save_with_ajax('Alerta',
-            '/venta/nuevo_oline', 'Esta seguro que desea reservar esta venta?', parametros,
+            '/venta/nuevo_online', 'Esta seguro que desea reservar esta venta?', parametros,
             function (response) {
                 localStorage.clear();
                 printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {

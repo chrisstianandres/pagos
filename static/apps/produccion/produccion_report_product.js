@@ -150,7 +150,7 @@ $(function () {
                         return 4;
                     };
                     doc.content[0].layout = objLayout;
-                    doc.content[1].table.widths = ["*", "*", "*", "*", "*","*","*"];
+                    doc.content[1].table.widths = ["*", "*", "*", "*", "*","*"];
                     doc.styles.tableBodyEven.alignment = 'center';
                     doc.styles.tableBodyOdd.alignment = 'center';
                     doc.styles.tableFooter.alignment = 'center';
