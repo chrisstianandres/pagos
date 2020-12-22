@@ -129,10 +129,14 @@ class lista(ValidatePermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
-        data['entidad'] = opc_entidad
-        data['boton'] = 'Nueva Venta'
-        data['titulo'] = 'Listado de Ventas'
-        data['nuevo'] = '/transacion/nuevo'
+        if self.request.user.tipo == 0:
+            data['entidad'] = 'Compras'
+            data['boton'] = 'Nueva Compra'
+            data['titulo'] = 'Listado de Compras realizadas'
+        else:
+            data['entidad'] = opc_entidad
+            data['boton'] = 'Nueva Venta'
+            data['titulo'] = 'Listado de Ventas'
         data['empresa'] = empresa
         return data
 

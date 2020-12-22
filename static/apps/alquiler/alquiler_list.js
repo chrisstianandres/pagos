@@ -1,5 +1,6 @@
 var datatable;
 var logotipo;
+var user_tipo = $('input[name="user_tipo"]').val();
 const toDataURL = url => fetch(url).then(response => response.blob())
     .then(blob => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -165,7 +166,6 @@ $(function () {
             {data: 'fecha_salida'},
             {data: 'fecha_entrega'},
             {data: "transaccion.cliente.full_name_list"},
-            {data: "transaccion.user.full_name"},
             {data: "transaccion.subtotal"},
             {data: "transaccion.iva"},
             {data: "transaccion.total"},
@@ -200,11 +200,12 @@ $(function () {
                 class: 'text-center',
                 width: "15%",
                 render: function (data, type, row) {
-                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
-                    var entregar = '<a type="button" rel="entregar" class="btn btn-warning btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Recibir prenda" ><i class="fa fa-check"></i></a>' + ' ';
-                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ';
-                    var pdf = '<a type="button" href= "/alquiler/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
-                    return detalle + entregar + devolver + pdf;
+                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
+                    var entregar = '<a type="button" rel="entregar" class="btn btn-warning btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Recibir prenda" ><i class="fa fa-check"></i></a>' + ' ';
+                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ';
+                    var pdf = '<a type="button" href= "/alquiler/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
+                    var dar = row.estado === 3 ? '<a type="button" rel="dar" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Dar prendas"><i class="fas fa-hand-holding-water"></i></a>' : '';
+                    return detalle + dar+ ' ' + entregar + devolver + pdf;
                 }
             },
             {
@@ -215,19 +216,40 @@ $(function () {
             }
         ],
         createdRow: function (row, data, dataIndex) {
+            console.log(user_tipo);
             if (data.estado === 1) {
-                $('td', row).eq(9).html('<span class="badge badge-success" style="color: white"> ENTREGADA');
-                $('td', row).eq(10).find('a[rel="entregar"]').hide();
+                $('td', row).eq(8).html('<span class="badge badge-success" style="color: white"> ENTREGADA');
+                $('td', row).eq(9).find('a[rel="entregar"]').hide();
+                if (user_tipo === '0') {
+                    $('td', row).eq(9).find('a[rel="entregar"]').hide();
+                     $('td', row).eq(9).find('a[rel="devolver"]').hide();
+                }
             } else if (data.estado === 0) {
-                $('td', row).eq(9).html('<span class="badge badge-warning" style="color: white"> ALQUILADA');
+                $('td', row).eq(8).html('<span class="badge badge-warning" style="color: white"> ALQUILADA');
                 $('td', row).eq(2).html('<span class="badge badge-warning" style="color: white"> ALQUILADA');
+                if (user_tipo === '0') {
+                    $('td', row).eq(9).find('a[rel="entregar"]').hide();
+                   $('td', row).eq(9).find('a[rel="devolver"]').hide();
+                }
             } else if (data.estado === 2) {
-                $('td', row).eq(9).html('<span class="badge badge-danger" style="color: white"> ANULADA');
+                $('td', row).eq(8).html('<span class="badge badge-danger" style="color: white"> ANULADA');
                 $('td', row).eq(2).html('<span class="badge badge-danger" style="color: white"> ANULADA');
-                $('td', row).eq(10).find('a[rel="devolver"]').hide();
-                $('td', row).eq(10).find('a[rel="entregar"]').hide();
-                $('td', row).eq(10).find('a[rel="pdf"]').hide();
+                $('td', row).eq(9).find('a[rel="devolver"]').hide();
+                if (user_tipo === '0') {
+                    $('td', row).eq(9).find('a[rel="entregar"]').hide();
+                    $('td', row).eq(9).find('a[rel="pdf"]').hide();
+                }
+            } else if (data.estado === 3) {
+                $('td', row).eq(8).html('<span class="badge badge-primary" style="color: white"> RESERVADA');
+                $('td', row).eq(1).html('<span class="badge badge-primary" style="color: white"> NO ENTREGADA');
+                $('td', row).eq(2).html('<span class="badge badge-primary" style="color: white"> RESERVADA');
+                $('td', row).eq(9).find('a[rel="entregar"]').hide();
+                if (user_tipo === '0') {
+                    $('td', row).eq(9).find('a[rel="entregar"]').hide();
+                    $('td', row).eq(9).find('a[rel="dar"]').hide();
+                }
             }
+
 
         }
     });
@@ -256,6 +278,20 @@ $(function () {
                 window.location.pathname, 'Esta seguro que desea realizar la recepcion de esta/as prendas?', parametros,
                 function () {
                     menssaje_ok('Exito!', 'Exito al receptar la/as prendas', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    });
+
+                });
+        })
+        .on('click', 'a[rel="dar"]', function () {
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'dar'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea realizar la entrega de esta/as prendas?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al entregar la/as prendas', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false);
                     });
 
@@ -334,7 +370,11 @@ $(function () {
         });
 
     $('#nuevo').on('click', function () {
-        window.location.replace('/reparacion/nuevo')
+        if (user_tipo === '0') {
+            window.location.href = '/alquiler/nuevo_online'
+        } else {
+            window.location.href ='/alquiler/nuevo'
+        }
 
     })
 });

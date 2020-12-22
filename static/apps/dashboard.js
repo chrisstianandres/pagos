@@ -203,6 +203,7 @@ function datatbles() {
 }
 
 
+
 $(function () {
     if (user_tipo === 1) {
         datatbles();
@@ -211,7 +212,12 @@ $(function () {
         $('#venta_client').on('click', function () {
             window.location.href = '/venta/lista'
 
+        });
+     $('#alquiler_client').on('click', function () {
+            window.location.href = '/alquiler/lista'
+
         })
+
     }
 
 

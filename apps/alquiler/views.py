@@ -2,6 +2,7 @@ from django.utils.decorators import method_decorator
 
 from apps.alquiler.forms import Detalle_AlquilerForm, AlquilerForm
 from apps.alquiler.models import Alquiler, Detalle_alquiler
+from apps.cliente.models import Cliente
 from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
@@ -36,6 +37,8 @@ from django.contrib.staticfiles import finders
 
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
+from apps.user.forms import UserForm
+from apps.user.models import User
 
 opc_icono = 'fas fa-donate'
 opc_entidad = 'Alquileres'
@@ -99,10 +102,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 result.fecha_entrega = datetime.now()
                 result.save()
                 data['resp'] = True
+            elif action == 'dar':
+                id = request.POST['id']
+                result = Alquiler.objects.get(id=id)
+                result.estado = 0
+                result.fecha_salida = datetime.now()
+                result.save()
+                data['resp'] = True
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            print(e)
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -183,6 +194,119 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['form2'] = Detalle_AlquilerForm()
         data['detalle'] = []
         data['formc'] = ClienteForm()
+        return data
+
+
+class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
+    form_class = Alquiler
+    template_name = 'front-end/alquiler/alquiler_online.html'
+    permission_required = 'venta.add_venta'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        try:
+            datos = json.loads(request.POST['ventas'])
+            if action == 'add':
+                if datos:
+                    with transaction.atomic():
+                        c = Transaccion()
+                        c.fecha_trans = datos['fecha_venta']
+                        c.cliente_id = datos['cliente']
+                        c.user_id = request.user.id
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.tipo = 2
+                        c.save()
+                        v = Alquiler()
+                        v.transaccion_id = c.id
+                        v.fecha_salida = datos['fecha_salida']
+                        v.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[
+                                             :i['cantidad']]:
+                                    dv = Detalle_alquiler()
+                                    dv.alquiler_id = v.id
+                                    dv.inventario_id = in_pr.id
+                                    dv.cantidad = int(i['cantidad'])
+                                    dv.pvp_by_alquiler = float(in_pr.producto.pvp_alq)
+                                    dv.subtotal = float(i['subtotal'])
+                                    in_pr.estado = 2
+                                    in_pr.save()
+                                    dv.save()
+                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock.stock = int(
+                                    Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock.save()
+                        data['id'] = v.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            elif action == 'reserva':
+                if datos:
+                    print(int(datos['cliente']))
+                    with transaction.atomic():
+                        us = User.objects.get(id=int(datos['cliente']))
+                        cli = Cliente.objects.get(cedula=us.cedula)
+                        c = Transaccion()
+                        c.fecha_trans = datos['fecha_venta']
+                        c.cliente_id = cli.id
+                        c.user_id = request.user.id
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.tipo = 2
+                        c.save()
+                        v = Alquiler()
+                        v.estado = 3
+                        v.transaccion_id = c.id
+                        v.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[
+                                             :i['cantidad']]:
+                                    dv = Detalle_alquiler()
+                                    dv.alquiler_id = v.id
+                                    dv.inventario_id = in_pr.id
+                                    dv.cantidad = int(i['cantidad'])
+                                    dv.pvp_by_alquiler = float(in_pr.producto.pvp_alq)
+                                    dv.subtotal = float(i['subtotal'])
+                                    in_pr.estado = 2
+                                    in_pr.save()
+                                    dv.save()
+                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock.stock = int(
+                                    Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock.save()
+                        data['id'] = v.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            print(e)
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Nuevo Alquiler'
+        data['empresa'] = empresa
+        data['form'] = TransaccionForm()
+        data['form2'] = Detalle_AlquilerForm()
+        data['detalle'] = []
+        data['formc'] = UserForm()
         return data
 
 

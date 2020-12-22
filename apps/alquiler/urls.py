@@ -9,6 +9,7 @@ app_name = 'Alquiler'
 urlpatterns = [
     path('lista', login_required(lista.as_view()), name='lista'),
     path('nuevo', login_required(CrudView.as_view()), name='nuevo'),
+    path('nuevo_online', login_required(CrudViewOnline.as_view()), name='nuevo_online'),
     path('printpdf/<int:pk>', login_required(printpdf.as_view()), name='printpdf'),
     # path('get_producto', login_required(views.get_producto), name='get_producto'),
     # path('get_servicio', login_required(views.get_servicio), name='get_servicio'),

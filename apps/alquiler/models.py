@@ -27,11 +27,14 @@ class Alquiler(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['transaccion'] = self.transaccion.toJSON()
-        item['fecha_salida'] = self.fecha_salida.strftime('%d-%m-%Y')
         if self.fecha_entrega is None:
             item['fecha_entrega'] = self.fecha_entrega
         else:
             item['fecha_entrega'] = self.fecha_entrega.strftime('%d-%m-%Y')
+        if self.fecha_salida is None:
+            item['fecha_salida'] = self.fecha_salida
+        else:
+            item['fecha_salida'] = self.fecha_salida.strftime('%d-%m-%Y')
         return item
 
     class Meta:

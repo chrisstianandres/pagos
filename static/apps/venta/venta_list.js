@@ -223,18 +223,27 @@ $(function () {
         drawCallback: draw,
         createdRow: function (row, data, dataIndex) {
             if (data.estado === 'FINALIZADA') {
+                if (user_tipo === '0') {
+                    $('td', row).eq(6).find('span').addClass('badge bg-success').attr("style", "color: white");
+                    $('td', row).eq(7).find('a[rel="devolver"]').hide();
+                }
                 $('td', row).eq(7).find('span').addClass('badge bg-success').attr("style", "color: white");
-                 $('td', row).eq(8).find('a[rel="devolver"]').hide();
-            }
-            else if (data.estado === 'DEVUELTA') {
+                $('td', row).eq(8).find('a[rel="devolver"]').hide();
+            } else if (data.estado === 'DEVUELTA') {
+                if (user_tipo === '0') {
+                    $('td', row).eq(6).find('span').addClass('badge bg-danger').attr("style", "color: white");
+                    $('td', row).eq(7).find('a[rel="devolver"]').hide();
+                    $('td', row).eq(7).find('a[rel="detalle"]').hide();
+                    $('td', row).eq(7).find('a[rel="pdf"]').hide();
+                }
                 $('td', row).eq(7).find('span').addClass('badge bg-danger').attr("style", "color: white");
                 $('td', row).eq(8).find('a[rel="devolver"]').hide();
                 $('td', row).eq(8).find('a[rel="detalle"]').hide();
                 $('td', row).eq(8).find('a[rel="pdf"]').hide();
-            }
-            else if (data.estado === 'RESERVADA') {
+            } else if (data.estado === 'RESERVADA') {
                 if (user_tipo === '0') {
-                    $('td', row).eq(8).find('a[rel="pagar"]').hide();
+                    $('td', row).eq(7).find('a[rel="pagar"]').hide();
+                    $('td', row).eq(6).find('span').addClass('badge bg-warning').attr("style", "color: white");
                 }
                 $('td', row).eq(7).find('span').addClass('badge bg-warning').attr("style", "color: white");
             }
@@ -356,7 +365,7 @@ $(function () {
         if (user_tipo === '0') {
             window.location.href = '/venta/online'
         } else {
-            window.location.replace('/venta/nuevo')
+             window.location.href = '/venta/nuevo'
         }
 
 
@@ -384,10 +393,11 @@ function daterange() {
 }
 
 var draw = function () {
-  if (user_tipo === '0') {
+    if (user_tipo === '0') {
         datatable.columns([2]).visible(false);
     }
 };
+
 function pad(str, max) {
     str = str.toString();
     return str.length < max ? pad("0" + str, max) : str;

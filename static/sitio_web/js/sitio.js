@@ -405,11 +405,13 @@ $(function () {
 
     $('#datatable tbody')
         .on('click', 'a[rel="remove"]', function () {
+             localStorage.clear();
             var tr = tblventa.cell($(this).closest('td, li')).index();
             borrar_todo_alert('Alerta de Eliminación',
                 'Esta seguro que desea eliminar este producto del carrito <br> ' +
                 '<strong>CONTINUAR?</strong>', function () {
                     carrito.items.productos.splice(tr.row, 1);
+                    localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
                     carrito.list();
                 })
         })

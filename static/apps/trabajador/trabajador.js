@@ -1,3 +1,4 @@
+var user_tipo = $('input[name="user_tipo"]').val();
 $(document).ready(function () {
     var option = $('input[name="option"]').val();
     if (option === 'editar') {
@@ -137,10 +138,19 @@ $(document).ready(function () {
         });
         $(this).val(changue);
     });
-     $('#id_groups').select2({
+    if (user_tipo==='0'){
+         $('#id_groups').select2({
+        theme: 'classic',
+        languaje: 'es',
+        placeholder: 'Buscar...',
+    }).prop('disabled',true);
+    } else {
+         $('#id_groups').select2({
         theme: 'classic',
         languaje: 'es',
         placeholder: 'Buscar...',
     });
+    }
+
 
 });

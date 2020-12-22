@@ -22,7 +22,7 @@
                     <div class="col-lg-3 col-md-12">
                         <div class="card card-success">
                             <div class="card-header">
-                                <h5>&nbsp;<i class="fa fa-book-open"></i> Datos de la Compra</h5>
+                                <h5>&nbsp;<i class="fa fa-book-open"></i> Datos del Alquiler</h5>
                             </div>
                             <div class="card-body">
                                 {% csrf_token %}
@@ -78,7 +78,7 @@
                     <div class="col-lg-9 col-md-12">
                         <div class="card card-success">
                             <div class="card-header">
-                                <h5><i class="fas fa-piggy-bank"></i>&nbsp;<strong>Compras</strong></h5>
+                                <h5><i class="fas fa-piggy-bank"></i>&nbsp;<strong>Alquileres</strong></h5>
                             </div>
                             <div class="card-body">
                                 <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="venta-tab"
@@ -93,7 +93,13 @@
                                                     <br>
                                                     {{ form2.inventario }}
                                                 </div>
-                                                <br>
+                                             <br>
+                                                <button type="button"
+                                                        class="btn btn-danger btn-sm btn-flat float-right btnRemoveall">
+                                                    <i class="far fa-trash-alt"></i> Quitar todo
+                                                </button>
+                                                <br><br>
+
                                             <div class="table-responsive">
                                                 <table class="table" id="tblproductos">
                                                     <thead>
@@ -136,7 +142,6 @@
                             </button>
                             <hr>
                                 <div id="paypal-button-container">
-
                                 </div>
                         </div>
 
@@ -168,7 +173,7 @@
     <script
             src="https://www.paypal.com/sdk/js?client-id=AQILMvtifA_65d48U-MTD4H-B8GUIkF5A4d0mt98W9N7reMHjVR4R4V286UHwf_JP08HwD6EOWEFQtWu"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
     </script>
-    <script src="{% static 'apps/venta/venta_online_form.js' %}"></script>
+    <script src="{% static 'apps/alquiler/alquiler_online_form.js' %}"></script>
 
 
 

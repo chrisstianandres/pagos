@@ -154,21 +154,27 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{% url 'user:lista' %}" class="nav-link">
-                                <i class="fas fa-user-shield"></i>
-                                <p>Usuarios</p>
+                            <a href="{% url 'venta:lista' %}" class="nav-link">
+                                <i class="fas fa-piggy-bank"></i>
+                                <p>Compras</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'user:groups' %}" class="nav-link">
-                                <i class="fas fa-user-lock"></i>
-                                <p>Grupos</p>
+                            <a href="{% url 'alquiler:lista' %}" class="nav-link">
+                                <i class="fas fa-donate"></i>
+                                <p>Alquileres</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-database"></i>
-                                <p>Respado de datos</p>
+                            <a href="{% url 'reparacion:lista' %}" class="nav-link">
+                                <i class="fa fa fa-tools"></i>
+                                <p>Reparaciones</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'confeccion:lista' %}" class="nav-link">
+                                <i class="fab fa-shirtsinbulk"></i>
+                                <p>Confecciones</p>
                             </a>
                         </li>
                     </ul>
