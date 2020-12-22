@@ -1,5 +1,6 @@
 from django.utils.decorators import method_decorator
 
+from apps.cliente.models import Cliente
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
 from datetime import datetime
@@ -33,51 +34,12 @@ from django.contrib.staticfiles import finders
 
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
+from apps.user.models import User
 
 opc_icono = 'fas fa-tools'
 opc_entidad = 'Reparaciones'
 crud = '/reparacion/crear'
 empresa = nombre_empresa()
-
-#
-# class lista(ValidatePermissionRequiredMixin, ListView):
-#     model = Producto
-#     template_name = 'front-end/reparacion/reparacion_list.html'
-#     permission_required = 'reparacion.view_reparacion'
-#
-#     @csrf_exempt
-#     def dispatch(self, request, *args, **kwargs):
-#         return super().dispatch(request, *args, **kwargs)
-#
-#     def post(self, request, *args, **kwargs):
-#         data = {}
-#         try:
-#             action = request.POST['action']
-#             start = request.POST['start_date']
-#             end = request.POST['end_date']
-#             if action == 'reparacion':
-#                 data = []
-#                 if start == '' and end == '':
-#                     query = Transaccion.objects.filter(tipo=1)
-#                 else:
-#                     query = Transaccion.objects.filter(tipo=1, fecha_trans__range=[start, end])
-#                 for c in query:
-#                     data.append(c.toJSON())
-#             else:
-#                 data['error'] = 'No ha seleccionado una opcion'
-#         except Exception as e:
-#             data['error'] = 'No ha seleccionado una opcion'
-#         return JsonResponse(data, safe=False)
-#
-#     def get_context_data(self, **kwargs):
-#         data = super().get_context_data(**kwargs)
-#         data['icono'] = opc_icono
-#         data['entidad'] = opc_entidad
-#         data['boton'] = 'Nueva Reparacion'
-#         data['titulo'] = 'Listado de Reparaciones'
-#         data['nuevo'] = '/Reparacion/nuevo'
-#         data['empresa'] = empresa
-#         return data
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
@@ -128,6 +90,13 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 result = Reparacion.objects.get(id=id)
                 result.estado = 1
                 result.fecha_entrega = datetime.now()
+                result.save()
+                data['resp'] = True
+            elif action == 'estado':
+                id = request.POST['id']
+                result = Reparacion.objects.get(id=id)
+                result.fecha_ingreso = datetime.now()
+                result.estado = 0
                 result.save()
                 data['resp'] = True
             else:
@@ -207,6 +176,101 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['empresa'] = empresa
         data['form'] = TransaccionForm()
         data['formr'] = ReparacionForm()
+        data['form2'] = Detalle_reparacionform()
+        data['detalle'] = []
+        data['formc'] = ClienteForm()
+        return data
+
+
+class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
+    form_class = Reparacion
+    template_name = 'front-end/reparacion/reparacion_online.html'
+    permission_required = 'reparacion.add_reparacion'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        try:
+            datos = json.loads(request.POST['reparacion'])
+            us = User.objects.get(id=request.user.id)
+            cli = Cliente.objects.get(cedula=us.cedula)
+            if action == 'add':
+                if datos:
+                    with transaction.atomic():
+                        c = Transaccion()
+                        c.fecha_trans = datos['fecha_venta']
+                        c.cliente_id = cli.id
+                        c.user_id = request.user.id
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.tipo = 1
+                        c.save()
+                        v = Reparacion()
+                        v.transaccion_id = c.id
+                        v.fecha_ingreso = datos['fecha_ingreso']
+                        v.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                dv = Detalle_reparacion()
+                                dv.reparacion_id = v.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_rep_by_prod = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                        data['id'] = v.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            elif action == 'reserva':
+                if datos:
+                    with transaction.atomic():
+                        c = Transaccion()
+                        c.fecha_trans = datos['fecha_venta']
+                        c.cliente_id = cli.id
+                        c.user_id = request.user.id
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.tipo = 1
+                        c.save()
+                        v = Reparacion()
+                        v.transaccion_id = c.id
+                        v.estado = 3
+                        v.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                dv = Detalle_reparacion()
+                                dv.reparacion_id = v.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_rep_by_prod = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                        data['id'] = v.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Nueva Reparacion'
+        data['empresa'] = empresa
+        data['form'] = TransaccionForm()
         data['form2'] = Detalle_reparacionform()
         data['detalle'] = []
         data['formc'] = ClienteForm()

@@ -27,11 +27,14 @@ class Reparacion(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['transaccion'] = self.transaccion.toJSON()
-        item['fecha_ingreso'] = self.fecha_ingreso.strftime('%d-%m-%Y')
         if self.fecha_entrega is None:
             item['fecha_entrega'] = self.fecha_entrega
         else:
             item['fecha_entrega'] = self.fecha_entrega.strftime('%d-%m-%Y')
+        if self.fecha_ingreso is None:
+            item['fecha_ingreso'] = self.fecha_ingreso
+        else:
+            item['fecha_ingreso'] = self.fecha_ingreso.strftime('%d-%m-%Y')
         return item
 
     class Meta:

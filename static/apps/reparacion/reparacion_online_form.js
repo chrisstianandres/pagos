@@ -1,5 +1,4 @@
-var tblventa;
-var ventas = {
+var reparacion = {
     items: {
         fecha_venta: '',
         fecha_ingreso: '',
@@ -31,16 +30,25 @@ var ventas = {
         this.list();
     },
     list: function () {
+        var numero = this.items.productos.length;
         this.calculate();
+        if (numero >= 1) {
+            $('#paypal_btn').show();
+            $('#count').html(numero);
+        } else {
+            $('#paypal_btn').hide();
+            $('#count').html('');
+        }
         tblventa = $("#tblproductos").DataTable({
-            destroy: true,
             autoWidth: false,
             dataSrc: "",
             responsive: true,
+            dom:
+                "<'row'<'col-sm-12'tr>>",
             language: {
                 "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
             },
-            data: this.items.productos,
+            data: reparacion.items.productos,
             columns: [
                 {data: 'id'},
                 {data: "producto_base.nombre"},
@@ -50,6 +58,7 @@ var ventas = {
                 {data: "pvp"},
                 {data: "subtotal"}
             ],
+            destroy: true,
             columnDefs: [
                 {
                     targets: [0],
@@ -63,7 +72,7 @@ var ventas = {
                     }
                 },
                 {
-                    targets: [-1],
+                    targets: [-1, -2],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
@@ -79,20 +88,14 @@ var ventas = {
 
                     }
                 },
-                {
-                    targets: [-2],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<input type="text" name="pvp" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
-
-                    }
-                }
             ], rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: 10000,
-                    step: 1
+                    max: 100000000,
+                    step: 1,
+                    buttondown_class: 'btn btn-primary btn-sm',
+                    buttonup_class: 'btn btn-primary btn-sm',
+
                 });
                 $(row).find('input[name="pvp"]').TouchSpin({
                     min: 1,
@@ -115,10 +118,114 @@ var ventas = {
 
     }
 };
+
 $(function () {
-    var action = '';
-    var pk = '';
-    //seleccionar producto del select producto
+    reparacion.list();
+    $('#tblproductos tbody')
+        .on('click', 'a[rel="remove"]', function () {
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            borrar_todo_alert('Alerta de Eliminación',
+                'Esta seguro que desea eliminar este producto del detalle <br> ' +
+                '<strong>CONTINUAR?</strong>', function () {
+                    reparacion.items.productos.splice(tr.row, 1);
+                    reparacion.list();
+                })
+        })
+        .on('change keyup', 'input[name="cantidad"]', function () {
+            var cantidad = parseInt($(this).val());
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            reparacion.items.productos[tr.row].cantidad = cantidad;
+            reparacion.calculate();
+            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + reparacion.items.productos[tr.row].subtotal.toFixed(2));
+
+        })
+     .on('change keyup', 'input[name="pvp"]', function () {
+            var pvp = parseFloat($(this).val());
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            reparacion.items.productos[tr.row].pvp = pvp;
+            reparacion.calculate();
+            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + reparacion.items.productos[tr.row].subtotal.toFixed(2));
+        });
+    paypal.Buttons({
+        createOrder: function (data, actions) {
+            // This function sets up the details of the transaction, including the amount and line item details.
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: $('#id_total').val()
+                    }
+                }]
+            });
+        },
+        onApprove: function (data, actions) {
+            // This function captures the funds from the transaction.
+            return actions.order.capture().then(function (details) {
+                // This function shows a transaction success message to your buyer.
+                if (reparacion.items.productos.length === 0) {
+                    menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
+                    return false
+                }
+                var parametros;
+                reparacion.items.fecha_venta = $('input[name="fecha_trans"]').val();
+                reparacion.items.fecha_ingreso = $('input[name="fecha_ingreso"]').val();
+                parametros = {'reparacion': JSON.stringify(reparacion.items)};
+                parametros['action'] = 'add';
+                parametros['id'] = '';
+                $.ajax({
+                    dataType: 'JSON',
+                    type: 'POST',
+                    url: window.location.pathname,
+                    data: parametros,
+                }).done(function (data) {
+                    if (!data.hasOwnProperty('error')) {
+                        callback_2(data, 'reparacion');
+                        return false;
+                    }
+                    menssaje_error('Error', data.error, 'fas fa-exclamation-circle');
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert(textStatus + ': ' + errorThrown);
+                });
+            });
+        }
+    }).render('#paypal-button-container');
+    //This function displays Smart Payment Buttons on your web page.
+
+//remover todos los productos del detalle
+    $('.btnRemoveall').on('click', function () {
+        if (reparacion.items.productos.length === 0) return false;
+        borrar_todo_alert('Alerta de Eliminación',
+            'Esta seguro que desea eliminar todos los productos seleccionados? <br>' +
+            '<strong>CONTINUAR?</strong>', function () {
+                reparacion.items.productos = [];
+                reparacion.list();
+            });
+    });
+
+    $('#save').on('click', function () {
+        if (reparacion.items.productos.length === 0) {
+            menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
+            return false
+        }
+        var parametros;
+        reparacion.items.fecha_venta = $('input[name="fecha_trans"]').val();
+        reparacion.items.cliente = $('input[name="cliente_id"]').val();
+        parametros = {'reparacion': JSON.stringify(reparacion.items)};
+        parametros['action'] = 'reserva';
+        parametros['id'] = '';
+        save_with_ajax('Alerta',
+            window.location.pathname, 'Esta seguro que desea reservar esta reparacion?', parametros,
+            function (response) {
+                printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+                    window.open('/reparacion/printpdf/' + response['id'], '_blank');
+                    location.href = '/reparacion/lista';
+                }, function () {
+                    location.href = '/reparacion/lista';
+                })
+
+            });
+    });
+
     $('#id_producto').on('select2:select', function (e) {
         $.ajax({
             type: "POST",
@@ -129,7 +236,7 @@ $(function () {
             },
             dataType: 'json',
             success: function (data) {
-                ventas.add(data);
+                reparacion.add(data);
                 $('#id_producto').val(null).trigger('change');
             },
             error: function (xhr, status, data) {
@@ -137,142 +244,7 @@ $(function () {
             },
 
         })
-    });
-    //remover producto del detalle
-    $('#tblproductos tbody')
-        .on('click', 'a[rel="remove"]', function () {
-            var tr = tblventa.cell($(this).closest('td, li')).index();
-            borrar_todo_alert('Alerta de Eliminación',
-                'Esta seguro que desea eliminar este producto de tu detalle <br> ' +
-                '<strong>CONTINUAR?</strong>', function () {
-                    ventas.items.productos.splice(tr.row, 1);
-                    ventas.list();
-                })
-        })
-        .on('change keyup', 'input[name="cantidad"]', function () {
-            var cantidad = parseInt($(this).val());
-            var tr = tblventa.cell($(this).closest('td, li')).index();
-            ventas.items.productos[tr.row].cantidad = cantidad;
-            ventas.calculate();
-            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
-        })
-        .on('change keyup', 'input[name="pvp"]', function () {
-            var pvp = parseFloat($(this).val());
-            var tr = tblventa.cell($(this).closest('td, li')).index();
-            ventas.items.productos[tr.row].pvp = pvp;
-            ventas.calculate();
-            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
-        })
-    ;
-    //remover todos los productos del detalle
-    $('.btnRemoveall').on('click', function () {
-        if (ventas.items.productos.length === 0) return false;
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar todos los productos seleccionados? <br>' +
-            '<strong>CONTINUAR?</strong>', function () {
-                ventas.items.productos = [];
-                ventas.list();
-            });
-    });
-    //boton guardar
-    $('#save').on('click', function () {
-        if ($('select[name="cliente"]').val() === "") {
-            menssaje_error('Error!', "Debe seleccionar un cliente", 'far fa-times-circle');
-            return false
-        } else if (ventas.items.productos.length === 0) {
-            menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
-            return false
-        }
-        var parametros;
-        ventas.items.fecha_venta = $('input[name="fecha_trans"]').val();
-        ventas.items.fecha_ingreso = $('input[name="fecha_ingreso"]').val();
-        ventas.items.cliente = $('#id_cliente option:selected').val();
-
-        parametros = {'reparacion': JSON.stringify(ventas.items)};
-        parametros['action'] = 'add';
-        parametros['id'] = '';
-        save_with_ajax('Alerta',
-            '/reparacion/nuevo', 'Esta seguro que desea guardar esta reparacion?', parametros, function (response) {
-                printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
-                    window.open('/reparacion/printpdf/' + response['id'], '_blank');
-                    // location.href = '/venta/printpdf/' + response['id'];
-                    location.href = '/reparacion/lista';
-                }, function () {
-                    location.href = '/reparacion/lista';
-                })
-
-            });
-
-    });
-    //boton agregar cliente
-    $('#id_new_client').on('click', function () {
-        $('#Modal').modal('show');
-    });
-    //enviar formulario de nuevo cliente
-    $('#form').on('submit', function (e) {
-        e.preventDefault();
-        action = 'add';
-        var parametros = new FormData(this);
-        parametros.append('action', action);
-        parametros.append('id', pk);
-        var isvalid = $(this).valid();
-        if (isvalid) {
-            save_with_ajax2('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
-                function (response) {
-                    menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
-                        $('#Modal').modal('hide');
-                        var newOption = new Option(response.cliente['full_name'], response.cliente['id'], false, true);
-                        $('#id_cliente').append(newOption).trigger('change');
-                    });
-                });
-        }
-
-    });
-    //buscar cliente en el select cliente
-    $('#id_cliente').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
-            },
-            "noResults": function () {
-                return "Sin resultados";
-            },
-            "searching": function () {
-                return "Buscando...";
-            }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: '/cliente/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search'
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
-
-            },
-
-        },
-        placeholder: 'Busca un cliente',
-        minimumInputLength: 1,
-    });
-    //mostrar el modal con el formulario cliente
-    $('#Modal').on('hidden.bs.modal', function (e) {
-        reset();
-        $('#form').trigger("reset");
-    });
-    //buscar produto del select producto
-    $('#id_producto').select2({
+    }).select2({
         theme: "classic",
         language: {
             inputTooShort: function () {
@@ -309,16 +281,4 @@ $(function () {
         placeholder: 'Busca un Producto',
         minimumInputLength: 1,
     });
-
-    $('input[name="fecha_ingreso"]').daterangepicker({
-        locale: {
-            format: 'YYYY-MM-DD',
-            applyLabel: '<i class="fas fa-check"></i> Selccionar',
-            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
-
-        },
-        minDate: new Date(),
-        singleDatePicker: true
-    });
 });
-
