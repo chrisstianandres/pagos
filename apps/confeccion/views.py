@@ -16,6 +16,7 @@ from xhtml2pdf import pisa
 
 from apps.backEnd import nombre_empresa
 from apps.cliente.forms import ClienteForm
+from apps.cliente.models import Cliente
 from apps.confeccion.forms import ConfeccionForm, Detalle_confeccionform
 from apps.confeccion.models import Confeccion, Detalle_confeccion
 from apps.empresa.models import Empresa
@@ -23,6 +24,8 @@ from apps.mixins import ValidatePermissionRequiredMixin
 from apps.producto_base.models import Producto_base
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
+from apps.user.forms import UserForm
+from apps.user.models import User
 
 opc_icono = 'fab fa-shirtsinbulk'
 opc_entidad = 'Confeccion'
@@ -78,6 +81,12 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 result = Confeccion.objects.get(id=id)
                 result.estado = 1
                 result.fecha_entrega = datetime.now()
+                result.save()
+                data['resp'] = True
+            elif action == 'estado':
+                id = request.POST['id']
+                result = Confeccion.objects.get(id=id)
+                result.estado = 0
                 result.save()
                 data['resp'] = True
             else:
@@ -156,6 +165,102 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['empresa'] = empresa
         data['form'] = TransaccionForm()
         data['formr'] = ConfeccionForm()
+        data['form2'] = Detalle_confeccionform()
+        data['detalle'] = []
+        data['formc'] = ClienteForm()
+        return data
+
+
+class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
+    form_class = Confeccion
+    template_name = 'front-end/confeccion/confeccion_online.html'
+    permission_required = 'confeccion.add_confeccion'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        try:
+            datos = json.loads(request.POST['confeccion'])
+            if action == 'add':
+                if datos:
+                    with transaction.atomic():
+                        us = User.objects.get(id=request.user.id)
+                        cli = Cliente.objects.get(cedula=us.cedula)
+                        c = Transaccion()
+                        c.fecha_trans = datos['fecha_venta']
+                        c.cliente_id = cli.id
+                        c.user_id = request.user.id
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.tipo = 3
+                        c.save()
+                        v = Confeccion()
+                        v.transaccion_id = c.id
+                        v.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                dv = Detalle_confeccion()
+                                dv.confeccion_id = v.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_by_confec = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                        data['id'] = v.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            elif action == 'reserva':
+                if datos:
+                    with transaction.atomic():
+                        us = User.objects.get(id=int(datos['cliente']))
+                        cli = Cliente.objects.get(cedula=us.cedula)
+                        c = Transaccion()
+                        c.fecha_trans = datos['fecha_venta']
+                        c.cliente_id = cli.id
+                        c.user_id = request.user.id
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.tipo = 3
+                        c.save()
+                        v = Confeccion()
+                        v.transaccion_id = c.id
+                        v.estado = 3
+                        v.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                dv = Detalle_confeccion()
+                                dv.confeccion_id = v.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_by_confec = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                        data['id'] = v.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Nueva Confeccion'
+        data['empresa'] = empresa
+        data['form'] = TransaccionForm()
         data['form2'] = Detalle_confeccionform()
         data['detalle'] = []
         data['formc'] = ClienteForm()
@@ -390,7 +495,7 @@ class report_total_alquilada(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = 'Confeccion de prendas/No entregadas'
-        data['titulo'] = 'Reporte de Alquiler de prendas'
+        data['titulo'] = 'Reporte de Confeccion de prendas'
         data['empresa'] = empresa
         return data
 

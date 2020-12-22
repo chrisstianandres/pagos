@@ -98,15 +98,6 @@ var ventas = {
 $(function () {
     var action = '';
     var pk = '';
-    //texto de los selects
-    $('.select2').select2({
-        "language": {
-            "noResults": function () {
-                return "Sin resultados";
-            }
-        },
-        allowClear: true
-    });
     //seleccionar producto del select producto
     $('#id_producto').on('select2:select', function (e) {
         $.ajax({

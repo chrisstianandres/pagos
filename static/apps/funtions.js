@@ -77,6 +77,18 @@ function callback(response) {
 
 }
 
+function callback_2(response, entidad) {
+    printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+        window.open('/'+entidad+'/printpdf/' + response['id'], '_blank');
+        localStorage.clear();
+        location.href = '/'+entidad+'/lista';
+    }, function () {
+        localStorage.clear();
+        location.href = '/'+entidad+'/lista';
+    })
+
+}
+
 function save_estado(title, url, content, parametros, callback) {
     $.confirm({
         theme: 'modern',

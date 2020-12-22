@@ -216,7 +216,6 @@ $(function () {
             }
         ],
         createdRow: function (row, data, dataIndex) {
-            console.log(user_tipo);
             if (data.estado === 1) {
                 $('td', row).eq(8).html('<span class="badge badge-success" style="color: white"> ENTREGADA');
                 $('td', row).eq(9).find('a[rel="entregar"]').hide();

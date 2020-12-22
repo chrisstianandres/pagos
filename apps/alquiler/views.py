@@ -251,7 +251,6 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                     data['error'] = "Datos Incompletos"
             elif action == 'reserva':
                 if datos:
-                    print(int(datos['cliente']))
                     with transaction.atomic():
                         us = User.objects.get(id=int(datos['cliente']))
                         cli = Cliente.objects.get(cedula=us.cedula)
