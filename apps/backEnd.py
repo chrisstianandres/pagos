@@ -84,6 +84,18 @@ class signin(TemplateView):
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
+    def get(self, request, *args, **kwargs):
+        data = {}
+        if not self.request.user.is_authenticated:
+            data['title'] = 'Registro de usuario'
+            data['nomb'] = nombre_empresa()
+            data['form'] = UserForm_online()
+            data['crud'] = '/signin/'
+            data['action'] = 'add'
+        else:
+            return HttpResponseRedirect("/")
+        return render(request, self.template_name, data)
+
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['title'] = 'Registro de usuario'

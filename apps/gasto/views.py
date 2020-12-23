@@ -158,7 +158,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nuevo Tipo de gasto'
+        data['boton'] = 'Nuevo gasto'
         data['titulo'] = 'Listado de Gastos'
         data['nuevo'] = '/gasto/nuevo'
         data['empresa'] = empresa

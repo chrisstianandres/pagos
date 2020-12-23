@@ -174,8 +174,8 @@ function datatbles() {
         },
         columns: [
             {data: 'compra.fecha_compra'},
-            {data: "producto.nombre"},
-            {data: "producto.presentacion.nombre"},
+            {data: "material.producto_base.nombre"},
+            {data: "material.producto_base.presentacion.nombre"},
             {data: "cantidad"},
             {data: "compra.total"}
         ],
