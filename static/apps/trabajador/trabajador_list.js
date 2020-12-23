@@ -223,5 +223,11 @@ $(function () {
                     })
                 })
         });
+
+    $('#nuevo').on('click', function () {
+            window.location.href = '/user/nuevo'
+
+
+    })
 });
 

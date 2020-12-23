@@ -1,0 +1,548 @@
+[
+{
+    "model": "transaccion.transaccion",
+    "pk": 2,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 1,
+        "fecha_trans": "2020-12-13",
+        "subtotal": "74.00",
+        "iva": "8.88",
+        "total": "82.88"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 3,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 1,
+        "fecha_trans": "2020-12-13",
+        "subtotal": "161.00",
+        "iva": "19.32",
+        "total": "180.32"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 4,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 1,
+        "fecha_trans": "2020-12-16",
+        "subtotal": "35.00",
+        "iva": "4.20",
+        "total": "39.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 5,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 1,
+        "fecha_trans": "2020-12-16",
+        "subtotal": "35.00",
+        "iva": "4.20",
+        "total": "39.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 6,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 30,
+        "fecha_trans": "2020-12-16",
+        "subtotal": "35.00",
+        "iva": "4.20",
+        "total": "39.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 7,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 1,
+        "fecha_trans": "2020-12-17",
+        "subtotal": "81.00",
+        "iva": "9.72",
+        "total": "90.72"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 8,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "12.00",
+        "iva": "1.44",
+        "total": "13.44"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 9,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "30.00",
+        "iva": "3.60",
+        "total": "33.60"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 10,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 11,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 12,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 13,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 14,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 15,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 16,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 17,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 18,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 19,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 20,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-19",
+        "subtotal": "27.00",
+        "iva": "3.24",
+        "total": "30.24"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 21,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 1,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "10.00",
+        "iva": "1.20",
+        "total": "11.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 22,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 1,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "10.00",
+        "iva": "1.20",
+        "total": "11.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 23,
+    "fields": {
+        "tipo": 0,
+        "cliente": 1,
+        "user": 1,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "10.00",
+        "iva": "1.20",
+        "total": "11.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 24,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 1,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "10.00",
+        "iva": "1.20",
+        "total": "11.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 25,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 1,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "10.00",
+        "iva": "1.20",
+        "total": "11.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 26,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 1,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "10.00",
+        "iva": "1.20",
+        "total": "11.20"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 27,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "81.00",
+        "iva": "9.72",
+        "total": "90.72"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 28,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "81.00",
+        "iva": "9.72",
+        "total": "90.72"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 29,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "15.00",
+        "iva": "1.80",
+        "total": "16.80"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 30,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "15.00",
+        "iva": "1.80",
+        "total": "16.80"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 31,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "15.00",
+        "iva": "1.80",
+        "total": "16.80"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 32,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "15.00",
+        "iva": "1.80",
+        "total": "16.80"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 33,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "15.00",
+        "iva": "1.80",
+        "total": "16.80"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 34,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "15.00",
+        "iva": "1.80",
+        "total": "16.80"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 35,
+    "fields": {
+        "tipo": 0,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-21",
+        "subtotal": "22.00",
+        "iva": "2.64",
+        "total": "24.64"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 47,
+    "fields": {
+        "tipo": 2,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-22",
+        "subtotal": "12.00",
+        "iva": "1.44",
+        "total": "13.44"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 48,
+    "fields": {
+        "tipo": 3,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-22",
+        "subtotal": "5.00",
+        "iva": "0.60",
+        "total": "5.60"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 49,
+    "fields": {
+        "tipo": 3,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-22",
+        "subtotal": "57.00",
+        "iva": "6.84",
+        "total": "63.84"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 50,
+    "fields": {
+        "tipo": 3,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-22",
+        "subtotal": "76.00",
+        "iva": "9.12",
+        "total": "85.12"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 51,
+    "fields": {
+        "tipo": 3,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-22",
+        "subtotal": "32.00",
+        "iva": "3.84",
+        "total": "35.84"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 52,
+    "fields": {
+        "tipo": 3,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-22",
+        "subtotal": "30.00",
+        "iva": "3.60",
+        "total": "33.60"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 53,
+    "fields": {
+        "tipo": 3,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-22",
+        "subtotal": "25.00",
+        "iva": "3.00",
+        "total": "28.00"
+    }
+},
+{
+    "model": "transaccion.transaccion",
+    "pk": 59,
+    "fields": {
+        "tipo": 1,
+        "cliente": 41,
+        "user": 36,
+        "fecha_trans": "2020-12-22",
+        "subtotal": "4.00",
+        "iva": "0.48",
+        "total": "4.48"
+    }
+}
+]

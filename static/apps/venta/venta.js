@@ -103,7 +103,7 @@ $(function () {
         ventas.items.productos = carro_respaldo;
         ventas.list();
     } else {
-        carrito.list();
+        ventas.list();
     }
     var action = '';
     var pk = '';

@@ -8,6 +8,4 @@ app_name = 'Devoluciones'
 
 urlpatterns = [
     path('lista', login_required(lista.as_view()), name='lista'),
-    path('data', login_required(views.data), name='data')
-
 ]

@@ -14,7 +14,8 @@ toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
 var datos = {
     fechas: {
         'start_date': '',
-        'end_date': ''
+        'end_date': '',
+        'action': 'report'
     },
     add: function (data) {
         if (data.key === 1) {
@@ -25,7 +26,7 @@ var datos = {
             this.fechas['end_date'] = '';
         }
         $.ajax({
-            url: '/devolucion/data',
+            url: window.location.pathname,
             type: 'POST',
             data: this.fechas,
             success: function (data) {
@@ -45,41 +46,37 @@ $(function () {
         scrollX: true,
         autoWidth: false,
         ajax: {
-            url: '/devolucion/data',
+            url: window.location.pathname,
             type: 'POST',
             data: datos.fechas,
             dataSrc: ""
         },
         language: {
-            url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
-            searchPanes: {
-                clearMessage: 'Limpiar Filtros',
-                collapse: {
-                    0: 'Filtros de Busqueda',
-                    _: 'Filtros seleccionados (%d)'
-                },
-                title: {
-                    _: 'Filtros seleccionados - %d',
-                    0: 'Ningun Filtro seleccionado',
-                },
-                activeMessage: 'Filtros activos (%d)',
-
-            }
+            url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
         },
         order: [[4, "desc"]],
-        dom: 'l<"toolbar">' + "<br>" + 'Bfrtip ',
-        buttons: [
-            {
-                className: 'btn-default my_class',
-                extend: 'searchPanes',
-                config: {
-                    cascadePanes: true,
-                    viewTotal: true,
-                    layout: 'columns-5'
+         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
+            "<'row'<'col-sm-12 col-md-3'l>>" +
+            "<'row'<'col-sm-12 col-md-12'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+         buttons: {
+            dom: {
+                button: {
+                    className: '',
+
+                },
+                container: {
+                    className: 'buttons-container float-md-right'
                 }
             },
+            buttons: [
             {
-                text: '<i class="fa fa-file-pdf"></i> Reporte PDF',
+                text: '<i class="fa fa-file-excel"></i> Excel', className: "btn btn-success my_class",
+                extend: 'excel'
+            },
+            {
+                text: '<i class="fa fa-file-pdf"></i>  PDF',
                 className: 'btn btn-danger my_class',
                 extend: 'pdfHtml5',
                 //filename: 'dt_custom_pdf',
@@ -156,105 +153,14 @@ $(function () {
                         return 4;
                     };
                     doc.content[0].layout = objLayout;
-                    doc.content[1].table.widths = ['*', '*', '*', '*', '*','*'];
+                    doc.content[1].table.widths = ['*', '*', '*', '*', '*', '*'];
                     doc.styles.tableBodyEven.alignment = 'center';
                     doc.styles.tableBodyOdd.alignment = 'center';
                 }
             },
-            {
-                text: '<i class="fa fa-file-excel"></i> Reporte Excel', className: "btn btn-success my_class",
-                extend: 'excel'
-            }
-        ],
+        ]
+         },
         columnDefs: [
-            {
-                searchPanes: {
-                    show: false,
-                },
-                targets: [0, 1, 2],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                },
-                targets: [3, 4, 5],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                    options: [
-                        {
-                            label: 'FINALIZADA',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] === 'FINALIZADA';
-                            }
-                        },
-                        {
-                            label: 'DEVUELTA',
-                            value: function (rowData, rowIdx) {
-                                return rowData[5] === 'DEVUELTA';
-                            }
-                        },
-                    ]
-                },
-                targets: [5],
-            },
-            {
-                searchPanes: {
-                    show: true,
-                    options: [
-                        {
-                            label: 'Menos de $ 10',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] < 10;
-                            }
-                        },
-                        {
-                            label: '$ 10 a $ 50',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 50 && rowData[3] >= 10;
-                            }
-                        },
-                        {
-                            label: '$ 50 a $ 100',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 100 && rowData[3] >= 50;
-                            }
-                        },
-                        {
-                            label: '$ 100 a $ 200',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 200 && rowData[3] >= 100;
-                            }
-                        },
-                        {
-                            label: '$ 200 a $ 300',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 300 && rowData[3] >= 200;
-                            }
-                        },
-                        {
-                            label: '$ 300 a $ 400',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 400 && rowData[3] >= 300;
-                            }
-                        },
-                        {
-                            label: '$ 400 a $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] <= 500 && rowData[3] >= 400;
-                            }
-                        },
-                        {
-                            label: 'Mas de $ 500',
-                            value: function (rowData, rowIdx) {
-                                return rowData[3] > 500;
-                            }
-                        },
-                    ]
-                },
-                targets: [3],
-            },
             {
                 targets: '_all',
                 class: 'text-center',
@@ -265,13 +171,13 @@ $(function () {
                 class: 'text-center',
                 width: "8%",
                 render: function (data, type, row) {
-                    return  '<a type="button" rel="detalle" class="btn btn-primary btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Detalle"><i class="fa fa-search"></i></a>' + ' ';;
+                    return '<a type="button" rel="detalle" class="btn btn-primary btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Detalle"><i class="fa fa-search"></i></a>' + ' ';
                 }
             },
             {
                 targets: [-2],
                 render: function (data, type, row) {
-                    return '$' + data ;
+                    return '$' + data;
                 }
             },
             {
@@ -302,21 +208,11 @@ $(function () {
                 return intVal(a) + intVal(b);
             }, 0);
 
-              $(api.column(6).footer()).html(
+            $(api.column(6).footer()).html(
                 '$ ' + parseFloat(pageTotal).toFixed(2) + ' ( $ ' + parseFloat(total).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
         },
-        // createdRow: function (row, data, dataIndex) {
-        //     if (data[2] === 'No vendido' && data[7] === 'En Stock') {
-        //         $('td', row).eq(2).find('span').addClass('badge bg-success').attr("style", "color: white");
-        //         $('td', row).eq(7).find('span').addClass('badge bg-success').attr("style", "color: white");
-        //     } else {
-        //         $('td', row).eq(7).find('span').addClass('badge bg-danger').attr("style", "color: white");
-        //         $('td', row).eq(8).find('a[rel="devolver"]').hide();
-        //     }
-        //
-        // }
     });
     $('#datatable tbody').on('click', 'a[rel="detalle"]', function () {
         $('.tooltip').remove();
@@ -332,10 +228,10 @@ $(function () {
             },
             destroy: true,
             ajax: {
-                url: '/venta/get_detalle',
+                url: '/venta/lista',
                 type: 'Post',
                 data: {
-                    'id': data[5]
+                    'id': data[0], 'action': 'detalle'
                 },
                 dataSrc: ""
             },
@@ -386,43 +282,6 @@ $(function () {
                 );
             },
         });
-        $("#tbldetalle_servicios").DataTable({
-            responsive: true,
-            autoWidth: false,
-            language: {
-                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
-            },
-            destroy: true,
-            ajax: {
-                url: '/venta/get_detalle_serv',
-                type: 'POST',
-                data: {
-                    'id': data[5]
-                },
-                dataSrc: ""
-            },
-            columns: [
-                {data: 'servicio'},
-                {data: 'cantidad'},
-                {data: 'pvp'},
-                {data: 'subtotal'}
-            ],
-            columnDefs: [
-                {
-                    targets: '_all',
-                    class: 'text-center'
-                },
-                {
-                    targets: [-1, -2],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
-                    }
-                },
-            ],
-        });
-
     });
 });
 

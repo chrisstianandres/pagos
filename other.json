@@ -1,0 +1,3330 @@
+[
+{
+    "model": "reparacion.reparacion",
+    "pk": 1,
+    "fields": {
+        "transaccion": 59,
+        "fecha_ingreso": "2020-12-22",
+        "fecha_entrega": "2020-12-22",
+        "estado": 1
+    }
+},
+{
+    "model": "reparacion.detalle_reparacion",
+    "pk": 1,
+    "fields": {
+        "reparacion": 1,
+        "producto": 2,
+        "pvp_rep_by_prod": "1.00",
+        "cantidad": 2,
+        "subtotal": "2.00"
+    }
+},
+{
+    "model": "reparacion.detalle_reparacion",
+    "pk": 2,
+    "fields": {
+        "reparacion": 1,
+        "producto": 1,
+        "pvp_rep_by_prod": "1.00",
+        "cantidad": 2,
+        "subtotal": "2.00"
+    }
+},
+
+{
+    "model": "venta.venta",
+    "pk": 1,
+    "fields": {
+        "transaccion": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 2,
+    "fields": {
+        "transaccion": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 3,
+    "fields": {
+        "transaccion": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 4,
+    "fields": {
+        "transaccion": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 5,
+    "fields": {
+        "transaccion": 4,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 6,
+    "fields": {
+        "transaccion": 5,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 7,
+    "fields": {
+        "transaccion": 6,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 8,
+    "fields": {
+        "transaccion": 7,
+        "estado": 2
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 9,
+    "fields": {
+        "transaccion": 8,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 10,
+    "fields": {
+        "transaccion": 9,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 11,
+    "fields": {
+        "transaccion": 10,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 12,
+    "fields": {
+        "transaccion": 11,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 13,
+    "fields": {
+        "transaccion": 12,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 14,
+    "fields": {
+        "transaccion": 13,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 15,
+    "fields": {
+        "transaccion": 14,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 16,
+    "fields": {
+        "transaccion": 15,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 17,
+    "fields": {
+        "transaccion": 16,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 18,
+    "fields": {
+        "transaccion": 17,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 19,
+    "fields": {
+        "transaccion": 18,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 20,
+    "fields": {
+        "transaccion": 19,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 21,
+    "fields": {
+        "transaccion": 20,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 22,
+    "fields": {
+        "transaccion": 21,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 23,
+    "fields": {
+        "transaccion": 22,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 24,
+    "fields": {
+        "transaccion": 23,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 25,
+    "fields": {
+        "transaccion": 24,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 26,
+    "fields": {
+        "transaccion": 25,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 27,
+    "fields": {
+        "transaccion": 26,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 28,
+    "fields": {
+        "transaccion": 27,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 29,
+    "fields": {
+        "transaccion": 28,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 30,
+    "fields": {
+        "transaccion": 29,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 31,
+    "fields": {
+        "transaccion": 30,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 32,
+    "fields": {
+        "transaccion": 31,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 33,
+    "fields": {
+        "transaccion": 32,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 34,
+    "fields": {
+        "transaccion": 33,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 35,
+    "fields": {
+        "transaccion": 34,
+        "estado": 1
+    }
+},
+{
+    "model": "venta.venta",
+    "pk": 36,
+    "fields": {
+        "transaccion": 35,
+        "estado": 2
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 1,
+    "fields": {
+        "venta": 1,
+        "inventario": 1,
+        "pvp_actual": "10.00",
+        "cantidad": 1,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 2,
+    "fields": {
+        "venta": 2,
+        "inventario": 1,
+        "pvp_actual": "10.00",
+        "cantidad": 12,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 3,
+    "fields": {
+        "venta": 4,
+        "inventario": 300,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 4,
+    "fields": {
+        "venta": 4,
+        "inventario": 301,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 5,
+    "fields": {
+        "venta": 4,
+        "inventario": 302,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 6,
+    "fields": {
+        "venta": 4,
+        "inventario": 350,
+        "pvp_actual": "10.00",
+        "cantidad": 5,
+        "subtotal": "50.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 7,
+    "fields": {
+        "venta": 4,
+        "inventario": 351,
+        "pvp_actual": "10.00",
+        "cantidad": 5,
+        "subtotal": "50.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 8,
+    "fields": {
+        "venta": 4,
+        "inventario": 352,
+        "pvp_actual": "10.00",
+        "cantidad": 5,
+        "subtotal": "50.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 9,
+    "fields": {
+        "venta": 4,
+        "inventario": 353,
+        "pvp_actual": "10.00",
+        "cantidad": 5,
+        "subtotal": "50.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 10,
+    "fields": {
+        "venta": 4,
+        "inventario": 354,
+        "pvp_actual": "10.00",
+        "cantidad": 5,
+        "subtotal": "50.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 11,
+    "fields": {
+        "venta": 4,
+        "inventario": 410,
+        "pvp_actual": "15.00",
+        "cantidad": 5,
+        "subtotal": "75.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 12,
+    "fields": {
+        "venta": 4,
+        "inventario": 411,
+        "pvp_actual": "15.00",
+        "cantidad": 5,
+        "subtotal": "75.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 13,
+    "fields": {
+        "venta": 4,
+        "inventario": 412,
+        "pvp_actual": "15.00",
+        "cantidad": 5,
+        "subtotal": "75.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 14,
+    "fields": {
+        "venta": 4,
+        "inventario": 413,
+        "pvp_actual": "15.00",
+        "cantidad": 5,
+        "subtotal": "75.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 15,
+    "fields": {
+        "venta": 4,
+        "inventario": 414,
+        "pvp_actual": "15.00",
+        "cantidad": 5,
+        "subtotal": "75.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 16,
+    "fields": {
+        "venta": 5,
+        "inventario": 355,
+        "pvp_actual": "10.00",
+        "cantidad": 2,
+        "subtotal": "20.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 17,
+    "fields": {
+        "venta": 5,
+        "inventario": 356,
+        "pvp_actual": "10.00",
+        "cantidad": 2,
+        "subtotal": "20.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 18,
+    "fields": {
+        "venta": 5,
+        "inventario": 415,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 19,
+    "fields": {
+        "venta": 6,
+        "inventario": 357,
+        "pvp_actual": "10.00",
+        "cantidad": 2,
+        "subtotal": "20.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 20,
+    "fields": {
+        "venta": 6,
+        "inventario": 358,
+        "pvp_actual": "10.00",
+        "cantidad": 2,
+        "subtotal": "20.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 21,
+    "fields": {
+        "venta": 6,
+        "inventario": 416,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 22,
+    "fields": {
+        "venta": 7,
+        "inventario": 359,
+        "pvp_actual": "10.00",
+        "cantidad": 2,
+        "subtotal": "20.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 23,
+    "fields": {
+        "venta": 7,
+        "inventario": 360,
+        "pvp_actual": "10.00",
+        "cantidad": 2,
+        "subtotal": "20.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 24,
+    "fields": {
+        "venta": 7,
+        "inventario": 417,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 25,
+    "fields": {
+        "venta": 8,
+        "inventario": 303,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 26,
+    "fields": {
+        "venta": 8,
+        "inventario": 304,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 27,
+    "fields": {
+        "venta": 8,
+        "inventario": 305,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 28,
+    "fields": {
+        "venta": 8,
+        "inventario": 418,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 29,
+    "fields": {
+        "venta": 8,
+        "inventario": 419,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 30,
+    "fields": {
+        "venta": 8,
+        "inventario": 420,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 31,
+    "fields": {
+        "venta": 9,
+        "inventario": 306,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 32,
+    "fields": {
+        "venta": 10,
+        "inventario": 421,
+        "pvp_actual": "15.00",
+        "cantidad": 2,
+        "subtotal": "30.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 33,
+    "fields": {
+        "venta": 10,
+        "inventario": 422,
+        "pvp_actual": "15.00",
+        "cantidad": 2,
+        "subtotal": "30.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 34,
+    "fields": {
+        "venta": 11,
+        "inventario": 423,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 35,
+    "fields": {
+        "venta": 11,
+        "inventario": 307,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 36,
+    "fields": {
+        "venta": 12,
+        "inventario": 424,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 37,
+    "fields": {
+        "venta": 12,
+        "inventario": 308,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 38,
+    "fields": {
+        "venta": 13,
+        "inventario": 425,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 39,
+    "fields": {
+        "venta": 13,
+        "inventario": 309,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 40,
+    "fields": {
+        "venta": 14,
+        "inventario": 426,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 41,
+    "fields": {
+        "venta": 14,
+        "inventario": 310,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 42,
+    "fields": {
+        "venta": 15,
+        "inventario": 427,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 43,
+    "fields": {
+        "venta": 15,
+        "inventario": 311,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 44,
+    "fields": {
+        "venta": 16,
+        "inventario": 428,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 45,
+    "fields": {
+        "venta": 16,
+        "inventario": 312,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 46,
+    "fields": {
+        "venta": 17,
+        "inventario": 429,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 47,
+    "fields": {
+        "venta": 17,
+        "inventario": 313,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 48,
+    "fields": {
+        "venta": 18,
+        "inventario": 430,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 49,
+    "fields": {
+        "venta": 18,
+        "inventario": 314,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 50,
+    "fields": {
+        "venta": 19,
+        "inventario": 431,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 51,
+    "fields": {
+        "venta": 19,
+        "inventario": 315,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 52,
+    "fields": {
+        "venta": 20,
+        "inventario": 432,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 53,
+    "fields": {
+        "venta": 20,
+        "inventario": 316,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 54,
+    "fields": {
+        "venta": 21,
+        "inventario": 433,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 55,
+    "fields": {
+        "venta": 21,
+        "inventario": 317,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 56,
+    "fields": {
+        "venta": 22,
+        "inventario": 361,
+        "pvp_actual": "10.00",
+        "cantidad": 1,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 57,
+    "fields": {
+        "venta": 23,
+        "inventario": 362,
+        "pvp_actual": "10.00",
+        "cantidad": 1,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 58,
+    "fields": {
+        "venta": 24,
+        "inventario": 363,
+        "pvp_actual": "10.00",
+        "cantidad": 1,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 59,
+    "fields": {
+        "venta": 25,
+        "inventario": 364,
+        "pvp_actual": "10.00",
+        "cantidad": 1,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 60,
+    "fields": {
+        "venta": 26,
+        "inventario": 365,
+        "pvp_actual": "10.00",
+        "cantidad": 1,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 61,
+    "fields": {
+        "venta": 27,
+        "inventario": 366,
+        "pvp_actual": "10.00",
+        "cantidad": 1,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 62,
+    "fields": {
+        "venta": 28,
+        "inventario": 318,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 63,
+    "fields": {
+        "venta": 28,
+        "inventario": 319,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 64,
+    "fields": {
+        "venta": 28,
+        "inventario": 320,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 65,
+    "fields": {
+        "venta": 28,
+        "inventario": 434,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 66,
+    "fields": {
+        "venta": 28,
+        "inventario": 435,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 67,
+    "fields": {
+        "venta": 28,
+        "inventario": 436,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 68,
+    "fields": {
+        "venta": 29,
+        "inventario": 321,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 69,
+    "fields": {
+        "venta": 29,
+        "inventario": 322,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 70,
+    "fields": {
+        "venta": 29,
+        "inventario": 323,
+        "pvp_actual": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 71,
+    "fields": {
+        "venta": 29,
+        "inventario": 437,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 72,
+    "fields": {
+        "venta": 29,
+        "inventario": 438,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 73,
+    "fields": {
+        "venta": 29,
+        "inventario": 439,
+        "pvp_actual": "15.00",
+        "cantidad": 3,
+        "subtotal": "45.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 74,
+    "fields": {
+        "venta": 30,
+        "inventario": 440,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 75,
+    "fields": {
+        "venta": 31,
+        "inventario": 441,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 76,
+    "fields": {
+        "venta": 32,
+        "inventario": 442,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 77,
+    "fields": {
+        "venta": 33,
+        "inventario": 443,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 78,
+    "fields": {
+        "venta": 34,
+        "inventario": 444,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 79,
+    "fields": {
+        "venta": 35,
+        "inventario": 445,
+        "pvp_actual": "15.00",
+        "cantidad": 1,
+        "subtotal": "15.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 80,
+    "fields": {
+        "venta": 36,
+        "inventario": 324,
+        "pvp_actual": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "venta.detalle_venta",
+    "pk": 81,
+    "fields": {
+        "venta": 36,
+        "inventario": 367,
+        "pvp_actual": "10.00",
+        "cantidad": 1,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "compra.compra",
+    "pk": 1,
+    "fields": {
+        "fecha_compra": "2020-12-12",
+        "proveedor": 1,
+        "user": 1,
+        "subtotal": "1116.10",
+        "iva": "133.93",
+        "total": "1250.03",
+        "estado": 1
+    }
+},
+{
+    "model": "compra.detalle_compra",
+    "pk": 1,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "p_compra_actual": "125.00",
+        "cantidad": 10,
+        "subtotal": "1116.10"
+    }
+},
+
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 1,
+    "fields": {
+        "produccion": 1,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 300,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 301,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 302,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 303,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 304,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 305,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 306,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 307,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 308,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 309,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 310,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 311,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 312,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 313,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 314,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 315,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 316,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 317,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 318,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 319,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 320,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 321,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 322,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 323,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 324,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 325,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 2
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 326,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 327,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 328,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 329,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 330,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 331,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 332,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 333,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 334,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 335,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 336,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 337,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 338,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 339,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 340,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 341,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 342,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 343,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 344,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 345,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 346,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 347,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 348,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 349,
+    "fields": {
+        "produccion": 7,
+        "producto": 2,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 350,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 351,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 352,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 353,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 354,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 355,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 356,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 357,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 358,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 359,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 360,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 361,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 362,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 363,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 364,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 365,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 366,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 367,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 368,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 369,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 370,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 371,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 372,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 373,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 374,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 375,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 376,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 377,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 378,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 379,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 380,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 381,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 382,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 383,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 384,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 385,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 386,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 387,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 388,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 389,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 390,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 391,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 392,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 393,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 394,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 395,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 396,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 397,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 398,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 399,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 400,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 401,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 402,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 403,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 404,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 405,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 406,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 407,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 408,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 409,
+    "fields": {
+        "produccion": 7,
+        "producto": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 410,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 411,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 412,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 413,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 414,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 415,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 416,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 417,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 418,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 419,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 420,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 421,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 422,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 423,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 424,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 425,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 426,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 427,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 428,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 429,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 430,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 431,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 432,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 433,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 434,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 435,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 436,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 437,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 438,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 439,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 440,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 441,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 442,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 443,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 444,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 445,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 446,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 447,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 448,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 449,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 450,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 451,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 452,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 453,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 454,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 455,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 456,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 457,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 458,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 459,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 460,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 461,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 462,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 463,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 464,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 465,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 466,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 467,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 468,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 469,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 470,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 471,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 472,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 473,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 474,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 475,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 476,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 477,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 478,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 479,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 480,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 481,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 482,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 483,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_productos.inventario_producto",
+    "pk": 484,
+    "fields": {
+        "produccion": 7,
+        "producto": 3,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 1,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 2,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 3,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 4,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 5,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 6,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 7,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 8,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 1
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 9,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "inventario_material.inventario_material",
+    "pk": 10,
+    "fields": {
+        "compra": 1,
+        "material": 1,
+        "estado": 0
+    }
+},
+{
+    "model": "confeccion.confeccion",
+    "pk": 1,
+    "fields": {
+        "transaccion": 48,
+        "fecha_entrega": null,
+        "estado": 0
+    }
+},
+{
+    "model": "confeccion.confeccion",
+    "pk": 2,
+    "fields": {
+        "transaccion": 49,
+        "fecha_entrega": null,
+        "estado": 3
+    }
+},
+{
+    "model": "confeccion.confeccion",
+    "pk": 3,
+    "fields": {
+        "transaccion": 50,
+        "fecha_entrega": null,
+        "estado": 0
+    }
+},
+{
+    "model": "confeccion.confeccion",
+    "pk": 4,
+    "fields": {
+        "transaccion": 51,
+        "fecha_entrega": null,
+        "estado": 0
+    }
+},
+{
+    "model": "confeccion.confeccion",
+    "pk": 5,
+    "fields": {
+        "transaccion": 52,
+        "fecha_entrega": null,
+        "estado": 0
+    }
+},
+{
+    "model": "confeccion.confeccion",
+    "pk": 6,
+    "fields": {
+        "transaccion": 53,
+        "fecha_entrega": null,
+        "estado": 0
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 1,
+    "fields": {
+        "confeccion": 1,
+        "producto": 2,
+        "pvp_by_confec": "5.00",
+        "cantidad": 1,
+        "subtotal": "5.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 2,
+    "fields": {
+        "confeccion": 2,
+        "producto": 1,
+        "pvp_by_confec": "7.00",
+        "cantidad": 3,
+        "subtotal": "21.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 3,
+    "fields": {
+        "confeccion": 2,
+        "producto": 3,
+        "pvp_by_confec": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 4,
+    "fields": {
+        "confeccion": 3,
+        "producto": 3,
+        "pvp_by_confec": "12.00",
+        "cantidad": 3,
+        "subtotal": "36.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 5,
+    "fields": {
+        "confeccion": 3,
+        "producto": 4,
+        "pvp_by_confec": "10.00",
+        "cantidad": 4,
+        "subtotal": "40.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 6,
+    "fields": {
+        "confeccion": 4,
+        "producto": 3,
+        "pvp_by_confec": "12.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 7,
+    "fields": {
+        "confeccion": 4,
+        "producto": 4,
+        "pvp_by_confec": "10.00",
+        "cantidad": 2,
+        "subtotal": "20.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 8,
+    "fields": {
+        "confeccion": 5,
+        "producto": 2,
+        "pvp_by_confec": "5.00",
+        "cantidad": 2,
+        "subtotal": "10.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 9,
+    "fields": {
+        "confeccion": 5,
+        "producto": 4,
+        "pvp_by_confec": "10.00",
+        "cantidad": 2,
+        "subtotal": "20.00"
+    }
+},
+{
+    "model": "confeccion.detalle_confeccion",
+    "pk": 10,
+    "fields": {
+        "confeccion": 6,
+        "producto": 2,
+        "pvp_by_confec": "5.00",
+        "cantidad": 5,
+        "subtotal": "25.00"
+    }
+},
+{
+    "model": "alquiler.alquiler",
+    "pk": 1,
+    "fields": {
+        "transaccion": 47,
+        "fecha_salida": "2020-12-10",
+        "fecha_entrega": null,
+        "estado": 3
+    }
+},
+{
+    "model": "alquiler.detalle_alquiler",
+    "pk": 1,
+    "fields": {
+        "alquiler": 1,
+        "inventario": 325,
+        "pvp_by_alquiler": "8.00",
+        "cantidad": 1,
+        "subtotal": "12.00"
+    }
+},
+{
+    "model": "material.material",
+    "pk": 1,
+    "fields": {
+        "producto_base": 4,
+        "p_compra": "125.00"
+    }
+},
+{
+    "model": "asignar_recursos.asig_recurso",
+    "pk": 1,
+    "fields": {
+        "fecha_asig": "2020-12-10",
+        "lote": "1",
+        "user": 1,
+        "estado": 2,
+        "inventariado": 1
+    }
+},
+{
+    "model": "asignar_recursos.asig_recurso",
+    "pk": 3,
+    "fields": {
+        "fecha_asig": "2020-12-12",
+        "lote": "2",
+        "user": 1,
+        "estado": 2,
+        "inventariado": 1
+    }
+},
+{
+    "model": "asignar_recursos.detalle_asig_recurso",
+    "pk": 1,
+    "fields": {
+        "asig_recurso": 3,
+        "inventario_material": 10
+    }
+},
+{
+    "model": "asignar_recursos.detalle_asig_recurso",
+    "pk": 2,
+    "fields": {
+        "asig_recurso": 3,
+        "inventario_material": 9
+    }
+},
+{
+    "model": "asignar_recursos.detalle_asig_maquina",
+    "pk": 1,
+    "fields": {
+        "asig_recurso": 3,
+        "maquina": 1
+    }
+},
+{
+    "model": "producto_base.producto_base",
+    "pk": 1,
+    "fields": {
+        "categoria": 1,
+        "presentacion": 1,
+        "nombre": "Camisa XL",
+        "stock": 42,
+        "descripcion": "Camisa XL 100% Algodon"
+    }
+},
+{
+    "model": "producto_base.producto_base",
+    "pk": 2,
+    "fields": {
+        "categoria": 1,
+        "presentacion": 1,
+        "nombre": "Camisa SM",
+        "stock": 24,
+        "descripcion": "Camisa SM"
+    }
+},
+{
+    "model": "producto_base.producto_base",
+    "pk": 3,
+    "fields": {
+        "categoria": 2,
+        "presentacion": 1,
+        "nombre": "Blusa SM",
+        "stock": 39,
+        "descripcion": "Blusa SM de algodon"
+    }
+},
+{
+    "model": "producto_base.producto_base",
+    "pk": 4,
+    "fields": {
+        "categoria": 3,
+        "presentacion": 2,
+        "nombre": "Tela de seda blanca",
+        "stock": 8,
+        "descripcion": "Tela de seda blanca para producci�n"
+    }
+},
+{
+    "model": "producto_base.producto_base",
+    "pk": 5,
+    "fields": {
+        "categoria": 4,
+        "presentacion": 1,
+        "nombre": "Pantal�n S",
+        "stock": 0,
+        "descripcion": "Pantal�n"
+    }
+},
+{
+    "model": "producto_base.producto_base",
+    "pk": 6,
+    "fields": {
+        "categoria": 4,
+        "presentacion": 1,
+        "nombre": "Pantal�n L",
+        "stock": 0,
+        "descripcion": "Pantal�n L"
+    }
+},
+{
+    "model": "producto_base.producto_base",
+    "pk": 7,
+    "fields": {
+        "categoria": 4,
+        "presentacion": 1,
+        "nombre": "Pantal�n SM",
+        "stock": 0,
+        "descripcion": "Pantal�n SM"
+    }
+},
+{
+    "model": "sitioweb.sitioweb",
+    "pk": 1,
+    "fields": {
+        "titulo": "Confecciones \"IJEI\"",
+        "mision": "Nuestra Mision es larga",
+        "vision": "Nuestra Vision tambien",
+        "mapa": "<iframe src=\"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31896.41200310224!2d-79.61713942433664!3d-2.1339125643377264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x902d47b9b02facc9%3A0xc4f916f01d2842fe!2sCASA%20GUADUA!5e0!3m2!1ses!2sec!4v1607001784903!5m2!1ses!2sec\" width=\"600\" height=\"450\" frameborder=\"0\" style=\"border:0;\" allowfullscreen=\"\" aria-hidden=\"false\" tabindex=\"0\"></iframe>"
+    }
+},
+
+]
