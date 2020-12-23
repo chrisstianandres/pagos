@@ -236,7 +236,7 @@ $(function () {
                 destroy: true,
                 ajax: {
                     url: window.location.pathname,
-                    type: 'Post',
+                    type: 'POST',
                     data: {
                         'action': 'detalle',
                         'id': data.id

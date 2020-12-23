@@ -50,6 +50,7 @@ $(document).ready(function () {
             telefono: {
                 required: true,
                 minlength: 10,
+                maxlength: 10,
                 digits: true
             },
             direccion: {

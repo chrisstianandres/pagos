@@ -244,9 +244,9 @@ $(function () {
                     dataSrc: ""
                 },
                 columns: [
-                    {data: 'inventario_material.material.producto_base.nombre'},
-                    {data: 'inventario_material.material.producto_base.categoria.nombre'},
-                    {data: 'inventario_material.material.producto_base.presentacion.nombre'},
+                    {data: 'material'},
+                    {data: 'categoria'},
+                    {data: 'presentacion'},
                     {data: 'cantidad'}
                 ]
             });

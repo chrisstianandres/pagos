@@ -51,10 +51,10 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = {}
         try:
             action = request.POST['action']
-            start = request.POST['start_date']
-            end = request.POST['end_date']
             if action == 'list':
                 data = []
+                start = request.POST['start_date']
+                end = request.POST['end_date']
                 if start and end:
                     compra = Compra.objects.filter(fecha_compra__range=[start, end])
                 else:
@@ -65,17 +65,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    for p in Detalle_compra.objects.all():
+                    for p in Detalle_compra.objects.filter(compra_id=id):
                         item = p.toJSON()
                         item['p_compra'] = p.p_compra_actual
                         item['subtotal'] = float(p.subtotal)
                         data.append(item)
                 else:
+
                     data['error'] = 'Ha ocurrido un error'
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -262,13 +263,13 @@ class report(ValidatePermissionRequiredMixin, ListView):
                 end_date = request.POST.get('end_date', '')
                 if start_date == '' and end_date == '':
                     query = Detalle_compra.objects.values('compra__fecha_compra', 'material__producto_base__nombre',
-                                                           'p_compra_actual').\
+                                                          'p_compra_actual'). \
                         order_by().annotate(Sum('cantidad')).annotate(Sum('compra__total')).annotate(Sum('subtotal'))
                 else:
                     query = (Detalle_compra.objects.values('compra__fecha_compra', 'material__producto_base__nombre',
                                                            'p_compra_actual').
                         filter(compra__fecha_compra__range=[start_date, end_date]).order_by().annotate(
-                        Sum('cantidad'))). annotate(Sum('compra__total'))
+                        Sum('cantidad'))).annotate(Sum('compra__total'))
                 for p in query:
                     data.append([
                         p['compra__fecha_compra'].strftime("%d/%m/%Y"),
@@ -313,11 +314,11 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 data = []
                 if start_date == '' and end_date == '':
-                    query = Compra.objects.values('fecha_compra', 'proveedor__nombre', 'user__username',).order_by().\
+                    query = Compra.objects.values('fecha_compra', 'proveedor__nombre', 'user__username', ).order_by(). \
                         annotate(Sum('total'))
                 else:
                     query = Compra.objects.values('fecha_compra', 'proveedor__nombre', 'user__username').filter(
-                        fecha_compra__range=[start_date, end_date]).order_by().\
+                        fecha_compra__range=[start_date, end_date]).order_by(). \
                         annotate(Sum('total'))
                 for p in query:
                     data.append([

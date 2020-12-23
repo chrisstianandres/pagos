@@ -1,6 +1,7 @@
 import json
 
 from django.db import transaction
+from django.db.models import Count
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -56,9 +57,15 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    for p in Detalle_asig_recurso.objects.filter(asig_recurso_id=id):
-                        item = p.toJSON()
-                        data.append(item)
+                    asig = Detalle_asig_recurso.objects.filter(asig_recurso_id=id).values('inventario_material__material__producto_base_id').annotate(total=Count('id'))
+                    for p in asig:
+                        pr = Producto_base.objects.get(id=int(p['inventario_material__material__producto_base_id']))
+                        data.append({
+                            'material': pr.nombre,
+                            'categoria': pr.categoria.nombre,
+                            'presentacion': pr.presentacion.nombre,
+                            'cantidad': int(p['total'])
+                        })
                 else:
                     data['error'] = 'Ha ocurrido un error'
             elif action == 'detalle_maquina':

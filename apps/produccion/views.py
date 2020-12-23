@@ -123,7 +123,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Produccion
-    template_name = 'front-end/Produccion/produccion_form.html'
+    template_name = 'front-end/produccion/produccion_form.html'
     permission_required = 'produccion.add_produccion'
 
     @method_decorator(csrf_exempt)
@@ -150,11 +150,11 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                     dv.produccion_id = c.id
                                     dv.producto_id = i['id']
                                     dv.save()
-                                    st = Inventario_producto.objects.filter(producto_id=int(i['id']), estado=1).count()
-                                    pp = Producto.objects.get(id=int(i['id']))
-                                    pb = Producto_base.objects.get(id=pp.id)
-                                    pb.stock = int(st)
-                                    pb.save()
+                                st = Inventario_producto.objects.filter(producto_id=int(i['id']), estado=1).count()
+                                pp = Producto.objects.get(id=int(i['id']))
+                                pb = Producto_base.objects.get(id=pp.producto_base.id)
+                                pb.stock = int(st)
+                                pb.save()
                             asig = Asig_recurso.objects.get(id=int(datos['asignacion']))
                             asig.inventariado = 1
                             asig.save()
