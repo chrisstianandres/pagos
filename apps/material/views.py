@@ -65,10 +65,11 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     result = {'id': int(i['asig_recurso_id']), 'text': str(px.nombre)}
                     data.append(result)
             elif action == 'get':
-                id = request.POST['id']
-                asig = request.POST['asig[id]']
-                material = Detalle_asig_recurso.objects.filter(asig_recurso_id=int(asig)).values('inventario_material__material__producto_base')
-                print(material)
+                print(request.POST)
+                # id = request.POST['id']
+                # asig = request.POST['asig[id]']
+                #
+                # material = Detalle_asig_recurso.objects.filter(asig_recurso_id=int(asig)).values('inventario_material__material__producto_base')
                 data = []
                 # for i in material:
                 #     item = i.toJSON()
@@ -92,6 +93,10 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 for i in material:
                     item = i.toJSON()
                     item['cantidad'] = 1
+                    item['subtotal'] = 0.00
+                    item['iva_emp'] = 12
+                    cal = format(float((i.p_compra*100)/112), '.2f')
+                    item['p_compra'] = cal
                     data.append(item)
             elif action == 'get_perd':
                 id = request.POST['id']

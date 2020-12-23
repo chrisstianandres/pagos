@@ -1,12 +1,4 @@
 $(document).ready(function () {
-    var option = $('input[name="option"]').val();
-    if (option === 'editar') {
-        $('#id_numero_documento').attr('readonly', 'true');
-        $('#id_documento').attr('readonly', 'true');
-        $('select[readonly="readonly"] option:not(:selected)').attr('disabled', true);
-
-    }
-
     jQuery.validator.addMethod("lettersonly", function (value, element) {
         return this.optional(element) || /^[a-z," "]+$/i.test(value);
     }, "Letters and spaces only please");

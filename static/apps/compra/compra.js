@@ -16,6 +16,7 @@ var compras = {
             dict.subtotal = dict.cantidad * parseFloat(dict.p_compra);
             subtotal += dict.subtotal;
             iva_emp = dict.iva_emp;
+            console.log(dict);
         });
         this.items.subtotal = subtotal;
         this.items.iva = this.items.subtotal * (iva_emp / 100);
@@ -113,7 +114,7 @@ $(function () {
             url: '/material/lista',
             data: {
                 "id": $('#id_material option:selected').val(),
-                "action": 'get'
+                "action": 'get_asig'
             },
             dataType: 'json',
             success: function (data) {

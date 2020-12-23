@@ -82,7 +82,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             if action == 'add':
                 f = ProveedorForm(request.POST)
                 data = self.save_data(f)
-                print(data)
             elif action == 'edit':
                 proveedor = Proveedor.objects.get(pk=int(pk))
                 f = ProveedorForm(request.POST, instance=proveedor)
@@ -99,8 +98,10 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 
     def save_data(self, f):
         data = {}
+        print(f.data)
         if f.is_valid():
             f.save(commit=False)
+            print(f.data['tipo'])
             if int(f.data['tipo']) == 0:
                 if verificar(f.data['num_doc']):
                     prod = f.save()

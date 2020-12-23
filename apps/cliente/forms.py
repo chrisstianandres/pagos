@@ -46,7 +46,7 @@ class ClienteForm(forms.ModelForm):
             'cedula': 'N° de cedula',
             'correo': 'Correo',
             'sexo': 'Genero',
-            'Telefono': 'telefono',
+            'Telefono': 'Celular',
             'Direccion': 'direccion'
 
         }
