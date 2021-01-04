@@ -315,7 +315,7 @@ $(function () {
         e.preventDefault();
         $.ajax({
             type: "POST",
-            url: '/producto/lista',
+            url: '/producto/get',
             data: {
                 "id": $(this).val(),
                 'action': 'get'

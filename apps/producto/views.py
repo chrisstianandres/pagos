@@ -417,12 +417,32 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
 
 
 @csrf_exempt
+
 def index(request):
     data = {}
     try:
         data = []
         for p in Producto.objects.filter(producto_base__stock__lt=10, producto_base__stock__gt=1):
             data.append(p.toJSON())
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def get_prod(request):
+    data = {}
+    try:
+        data = []
+        id = request.POST['id']
+        producto = Producto.objects.filter(pk=id)
+        empresa = Empresa.objects.first()
+        for i in producto:
+            item = i.toJSON()
+            item['cantidad'] = 1
+            item['subtotal'] = 0.00
+            item['iva_emp'] = empresa.iva
+            data.append(item)
     except Exception as e:
         data['error'] = str(e)
     return JsonResponse(data, safe=False)
