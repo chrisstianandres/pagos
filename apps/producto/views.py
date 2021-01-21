@@ -344,7 +344,6 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
             data['error'] = f.errors
         return data
 
-
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         if 'form' not in data:

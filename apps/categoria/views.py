@@ -70,7 +70,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             elif action == 'edit':
                 cat = Categoria.objects.get(pk=int(pk))
                 f = CategoriaForm(request.POST, instance=cat)
-                data = self.save_data(f)
+                data = self.edit_data(f, pk)
             elif action == 'delete':
                 cat = Categoria.objects.get(pk=pk)
                 cat.delete()
@@ -84,9 +84,31 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def save_data(self, f):
         data = {}
         if f.is_valid():
-            var = f.save()
-            data['categoria'] = var.toJSON()
-            data['resp'] = True
+            f.save(commit=False)
+            if Categoria.objects.filter(nombre__icontains=f.data['nombre']):
+                f.add_error("nombre", "Ya existe una categoria este nombre")
+                data['error'] = f.errors
+            else:
+                var = f.save()
+                data['resp'] = True
+                data['categoria'] = var.toJSON()
+                data['resp'] = True
+        else:
+            data['error'] = f.errors
+        return data
+
+    def edit_data(self, f, pk):
+        data = {}
+        if f.is_valid():
+            f.save(commit=False)
+            if Categoria.objects.filter(nombre__icontains=f.data['nombre']).exclude(pk=pk):
+                f.add_error("nombre", "Ya existe una categoria este nombre")
+                data['error'] = f.errors
+            else:
+                var = f.save()
+                data['resp'] = True
+                data['categoria'] = var.toJSON()
+                data['resp'] = True
         else:
             data['error'] = f.errors
         return data

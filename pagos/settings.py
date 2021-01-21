@@ -65,6 +65,8 @@ INSTALLED_APPS = [
     'apps.producto_base',
     'apps.sitioweb',
     'apps.produccion',
+    'apps.talla',
+    'apps.tipo_material'
 ]
 
 MIDDLEWARE = [

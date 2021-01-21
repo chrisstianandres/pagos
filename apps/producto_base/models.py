@@ -7,7 +7,6 @@ from apps.presentacion.models import Presentacion
 
 class Producto_base(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
-    presentacion = models.ForeignKey(Presentacion, on_delete=models.PROTECT)
     nombre = models.CharField(max_length=50)
     stock = models.IntegerField(default=0)
     descripcion = models.CharField(max_length=50)
@@ -18,9 +17,7 @@ class Producto_base(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['categoria'] = self.categoria.toJSON()
-        item['presentacion'] = self.presentacion.toJSON()
         return item
-
 
     class Meta:
         db_table = 'producto_base'

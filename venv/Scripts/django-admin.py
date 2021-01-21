@@ -1,4 +1,4 @@
-#!C:\Users\Angie\PycharmProjects\pagos\venv\Scripts\python.exe
+#!D:\PycharmProjects\pagos\venv\Scripts\python.exe
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 

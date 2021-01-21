@@ -1,4 +1,4 @@
-#!C:\Users\Angie\PycharmProjects\pagos\venv\Scripts\python.exe
+#!D:\PycharmProjects\pagos\venv\Scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'future==0.18.2','console_scripts','futurize'
 __requires__ = 'future==0.18.2'
 import re

@@ -21,6 +21,7 @@ from apps.empresa.models import Empresa
 def nombre_empresa():
     try:
         empresa = Empresa.objects.first()
+        print(12)
     except ObjectDoesNotExist:
         empresa = {'nombre': 'Sin nombre'}
     return empresa
@@ -130,6 +131,17 @@ def connect(request):
 def disconnect(request):
     logout(request)
     return HttpResponseRedirect('/login')
+
+
+@csrf_exempt
+def check_ced(request):
+    data = {}
+    nro = request.POST['data']
+    if verificar(nro):
+        data['resp'] = True
+    else:
+        data['error'] = "Numero de Cedula no valido para Ecuador"
+    return JsonResponse(data)
 
 
 def verificar(nro):

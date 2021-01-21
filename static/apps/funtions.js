@@ -79,12 +79,12 @@ function callback(response) {
 
 function callback_2(response, entidad) {
     printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
-        window.open('/'+entidad+'/printpdf/' + response['id'], '_blank');
+        window.open('/' + entidad + '/printpdf/' + response['id'], '_blank');
         localStorage.clear();
-        location.href = '/'+entidad+'/lista';
+        location.href = '/' + entidad + '/lista';
     }, function () {
         localStorage.clear();
-        location.href = '/'+entidad+'/lista';
+        location.href = '/' + entidad + '/lista';
     })
 
 }
@@ -333,5 +333,28 @@ function borrar_producto_carito(title, content, callback) {
         obj.close();
     }, 2000);
 
+
+}
+
+function validar() {
+    jQuery.validator.addMethod("val_ced", function (value, element) {
+        if (value.length === 10 || value.length === 13) {
+            $.ajax({
+                type: "POST",
+                url: '/verificar/',
+                data: {'data': value.toString()},
+                dataType: 'json',
+                success: function (data) {
+                    if (!data.hasOwnProperty('error')) {
+                        $(element).addClass("is-valid").removeClass("is-invalid");
+                        return false;
+                    }
+                    $(element).addClass("is-invalid").removeClass("is-valid");
+                },
+            })
+        }
+        return false
+        // return this.optional(element) || /^[a-z," "]+$/i.test(value);
+    }, "");
 
 }

@@ -25,6 +25,8 @@ $(document).ready(function () {
                 .removeClass("is-invalid");
         }
     });
+
+    validar();
     $("#form").validate({
         rules: {
             username: {
@@ -48,7 +50,8 @@ $(document).ready(function () {
                 required: true,
                 minlength: 10,
                 maxlength: 10,
-                digits: true
+                digits: true,
+                val_ced: true
             },
             correo: {
                 required: true,
@@ -99,6 +102,7 @@ $(document).ready(function () {
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
                 maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+                val_ced: "Tu numero de documento no es valido para Ecuador",
             },
             correo: "Debe ingresar un correo valido",
             cargo: "Debe seleccionar un cargo",

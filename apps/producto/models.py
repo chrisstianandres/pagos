@@ -1,16 +1,21 @@
 from django.db import models
 from django.forms import model_to_dict
 
+from apps.presentacion.models import Presentacion
 from apps.producto_base.models import Producto_base
+from apps.talla.models import Talla
 from pagos.settings import STATIC_URL, MEDIA_URL
 
 
 class Producto(models.Model):
     producto_base = models.ForeignKey(Producto_base, on_delete=models.PROTECT)
+    talla = models.ForeignKey(Talla, on_delete=models.PROTECT, null=True, blank=True)
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
+    presentacion = models.ForeignKey(Presentacion, on_delete=models.PROTECT, null=True, blank=True)
     pvp_alq = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     pvp_confec = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     imagen = models.ImageField(upload_to='producto/imagen', blank=True, null=True)
+    color = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return '%s' % self.producto_base.nombre

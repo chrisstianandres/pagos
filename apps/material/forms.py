@@ -37,21 +37,18 @@ class Producto_baseForm(forms.ModelForm):
                 attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control form-rounded'})
             self.fields['categoria'].widget.attrs = {
                 'class': 'form-control select2'}
-            self.fields['presentacion'].widget.attrs = {
-                'class': 'form-control select2'}
 
     class Meta:
         model = Producto_base
         fields = ['nombre',
                   'descripcion',
                   'categoria',
-                  'presentacion'
+
                   ]
         labels = {
             'nombre': 'Nombre',
             'descripcion': 'Decripcion',
             'categoria': 'Categoria',
-            'presentacion': 'Presentacion'
         }
         widgets = {
             'nombre': forms.TextInput(),
