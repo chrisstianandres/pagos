@@ -24,10 +24,6 @@ class ProduccionForm(forms.ModelForm):
                 'readonly': True,
                 'class': 'form-control'
             }
-            self.fields['asignacion'].widget.attrs = {
-                'class': 'form-control select2',
-            }
-            self.fields['asignacion'].queryset = Asig_recurso.objects.none()
             self.fields['novedades'].widget.attrs = {
                 'class': 'form-control'
             }
@@ -38,13 +34,11 @@ class ProduccionForm(forms.ModelForm):
         model = Produccion
         fields = [
             'fecha_ingreso',
-            'asignacion',
             'novedades',
 
         ]
         labels = {
-            'fecha_ingreso': 'Fecha de Ingreso de Produccion',
-            'asignacion': 'Asignacion de Materiales',
+            'fecha_ingreso': 'Fecha fin de Produccion',
             'novedades': 'Novedades',
         }
         widgets = {
@@ -54,30 +48,6 @@ class ProduccionForm(forms.ModelForm):
             ),
             'novedades': forms.Textarea()
         }
-
-
-class Detalle_perdidas_productosForm(forms.ModelForm):
-    # constructor
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.Meta.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
-            self.fields['producto'].widget.attrs = {
-                'class': 'form-control select2',
-                'data-live-search': "true",
-                'id': "id_productos_perdida",
-                'style': 'width: 100%'
-            }
-            self.fields["producto"].queryset = Producto.objects.none()
-        # habilitar, desabilitar, y mas
-
-    class Meta:
-        model = Detalle_perdidas_productos
-        fields = [
-            'producto'
-        ]
 
 
 class Detalle_perdidas_materialesForm(forms.ModelForm):
@@ -101,25 +71,3 @@ class Detalle_perdidas_materialesForm(forms.ModelForm):
             'material'
         ]
 
-
-class Inventario_productosForm(forms.ModelForm):
-    # constructor
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.Meta.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
-            self.fields['producto'].widget.attrs = {
-                'class': 'form-control select2',
-                'data-live-search': "true",
-                'style': 'width: 100%'
-            }
-            self.fields["producto"].queryset = Producto.objects.none()
-        # habilitar, desabilitar, y mas
-
-    class Meta:
-        model = Inventario_producto
-        fields = [
-            'producto'
-        ]

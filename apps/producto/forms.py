@@ -24,17 +24,21 @@ class Producto_baseForm(forms.ModelForm):
             self.fields['categoria'].widget.attrs = {
                 'class': 'form-control select2',
                 'id': 'id_despcripcion_producto'}
+            self.fields['color'].widget.attrs = {
+                'class': 'form-control select2'}
 
     class Meta:
         model = Producto_base
         fields = ['nombre',
                   'descripcion',
-                  'categoria'
+                  'categoria',
+                  'color'
                   ]
         labels = {
             'nombre': 'Nombre',
             'descripcion': 'Decripcion',
-            'categoria': 'Categoria'
+            'categoria': 'Categoria',
+            'color': 'Color'
         }
         widgets = {
             'nombre': forms.TextInput(),
@@ -65,11 +69,13 @@ class ProductoForm(forms.ModelForm):
             self.fields['presentacion'].widget.attrs = {
                 'class': 'form-control select2',
                 'id': 'id_presentacion_producto'}
+            self.fields['talla'].widget.attrs = {
+                'class': 'form-control select2'}
 
     class Meta:
         model = Producto
-        fields = ['producto_base', 'pvp', 'pvp_alq', 'pvp_confec', 'imagen', 'presentacion']
-        labels = {'producto_base': 'Producto', 'pvp': 'P.V.P.', 'pvp_alq': 'Precio Alquiler.',
+        fields = ['producto_base', 'pvp', 'pvp_alq', 'pvp_confec', 'imagen', 'presentacion', 'talla']
+        labels = {'producto_base': 'Producto', 'pvp': 'P.V.P.', 'pvp_alq': 'Precio Alquiler.',  'talla': 'Talla',
                   'pvp_confec': 'Precio Confeccion.', 'imagen': 'Imagen',  'presentacion': 'Presentacion'}
         widgets = {'pvp': forms.TextInput(), 'pvp_alq': forms.TextInput(), 'pvp_confec': forms.TextInput()}
 

@@ -147,59 +147,10 @@ $(function () {
         allowClear: true
     });
     //seleccionar producto del select producto
-    $('#id_inventario_material').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/material/lista',
-            data: {
-                "id": $('#id_inventario_material option:selected').val(),
-                "action": 'get_asig'
-            },
-            dataType: 'json',
-            success: function (data) {
-                compras.add(data[0]);
-                $('#id_inventario_material option:selected').remove();
-            },
-            error: function (xhr, status, data) {
-                menssaje_error('Error', data[0], 'fa fa-times', function () {
-
-                });
-            },
-
-        })
-    });
     //cantidad de productos
-    $('#tblinsumos tbody')
-        .on('click', 'a[rel="remove"]', function () {
-        var tr = tblcompra.cell($(this).closest('td, li')).index();
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar este producto de tu detalle?', function () {
-                var p = compras.items.productos[tr.row];
-                compras.items.productos.splice(tr.row, 1);
-                $('#id_material').append('<option value="' + p.id + '">' + p.nombre + '</option>');
-                menssaje_ok('Confirmacion!', 'Material eliminado', 'far fa-smile-wink', function () {
-                    compras.list();
-                });
-            })
-    })
-        .on('change keyup', 'input[name="cantidad"]', function () {
-            var cantidad = parseInt($(this).val());
-            var tr = tblcompra.cell($(this).closest('td, li')).index();
-            compras.items.productos[tr.row].cantidad = cantidad;
-        });
 
-    $('.btnRemoveall').on('click', function () {
-        if (compras.items.productos.length === 0) return false;
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar todos los productos seleccionados?', function () {
-                compras.items.productos = [];
-                menssaje_ok('Confirmacion!', 'Productos eliminados', 'far fa-smile-wink', function () {
-                    compras.list();
-                });
-            });
-    });
 
-    $('#save').on('click', function () {
+ $('#save').on('click', function () {
         if ($('input[name="lote"]').val() === "") {
             menssaje_error('Error!', "Debe ingresar un numero de lote", 'far fa-times-circle');
             return false
@@ -219,101 +170,5 @@ $(function () {
                 window.location.replace('/asignacion/lista')
             });
     });
-
-    $('#id_inventario_material').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
-            },
-            "noResults": function () {
-                return "Sin resultados";
-            },
-            "searching": function () {
-                return "Buscando...";
-            }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: '/material/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search_asig'
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
-
-            },
-
-        },
-        placeholder: 'Busca un material',
-        minimumInputLength: 1,
-    });
-    $('#id_maquina').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
-            },
-            "noResults": function () {
-                return "Sin resultados";
-            },
-            "searching": function () {
-                return "Buscando...";
-            }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: '/maquina/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search_asig'
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
-
-            },
-
-        },
-        placeholder: 'Busca una maquina',
-        minimumInputLength: 1,
-    });
-
-    $('#id_maquina').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/maquina/lista',
-            data: {
-                "id": $('#id_maquina option:selected').val(),
-                "action": 'get_asig'
-            },
-            dataType: 'json',
-            success: function (data) {
-                compras.add_machine(data[0]);
-                $('#id_maquina option:selected').remove();
-            },
-            error: function (xhr, status, data) {
-                menssaje_error('Error', data[0], 'fa fa-times', function () {
-
-                });
-            },
-
-        })
-    });
-
 });
 

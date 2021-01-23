@@ -35,7 +35,7 @@ class Asig_recursoForm(forms.ModelForm):
 
         ]
         labels = {
-            'fecha_asig': 'Fecha de Asignacion',
+            'fecha_asig': 'Fecha inicio de Produccion',
             'lote': 'Lote',
         }
         widgets = {

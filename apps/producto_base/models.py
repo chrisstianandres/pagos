@@ -2,11 +2,13 @@ from django.db import models
 from django.forms import model_to_dict
 
 from apps.categoria.models import Categoria
+from apps.color.models import Color
 from apps.presentacion.models import Presentacion
 
 
 class Producto_base(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
+    color = models.ForeignKey(Color, on_delete=models.PROTECT, null=True, blank=True)
     nombre = models.CharField(max_length=50)
     stock = models.IntegerField(default=0)
     descripcion = models.CharField(max_length=50)
@@ -17,6 +19,7 @@ class Producto_base(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['categoria'] = self.categoria.toJSON()
+        item['color'] = self.color.toJSON()
         return item
 
     class Meta:

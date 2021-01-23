@@ -15,12 +15,22 @@ class MaterialForm(forms.ModelForm):
             })
             self.fields['p_compra'].widget.attrs = {'class': 'form-control form-control-sm input-sm',
                                                     'value': 1}
+            self.fields['calidad'].widget.attrs = {
+                'class': 'form-control select2'}
+            self.fields['tipo_material'].widget.attrs = {
+                'class': 'form-control select2'}
+            self.fields['medida'].widget.attrs = {
+                'class': 'form-control'}
+            self.fields['ud_medida'].widget.attrs = {
+                'class': 'form-control'}
 
     class Meta:
         model = Material
-        fields = ['p_compra']
-        labels = {'p_compra': 'P. Compra'}
-        widgets = {'p_compra': forms.TextInput()}
+        fields = ['p_compra', 'calidad', 'tipo_material', 'ud_medida', 'medida']
+        labels = {'p_compra': 'P. Compra','calidad': 'Calidad', 'tipo_material': 'Tipo de Material',
+                  'ud_medida': 'Unidad de medida', 'medida': 'Medida',}
+        widgets = {'p_compra': forms.TextInput(), 'ud_medida': forms.TextInput(), 'medida': forms.TextInput(),
+                   }
 
 
 class Producto_baseForm(forms.ModelForm):
@@ -37,18 +47,22 @@ class Producto_baseForm(forms.ModelForm):
                 attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control form-rounded'})
             self.fields['categoria'].widget.attrs = {
                 'class': 'form-control select2'}
+            self.fields['color'].widget.attrs = {
+                'class': 'form-control select2'}
 
     class Meta:
         model = Producto_base
         fields = ['nombre',
                   'descripcion',
                   'categoria',
+                  'color',
 
                   ]
         labels = {
             'nombre': 'Nombre',
             'descripcion': 'Decripcion',
             'categoria': 'Categoria',
+            'color': 'Color',
         }
         widgets = {
             'nombre': forms.TextInput(),

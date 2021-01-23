@@ -353,7 +353,7 @@ function validar() {
                 },
             })
         }
-        return false
+        return true;
         // return this.optional(element) || /^[a-z," "]+$/i.test(value);
     }, "");
 

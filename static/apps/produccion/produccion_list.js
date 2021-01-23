@@ -177,7 +177,7 @@ $(function () {
                 targets: [-2],
                 class: 'text-center',
                 render: function (data, type, row) {
-                    return '<span>'+data+'</span>';
+                    return '<span>' + data + '</span>';
                 }
             },
             {
@@ -185,19 +185,26 @@ $(function () {
                 class: 'text-center',
                 width: "15%",
                 render: function (data, type, row) {
-                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Asignacion" ><i class="fa fa-search"></i></a>' + ' ';
+                    var detalle_asig = '<a type="button" rel="detalle_asig" class="btn btn-info btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Asignacion" ><i class="fab fa-searchengin"></i></a>' + ' ';
+                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Ingresos de Produccion" ><i class="fa fa-search"></i></a>' + ' ';
                     var anular = '<a type="button" rel="anular" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ';
-                    return detalle + anular;
+                    var agregar = '<a type="button" rel="agregar" class="btn btn-warning btn-xs btn-round" href="add_recurso/'+data+'" style="color: white" data-toggle="tooltip" title="Agregar recursos"><i class="fas fa-plus"></i></a>' + ' ';
+                    return detalle_asig + agregar + detalle + anular;
                 }
             },
         ],
         createdRow: function (row, data, dataIndex) {
             if (data.estado === 0) {
                 $('td', row).eq(3).find('span').addClass('badge bg-success').attr("style", "color: white");
-            } else if (data.estado === 1) {
+            } else if (data.estado === 2) {
                 $('td', row).eq(3).find('span').addClass('badge bg-danger').attr("style", "color: white");
                 $('td', row).eq(4).find('a[rel="anular"]').hide();
+                $('td', row).eq(4).find('a[rel="detalle_asig"]').hide();
+
+            } else if (data.estado === 1) {
+                $('td', row).eq(3).find('span').addClass('badge bg-info').attr("style", "color: white");
                 $('td', row).eq(4).find('a[rel="detalle"]').hide();
+
             }
         }
     });
@@ -309,7 +316,7 @@ $(function () {
         });
 
     $('#nuevo').on('click', function () {
-        window.location.replace('/produccion/nuevo');
+        window.location.href = '/produccion/nuevo';
 
     })
 });

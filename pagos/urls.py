@@ -55,5 +55,6 @@ urlpatterns = [
     path('devolucion/', include('apps.delvoluciones_venta.urls', namespace='devolucion')),
     path('talla/', include('apps.talla.urls', namespace='talla')),
     path('tipo_mat/', include('apps.tipo_material.urls', namespace='tipo_mat')),
+    path('color/', include('apps.color.urls', namespace='color')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\
                   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

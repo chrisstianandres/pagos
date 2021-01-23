@@ -32,6 +32,7 @@ class Asig_recurso(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['user'] = self.user.toJSON()
+        item['fecha_asig'] = self.fecha_asig.strftime('%d/%m/%Y')
         item['estado_label'] = self.get_estado_display()
         return item
 

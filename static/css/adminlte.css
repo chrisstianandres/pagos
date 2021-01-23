@@ -12311,6 +12311,12 @@ body.sidebar-collapse:not(.sidebar-mini-md):not(.sidebar-mini) .main-header::bef
   color: #ffffff;
 }
 
+
+.sidebar-dark-red2 {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
 .sidebar-dark-purple .nav-sidebar.nav-legacy > .nav-item > .nav-link.active,
 .sidebar-light-purple .nav-sidebar.nav-legacy > .nav-item > .nav-link.active {
   border-color: #6f42c1;

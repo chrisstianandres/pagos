@@ -29,6 +29,7 @@ class Compra(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['proveedor'] = self.proveedor.toJSON()
+        item['fecha_compra'] = self.fecha_compra.strftime('YYYY-mm-dd')
         item['user'] = self.user.username
         item['subtotal'] = format(self.subtotal, '.2f')
         item['iva'] = format(self.iva, '.2f')

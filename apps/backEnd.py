@@ -21,7 +21,6 @@ from apps.empresa.models import Empresa
 def nombre_empresa():
     try:
         empresa = Empresa.objects.first()
-        print(12)
     except ObjectDoesNotExist:
         empresa = {'nombre': 'Sin nombre'}
     return empresa

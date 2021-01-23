@@ -42,7 +42,7 @@ class User(AbstractUser):
             return '{}{}'.format(MEDIA_URL, 'user/user_woman.png')
 
     def toJSON(self):
-        item = model_to_dict(self)
+        item = model_to_dict(self, exclude=['is_active', 'groups', 'is_staff', 'is_superuser', 'user_permissions'] )
         if self.last_login:
             item['last_login'] = self.last_login.strftime('%d-%m-%Y')
         item['date_joined'] = self.date_joined.strftime('%d-%m-%Y')

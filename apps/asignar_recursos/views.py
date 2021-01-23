@@ -136,7 +136,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.user_id = request.user.id
                         c.save()
                         for i in datos['productos']:
-
                             for inv in Inventario_material.objects.filter(material_id=i['id'], estado=1)[:i['cantidad']]:
                                 dv = Detalle_asig_recurso()
                                 dv.asig_recurso_id = c.id
@@ -177,10 +176,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['titulo'] = 'Nueva Asignacion'
         data['nuevo'] = '/asignar/nuevo'
         data['empresa'] = empresa
-        data['form'] = Asig_recursoForm()
-        data['form2'] = Detalle_Asig_recursoForm()
-        data['detalle'] = []
-        data['formp'] = Detalle_Asig_maquinaForm()
         return data
 
 

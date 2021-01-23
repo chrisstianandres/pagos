@@ -19,7 +19,6 @@ class Material(models.Model):
     p_compra = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     medida = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     ud_medida = models.CharField(max_length=50, null=True, blank=True)
-    color = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return '%s' % self.producto_base.nombre
@@ -32,7 +31,6 @@ class Material(models.Model):
         item['calidad'] = self.get_calidad_display()
         item['tipo_material'] = self.tipo_material.toJSON()
         return item
-
 
     class Meta:
         db_table = 'material'

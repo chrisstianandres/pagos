@@ -82,9 +82,11 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'search_asig':
                 data = []
                 term = request.POST['term']
-                query = Material.objects.filter(Q(producto_base__nombre__icontains=term, producto_base__stock__gte=1))[0:10]
+                query = Material.objects.filter(Q(producto_base__nombre__icontains=term) |
+                                                Q(producto_base__color__nombre__icontains=term),
+                                                producto_base__stock__gte=1)[0:10]
                 for a in query:
-                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
+                    result = {'id': int(a.id), 'text': str(str(a.producto_base.nombre) + ' / ' + str(a.producto_base.color) )}
                     data.append(result)
             elif action == 'get_asig':
                 id = request.POST['id']
