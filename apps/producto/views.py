@@ -53,7 +53,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'search_rep':
                 data = []
                 term = request.POST['term']
-                query = Producto.objects.filter( Q(producto_base__nombre__icontains=term) | Q(producto_base__color__nombre__icontains=term))[0:10]
+                query = Producto.objects.filter(Q(producto_base__nombre__icontains=term) | Q(producto_base__color__nombre__icontains=term))[0:10]
                 for a in query:
                     result = {'id': int(a.id), 'text': str(str(a.producto_base.nombre) + ' / '+str(a.producto_base.color.nombre))}
                     data.append(result)
@@ -316,6 +316,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                 data = []
                 term = request.POST['term']
                 query = Producto_base.objects.filter(nombre__icontains=term)[0:10]
+
                 for a in query:
                     result = {'id': int(a.id), 'text': 'Nombre: ' + str(a.nombre) + ' / ' + 'Descripcion: ' + str(a.descripcion)}
                     data.append(result)

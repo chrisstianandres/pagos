@@ -475,6 +475,7 @@ def finalizar(request, id):
     for d in Detalle_produccion.objects.filter(produccion_id=produccion.id):
         pro = d.producto.toJSON()
         pro['cantidad'] = d.cantidad
+        pro['cantidad_estimada'] = d.cantidad
         productos.append(pro)
     data['productos'] = productos
     return render(request, 'front-end/produccion/produccion_form.html', data)

@@ -78,7 +78,6 @@ var produccion = {
 
     },
     list_productos: function () {
-        console.log(this.items.productos);
         tblproductos = $("#tblinventario").DataTable({
             destroy: true,
             autoWidth: false,
@@ -101,7 +100,6 @@ var produccion = {
                     targets: [0],
                     orderable: false,
                     render: function (data, type, row) {
-                        console.log(row);
                         return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Insumo"><i class="fa fa-trash-alt"></i></a>';
                         //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
                     }
@@ -130,8 +128,7 @@ var produccion = {
     },
 
     add_perdida_producto: function (data) {
-        console.log(data);
-        this.items.perdidas_productos.push(data[0]);
+        this.items.perdidas_productos.push(data);
         this.items.perdidas_productos = this.exclude_duplicados_perdidas_productos(this.items.perdidas_productos);
         this.list_perdidas_productos();
 
@@ -150,7 +147,7 @@ var produccion = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
+                {data: "presentacion.nombre"},
                 {data: "cantidad"}
             ],
             columnDefs: [
@@ -247,7 +244,6 @@ var produccion = {
 
     },
     list_material: function () {
-        console.log(this.items.materiales);
         tblmateriales = $("#tblinsumos").DataTable({
             destroy: true,
             autoWidth: false,
@@ -282,7 +278,6 @@ var produccion = {
                     targets: [-1],
                     orderable: false,
                     render: function (data, type, row) {
-                        console.log(row);
                         return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
 
                     }
@@ -292,22 +287,22 @@ var produccion = {
                     class: 'text-center'
                 },
             ],
-            rowCallback: function (row, data) {
-                $(row).find('input[name="cantidad"]').TouchSpin({
-                    min: 1,
-                    max: data.producto_base.stock,
-                    step: 1
-                });
-            },
-            createdRow: function (row, data, dataIndex) {
-                if (data.producto_base.stock <= 5) {
-                    $('td', row).eq(8).html('<span class = "badge badge-danger" style="color: white ">' + data.producto_base.stock + '</span>');
-                } else if (data.producto_base.stock <= 10) {
-                    $('td', row).eq(8).html('<span class = "badge badge-warning" style="color: white ">' + data.producto_base.stock + '</span>');
-                } else if (data.producto_base.stock > 10) {
-                    $('td', row).eq(8).html('<span class = "badge badge-success" style="color: white ">' + data.producto_base.stock + '</span>');
-                }
-            }
+            // rowCallback: function (row, data) {
+            //     $(row).find('input[name="cantidad"]').TouchSpin({
+            //         min: 1,
+            //         max: data.producto_base.stock,
+            //         step: 1
+            //     });
+            // },
+            // createdRow: function (row, data, dataIndex) {
+            //     if (data.producto_base.stock <= 5) {
+            //         $('td', row).eq(8).html('<span class = "badge badge-danger" style="color: white ">' + data.producto_base.stock + '</span>');
+            //     } else if (data.producto_base.stock <= 10) {
+            //         $('td', row).eq(8).html('<span class = "badge badge-warning" style="color: white ">' + data.producto_base.stock + '</span>');
+            //     } else if (data.producto_base.stock > 10) {
+            //         $('td', row).eq(8).html('<span class = "badge badge-success" style="color: white ">' + data.producto_base.stock + '</span>');
+            //     }
+            // }
         });
     },
 
@@ -402,6 +397,7 @@ $(function () {
     action = $('#action').val();
 
     if (action === 'finalizar') {
+
         $('#ingreso_productos').show();
         $('#ingreso_materiales').hide();
         $('#id_lote').prop('readonly', true);
@@ -484,7 +480,6 @@ $(function () {
             });
 
         //cantidad de productos
-        var c = 0;
         $('#tblinventario tbody')
             .on('click', 'a[rel="remove"]', function () {
                 var tr = tblproductos.cell($(this).closest('td, li')).index();
@@ -500,12 +495,25 @@ $(function () {
             .on('change keyup', 'input[name="cantidad"]', function () {
                 var cantidad = parseInt($(this).val());
                 var tr = tblproductos.cell($(this).closest('td, li')).index();
+                var estimada = parseInt(produccion.items.productos[tr.row].cantidad_estimada);
                 produccion.items.productos[tr.row].cantidad = cantidad;
+                if (estimada >= cantidad) {
+                    var perdida = parseInt(estimada - parseInt(produccion.items.productos[tr.row].cantidad));
+                    var nuevo = produccion.items.productos[tr.row];
+                    nuevo['cantidad'] = perdida;
+                    if (perdida === 1) {
+                        produccion.add_perdida_producto(nuevo);
+                    } else if (perdida === 0){
+                        alert(15);
+                         produccion.items.perdidas_productos.splice(tr.row, 1);
+                    }
+                    else {
+                        produccion.items.perdidas_productos[tr.row].cantidad = perdida;
+                    }
+                     produccion.list_perdidas_productos();
+                }
 
-               $(this).on('touchspin.on.stopspin', function () {
-                   console.log(c);
-                   c=c+1;
-               });
+
             });
 
         $('#tblperdidas_materiales tbody')
@@ -793,14 +801,13 @@ $(function () {
 
         $('#tblinsumos tbody')
             .on('click', 'a[rel="remove"]', function () {
-                var tr = tblcompra.cell($(this).closest('td, li')).index();
+                var tr = tblmateriales.cell($(this).closest('td, li')).index();
                 borrar_todo_alert('Alerta de Eliminación',
-                    'Esta seguro que desea eliminar este producto de tu detalle?', function () {
-                        var p = compras.items.productos[tr.row];
-                        compras.items.productos.splice(tr.row, 1);
-                        $('#id_material').append('<option value="' + p.id + '">' + p.nombre + '</option>');
+                    'Esta seguro que desea eliminar este material de tu detalle?', function () {
+                        var p = produccion.items.materiales[tr.row];
+                        produccion.items.materiales.splice(tr.row, 1);
                         menssaje_ok('Confirmacion!', 'Material eliminado', 'far fa-smile-wink', function () {
-                            compras.list();
+                            produccion.list_material();
                         });
                     })
             })
@@ -808,6 +815,24 @@ $(function () {
                 var cantidad = parseInt($(this).val());
                 var tr = tblmateriales.cell($(this).closest('td, li')).index();
                 produccion.items.materiales[tr.row].cantidad = cantidad;
+            });
+
+           $('#tblproductos_estimado tbody')
+            .on('click', 'a[rel="remove"]', function () {
+                var tr = tblproductos_estimado.cell($(this).closest('td, li')).index();
+                borrar_todo_alert('Alerta de Eliminación',
+                    'Esta seguro que desea eliminar este producto de tu detalle?', function () {
+                        var p = produccion.items.productos_estimados[tr.row];
+                        produccion.items.productos_estimados.splice(tr.row, 1);
+                        menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
+                            produccion.list_estimado();
+                        });
+                    })
+            })
+            .on('change keyup', 'input[name="cantidad"]', function () {
+                var cantidad = parseInt($(this).val());
+                var tr = tblproductos_estimado.cell($(this).closest('td, li')).index();
+                produccion.items.productos_estimados[tr.row].cantidad = cantidad;
             });
 
     }
