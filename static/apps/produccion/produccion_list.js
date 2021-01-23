@@ -189,7 +189,8 @@ $(function () {
                     var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Ingresos de Produccion" ><i class="fa fa-search"></i></a>' + ' ';
                     var anular = '<a type="button" rel="anular" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ';
                     var agregar = '<a type="button" rel="agregar" class="btn btn-warning btn-xs btn-round" href="add_recurso/'+data+'" style="color: white" data-toggle="tooltip" title="Agregar recursos"><i class="fas fa-plus"></i></a>' + ' ';
-                    return detalle_asig + agregar + detalle + anular;
+                    var finalizar = '<a type="button" rel="finalizar" class="btn btn-success btn-xs btn-round" href="finalizar/'+data+'" style="color: white" data-toggle="tooltip" title="Finalizar Produccion"><i class="far fa-calendar-check"></i></a>' + ' ';
+                    return detalle_asig + agregar + detalle + anular+ finalizar;
                 }
             },
         ],

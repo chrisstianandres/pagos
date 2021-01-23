@@ -2,7 +2,7 @@ var tblproductos_estimado;
 var tblproductos;
 var tblperdidas_productos;
 var tblperdidas_materiales;
-var data_asig='';
+var data_asig = '';
 var produccion = {
     items: {
         fecha_ingreso: '',
@@ -22,7 +22,7 @@ var produccion = {
 
     },
     list_estimado: function () {
-        tblproductos = $("#tblproductos_estimado").DataTable({
+        tblproductos_estimado = $("#tblproductos_estimado").DataTable({
             destroy: true,
             autoWidth: false,
             dataSrc: "",
@@ -31,6 +31,63 @@ var produccion = {
                 "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
             },
             data: this.items.productos_estimados,
+            columns: [
+                {data: 'id'},
+                {data: "producto_base.nombre"},
+                {data: "producto_base.categoria.nombre"},
+                {data: "presentacion.nombre"},
+                {data: "producto_base.color.nombre"},
+                {data: "cantidad"}
+            ],
+            columnDefs: [
+                {
+                    targets: [0],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        console.log(row);
+                        return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Insumo"><i class="fa fa-trash-alt"></i></a>';
+                        //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                    }
+                },
+                {
+                    targets: [-1],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
+
+                    }
+                },
+                {
+                    targets: '_all',
+                    class: 'text-center'
+                },
+            ],
+            rowCallback: function (row, data) {
+                $(row).find('input[name="cantidad"]').TouchSpin({
+                    min: 1,
+                    max: 10000000,
+                    step: 1
+                });
+            },
+        });
+    },
+    add_producto: function (data) {
+        this.items.productos.push(data[0]);
+        this.items.productos = this.exclude_duplicados(this.items.productos);
+        this.list_estimado();
+
+    },
+    list_productos: function () {
+        console.log(this.items.productos);
+        tblproductos = $("#tblinventario").DataTable({
+            destroy: true,
+            autoWidth: false,
+            dataSrc: "",
+            responsive: true,
+            language: {
+                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+            },
+            data: this.items.productos,
             columns: [
                 {data: 'id'},
                 {data: "producto_base.nombre"},
@@ -164,7 +221,7 @@ var produccion = {
                     targets: [-1],
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="'+data+'">';
+                        return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
 
                     }
                 },
@@ -190,7 +247,7 @@ var produccion = {
 
     },
     list_material: function () {
-        console.log( this.items.materiales);
+        console.log(this.items.materiales);
         tblmateriales = $("#tblinsumos").DataTable({
             destroy: true,
             autoWidth: false,
@@ -340,372 +397,422 @@ var produccion = {
     }
 
 };
+var action;
 $(function () {
-    //seleccionar producto del select producto
-    $('#id_producto')
-        .on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $('#id_producto option:selected').val(),
-                "action": 'get_rep'
-            },
-            dataType: 'json',
-            success: function (data) {
-                produccion.add(data);
-                $('#id_producto').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                menssaje_error('Error', data[0], 'fa fa-times', function () {
+    action = $('#action').val();
 
-                });
-            },
+    if (action === 'finalizar') {
+        $('#ingreso_productos').show();
+        $('#ingreso_materiales').hide();
+        $('#id_lote').prop('readonly', true);
+        $('#id_novedades').prop('readonly', true);
 
-        })
-    })
-        .select2({
-            theme: "classic",
-            language: {
-                inputTooShort: function () {
-                    return "Ingresa al menos un caracter...";
-                },
-                "noResults": function () {
-                    return "Sin resultados";
-                },
-                "searching": function () {
-                    return "Buscando...";
-                }
-            },
-            allowClear: true,
-            ajax: {
-                delay: 250,
-                type: 'POST',
-                url: '/producto/lista',
-                data: function (params) {
-                    var queryParameters = {
-                        term: params.term,
-                        'action': 'search_rep'
-                    };
-                    return queryParameters;
-                },
-                processResults: function (data) {
-                    return {
-                        results: data
-                    };
-
-                },
-
-            },
-            placeholder: 'Busca un Producto',
-            minimumInputLength: 1,
-        });
-
-    $('#id_producto_estimado')
-        .on('select2:select', function (e) {
+        $('#id_productos_perdida').on('select2:select', function (e) {
             $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $('#id_producto_estimado option:selected').val(),
-                "action": 'get_rep'
-            },
-            dataType: 'json',
-            success: function (data) {
-                produccion.add_estimado(data);
-                $('#id_producto_estimado').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                menssaje_error('Error', data[0], 'fa fa-times', function () {
-
-                });
-            },
-
-        })})
-        .select2({
-            theme: "classic",
-            language: {
-                inputTooShort: function () {
-                    return "Ingresa al menos un caracter...";
-                },
-                "noResults": function () {
-                    return "Sin resultados";
-                },
-                "searching": function () {
-                    return "Buscando...";
-                }
-            },
-            allowClear: true,
-            ajax: {
-                delay: 250,
-                type: 'POST',
+                type: "POST",
                 url: '/producto/lista',
-                data: function (params) {
-                    var queryParameters = {
-                        term: params.term,
-                        'action': 'search_rep'
-                    };
-                    return queryParameters;
+                data: {
+                    "id": $('#id_productos_perdida option:selected').val(),
+                    "action": 'get_rep'
                 },
-                processResults: function (data) {
-                    return {
-                        results: data
-                    };
+                dataType: 'json',
+                success: function (data) {
+                    produccion.add_perdida_producto(data);
+                    $('#id_productos_perdida').val(null).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    menssaje_error('Error', data[0], 'fa fa-times', function () {
 
+                    });
                 },
 
-            },
-            placeholder: 'Busca un Producto',
-            minimumInputLength: 1,
-        });
-
-    $('#id_productos_perdida').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $('#id_productos_perdida option:selected').val(),
-                "action": 'get_rep'
-            },
-            dataType: 'json',
-            success: function (data) {
-                produccion.add_perdida_producto(data);
-                $('#id_productos_perdida').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                menssaje_error('Error', data[0], 'fa fa-times', function () {
-
-                });
-            },
-
+            })
         })
-    })
-        .select2({
-            theme: "classic",
-            language: {
-                inputTooShort: function () {
-                    return "Ingresa al menos un caracter...";
-                },
-                "noResults": function () {
-                    return "Sin resultados";
-                },
-                "searching": function () {
-                    return "Buscando...";
-                }
-            },
-            allowClear: true,
-            ajax: {
-                delay: 250,
-                type: 'POST',
-                url: '/producto/lista',
-                data: function (params) {
-                    var queryParameters = {
-                        term: params.term,
-                        'action': 'search_rep'
-                    };
-                    return queryParameters;
-                },
-                processResults: function (data) {
-                    return {
-                        results: data
-                    };
-
-                },
-
-            },
-            placeholder: 'Busca un Producto',
-            minimumInputLength: 1,
-        });
-
-    $('#id_material')
-        .on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/material/lista',
-            data: {
-                "id": $('#id_material option:selected').val(),
-                "action": 'get_perd'
-            },
-            dataType: 'json',
-            success: function (data) {
-                produccion.add_perdida_materiales(data[0]);
-                $('#id_material').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                menssaje_error('Error', data[0], 'fa fa-times', function () {
-
-                });
-            },
-
-        })
-    })
-        .select2({
-            theme: "classic",
-            language: {
-                inputTooShort: function () {
-                    return "Ingresa al menos un caracter...";
-                },
-                "noResults": function () {
-                    return "Sin resultados";
-                },
-                "searching": function () {
-                    return "Buscando...";
-                }
-            },
-            allowClear: true,
-            ajax: {
-                delay: 250,
-                type: 'POST',
-                url: '/material/lista',
-                data: function (params) {
-                    if (data_asig !== '') {
-                        var queryParameters = {
-                            term: params.term,
-                            'action': 'search_perd',
-                            "asig": data_asig,
-                        };
-                        return queryParameters;
-                    } else {
-                        menssaje_error('Error', 'Debe buscar un lote para poder ingresar perdidas de materiales', 'fa fa-times',
-                            function () {
-
-                            })
+            .select2({
+                theme: "classic",
+                language: {
+                    inputTooShort: function () {
+                        return "Ingresa al menos un caracter...";
+                    },
+                    "noResults": function () {
+                        return "Sin resultados";
+                    },
+                    "searching": function () {
+                        return "Buscando...";
                     }
                 },
-                processResults: function (data) {
-                    return {
-                        results: data
-                    };
+                allowClear: true,
+                ajax: {
+                    delay: 250,
+                    type: 'POST',
+                    url: '/producto/lista',
+                    data: function (params) {
+                        var queryParameters = {
+                            term: params.term,
+                            'action': 'search_rep'
+                        };
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+
+                    },
 
                 },
+                placeholder: 'Busca un Producto',
+                minimumInputLength: 1,
+            });
 
-            },
-            placeholder: 'Busca un Material',
-            minimumInputLength: 1,
-        });
-
-
-    //cantidad de productos
-    $('#tblinventario tbody')
-        .on('click', 'a[rel="remove"]', function () {
-        var tr = tblproductos.cell($(this).closest('td, li')).index();
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar este producto de tu detalle?', function () {
-                var p = produccion.items.productos[tr.row];
-                produccion.items.productos.splice(tr.row, 1);
-                menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
-                    produccion.list();
-                });
+        $('#tblperdidas_productos tbody')
+            .on('click', 'a[rel="remove"]', function () {
+                var tr = tblperdidas_productos.cell($(this).closest('td, li')).index();
+                borrar_todo_alert('Alerta de Eliminación',
+                    'Esta seguro que desea eliminar este producto de tu detalle de perdidas?', function () {
+                        var p = produccion.items.perdidas_productos[tr.row];
+                        produccion.items.perdidas_productos.splice(tr.row, 1);
+                        menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
+                            produccion.list_perdidas_productos();
+                        });
+                    })
             })
-    })
-        .on('change keyup', 'input[name="cantidad"]', function () {
-            var cantidad = parseInt($(this).val());
-            var tr = tblproductos.cell($(this).closest('td, li')).index();
-            produccion.items.productos[tr.row].cantidad = cantidad;
-        });
+            .on('change keyup', 'input[name="cantidad"]', function () {
+                var cantidad = parseInt($(this).val());
+                var tr = tblperdidas_productos.cell($(this).closest('td, li')).index();
+                produccion.items.perdidas_productos[tr.row].cantidad = cantidad;
+            });
 
-
-    $('#tblperdidas_productos tbody')
-        .on('click', 'a[rel="remove"]', function () {
-        var tr = tblperdidas_productos.cell($(this).closest('td, li')).index();
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar este producto de tu detalle de perdidas?', function () {
-                var p = produccion.items.perdidas_productos[tr.row];
-                produccion.items.perdidas_productos.splice(tr.row, 1);
-                menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
-                    produccion.list_perdidas_productos();
-                });
+        //cantidad de productos
+        var c = 0;
+        $('#tblinventario tbody')
+            .on('click', 'a[rel="remove"]', function () {
+                var tr = tblproductos.cell($(this).closest('td, li')).index();
+                borrar_todo_alert('Alerta de Eliminación',
+                    'Esta seguro que desea eliminar este producto de tu detalle?', function () {
+                        var p = produccion.items.productos[tr.row];
+                        produccion.items.productos.splice(tr.row, 1);
+                        menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
+                            produccion.list();
+                        });
+                    })
             })
-    })
-        .on('change keyup', 'input[name="cantidad"]', function () {
-            var cantidad = parseInt($(this).val());
-            var tr = tblperdidas_productos.cell($(this).closest('td, li')).index();
-            produccion.items.perdidas_productos[tr.row].cantidad = cantidad;
-        });
+            .on('change keyup', 'input[name="cantidad"]', function () {
+                var cantidad = parseInt($(this).val());
+                var tr = tblproductos.cell($(this).closest('td, li')).index();
+                produccion.items.productos[tr.row].cantidad = cantidad;
 
+               $(this).on('touchspin.on.stopspin', function () {
+                   console.log(c);
+                   c=c+1;
+               });
+            });
 
-    $('#tblperdidas_materiales tbody')
-        .on('click', 'a[rel="remove"]', function () {
-        var tr = tblperdidas_materiales.cell($(this).closest('td, li')).index();
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar este material de tu detalle de perdidas?', function () {
-                var p = produccion.items.perdidas_materiales[tr.row];
-                produccion.items.perdidas_materiales.splice(tr.row, 1);
-                menssaje_ok('Confirmacion!', 'Material eliminado', 'far fa-smile-wink', function () {
-                    produccion.list_perdidas_materiales();
-                });
+        $('#tblperdidas_materiales tbody')
+            .on('click', 'a[rel="remove"]', function () {
+                var tr = tblperdidas_materiales.cell($(this).closest('td, li')).index();
+                borrar_todo_alert('Alerta de Eliminación',
+                    'Esta seguro que desea eliminar este material de tu detalle de perdidas?', function () {
+                        var p = produccion.items.perdidas_materiales[tr.row];
+                        produccion.items.perdidas_materiales.splice(tr.row, 1);
+                        menssaje_ok('Confirmacion!', 'Material eliminado', 'far fa-smile-wink', function () {
+                            produccion.list_perdidas_materiales();
+                        });
+                    })
             })
-    })
-        .on('change keyup', 'input[name="cantidad"]', function () {
-            var cantidad = parseInt($(this).val());
-            var tr = tblperdidas_materiales.cell($(this).closest('td, li')).index();
-            produccion.items.perdidas_materiales[tr.row].cantidad = cantidad;
+            .on('change keyup', 'input[name="cantidad"]', function () {
+                var cantidad = parseInt($(this).val());
+                var tr = tblperdidas_materiales.cell($(this).closest('td, li')).index();
+                produccion.items.perdidas_materiales[tr.row].cantidad = cantidad;
+            });
+
+
+        $('#btnRemoveall_inventario').on('click', function () {
+            if (produccion.items.productos.length === 0) return false;
+            borrar_todo_alert('Alerta de Eliminación',
+                'Esta seguro que desea eliminar todos los productos Ingresados?', function () {
+                    produccion.items.productos = [];
+                    menssaje_ok('Confirmacion!', 'Productos eliminados', 'far fa-smile-wink', function () {
+                        produccion.list();
+                    });
+                });
+        });
+
+        $('#btnRemoveall_perdidas_productos').on('click', function () {
+            if (produccion.items.perdidas_productos.length === 0) return false;
+            borrar_todo_alert('Alerta de Eliminación',
+                'Esta seguro que desea eliminar todos los productos Ingresados como perdidas?', function () {
+                    produccion.items.perdidas_productos = [];
+                    menssaje_ok('Confirmacion!', 'Productos eliminados', 'far fa-smile-wink', function () {
+                        produccion.list_perdidas_productos();
+                    });
+                });
+        });
+
+        $('#btnRemoveall_perdidas_materiales').on('click', function () {
+            if (produccion.items.perdidas_materiales.length === 0) return false;
+            borrar_todo_alert('Alerta de Eliminación',
+                'Esta seguro que desea eliminar todos los materiales Ingresados como perdidas?', function () {
+                    produccion.items.perdidas_materiales = [];
+                    menssaje_ok('Confirmacion!', 'Materiales eliminados', 'far fa-smile-wink', function () {
+                        produccion.list_perdidas_materiales();
+                    });
+                });
         });
 
 
-    $('#btnRemoveall_inventario').on('click', function () {
-        if (produccion.items.productos.length === 0) return false;
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar todos los productos Ingresados?', function () {
-                produccion.items.productos = [];
-                menssaje_ok('Confirmacion!', 'Productos eliminados', 'far fa-smile-wink', function () {
-                    produccion.list();
-                });
-            });
-    });
+        $('#id_producto_produccion')
+            .on('select2:select', function (e) {
+                $.ajax({
+                    type: "POST",
+                    url: '/producto/lista',
+                    data: {
+                        "id": $('#id_producto option:selected').val(),
+                        "action": 'get_rep'
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        produccion.add(data);
+                        $('#id_producto').val(null).trigger('change');
+                    },
+                    error: function (xhr, status, data) {
+                        menssaje_error('Error', data[0], 'fa fa-times', function () {
 
-    $('#btnRemoveall_perdidas_productos').on('click', function () {
-        if (produccion.items.perdidas_productos.length === 0) return false;
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar todos los productos Ingresados como perdidas?', function () {
-                produccion.items.perdidas_productos = [];
-                menssaje_ok('Confirmacion!', 'Productos eliminados', 'far fa-smile-wink', function () {
-                    produccion.list_perdidas_productos();
-                });
-            });
-    });
+                        });
+                    },
 
-    $('#btnRemoveall_perdidas_materiales').on('click', function () {
-        if (produccion.items.perdidas_materiales.length === 0) return false;
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar todos los materiales Ingresados como perdidas?', function () {
-                produccion.items.perdidas_materiales = [];
-                menssaje_ok('Confirmacion!', 'Materiales eliminados', 'far fa-smile-wink', function () {
-                    produccion.list_perdidas_materiales();
-                });
-            });
-    });
+                })
+            })
+            .select2({
+                theme: "classic",
+                language: {
+                    inputTooShort: function () {
+                        return "Ingresa al menos un caracter...";
+                    },
+                    "noResults": function () {
+                        return "Sin resultados";
+                    },
+                    "searching": function () {
+                        return "Buscando...";
+                    }
+                },
+                allowClear: true,
+                ajax: {
+                    delay: 250,
+                    type: 'POST',
+                    url: '/producto/lista',
+                    data: function (params) {
+                        var queryParameters = {
+                            term: params.term,
+                            'action': 'search_rep'
+                        };
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
 
-    $('#save').on('click', function () {
-        if ($('#id_lote').val() === "") {
-            menssaje_error('Error!', "Debe Ingresar un lote", 'far fa-times-circle');
-            return false
-        } else if ($('#id_novedades').val()===""){
-            $('#id_novedades').addClass('is-invalid');
-        } else if ($('#id_novedades').val()!==""){
-            $('#id_novedades').removeClass('is-invalid').addClass('is-valid');
-        } else if (produccion.items.materiales.length === 0 ) {
-            menssaje_error('Error!', "Debe ingresar al menos un material", 'far fa-times-circle');
-            return false
-        } else if (produccion.items.maquinas.length === 0 ){
-            menssaje_error('Error!', "Debe ingresar al menos una maquina ", 'far fa-times-circle');
-            return false
-        } else if (produccion.items.productos_estimados.length === 0) {
-            menssaje_error('Error!', "Debe ingresar al menos un producto a producir", 'far fa-times-circle');
-            return false
-        }
-        var parametros;
-        produccion.items.fecha_ingreso = $('input[name="fecha_ingreso"]').val();
-        produccion.items.lote = $('input[name="lote"]').val();
-        produccion.items.novedades = $('textarea[name="novedades"]').val();
-        parametros = {'ingresos': JSON.stringify(produccion.items)};
-        parametros['action'] = 'add';
-        parametros['id'] = '';
-        save_with_ajax('Alerta',
-            window.location.pathname, 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
-                window.location.replace('/produccion/lista')
+                    },
+
+                },
+                placeholder: 'Busca un Producto',
+                minimumInputLength: 1,
             });
-    });
+
+        $('#save').on('click', function () {
+            if (produccion.items.productos.length === 0) {
+                menssaje_error('Error!', "Debe Ingresar los productos resultantes de la prdoduccion", 'far fa-times-circle');
+                return false
+            }
+            var parametros;
+            parametros = {'ingresos': JSON.stringify(produccion.items)};
+            parametros['action'] = 'finalizar';
+            save_with_ajax('Alerta',
+                window.location.pathname, 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
+                    window.location.href = '/produccion/lista'
+                });
+        });
+    } else {
+        $('#save').on('click', function () {
+            if ($('#id_lote').val() === "") {
+                menssaje_error('Error!', "Debe Ingresar un lote", 'far fa-times-circle');
+                return false
+            } else if ($('#id_novedades').val() === "") {
+                $('#id_novedades').addClass('is-invalid');
+            } else if ($('#id_novedades').val() !== "") {
+                $('#id_novedades').removeClass('is-invalid').addClass('is-valid');
+            } else if (produccion.items.materiales.length === 0) {
+                menssaje_error('Error!', "Debe ingresar al menos un material", 'far fa-times-circle');
+                return false
+            } else if (produccion.items.maquinas.length === 0) {
+                menssaje_error('Error!', "Debe ingresar al menos una maquina ", 'far fa-times-circle');
+                return false
+            } else if (produccion.items.productos_estimados.length === 0) {
+                menssaje_error('Error!', "Debe ingresar al menos un producto a producir", 'far fa-times-circle');
+                return false
+            }
+            var parametros;
+            produccion.items.fecha_ingreso = $('input[name="fecha_ingreso"]').val();
+            produccion.items.lote = $('input[name="lote"]').val();
+            produccion.items.novedades = $('textarea[name="novedades"]').val();
+            parametros = {'ingresos': JSON.stringify(produccion.items)};
+            parametros['action'] = 'add';
+            parametros['id'] = '';
+            save_with_ajax('Alerta',
+                window.location.pathname, 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
+                    window.location.replace('/produccion/lista')
+                });
+        });
+
+        $('#id_producto_estimado')
+            .on('select2:select', function (e) {
+                $.ajax({
+                    type: "POST",
+                    url: '/producto/lista',
+                    data: {
+                        "id": $('#id_producto_estimado option:selected').val(),
+                        "action": 'get_rep'
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        produccion.add_estimado(data);
+                        $('#id_producto_estimado').val(null).trigger('change');
+                    },
+                    error: function (xhr, status, data) {
+                        menssaje_error('Error', data[0], 'fa fa-times', function () {
+
+                        });
+                    },
+
+                })
+            })
+            .select2({
+                theme: "classic",
+                language: {
+                    inputTooShort: function () {
+                        return "Ingresa al menos un caracter...";
+                    },
+                    "noResults": function () {
+                        return "Sin resultados";
+                    },
+                    "searching": function () {
+                        return "Buscando...";
+                    }
+                },
+                allowClear: true,
+                ajax: {
+                    delay: 250,
+                    type: 'POST',
+                    url: '/producto/lista',
+                    data: function (params) {
+                        var queryParameters = {
+                            term: params.term,
+                            'action': 'search_rep'
+                        };
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+
+                    },
+
+                },
+                placeholder: 'Busca un Producto',
+                minimumInputLength: 1,
+            });
+
+        $('#id_material')
+            .on('select2:select', function (e) {
+                $.ajax({
+                    type: "POST",
+                    url: '/material/lista',
+                    data: {
+                        "id": $('#id_material option:selected').val(),
+                        "action": 'get_perd'
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        produccion.add_perdida_materiales(data[0]);
+                        $('#id_material').val(null).trigger('change');
+                    },
+                    error: function (xhr, status, data) {
+                        menssaje_error('Error', data[0], 'fa fa-times', function () {
+
+                        });
+                    },
+
+                })
+            })
+            .select2({
+                theme: "classic",
+                language: {
+                    inputTooShort: function () {
+                        return "Ingresa al menos un caracter...";
+                    },
+                    "noResults": function () {
+                        return "Sin resultados";
+                    },
+                    "searching": function () {
+                        return "Buscando...";
+                    }
+                },
+                allowClear: true,
+                ajax: {
+                    delay: 250,
+                    type: 'POST',
+                    url: '/material/lista',
+                    data: function (params) {
+                        if (data_asig !== '') {
+                            var queryParameters = {
+                                term: params.term,
+                                'action': 'search_perd',
+                                "asig": data_asig,
+                            };
+                            return queryParameters;
+                        } else {
+                            menssaje_error('Error', 'Debe buscar un lote para poder ingresar perdidas de materiales', 'fa fa-times',
+                                function () {
+
+                                })
+                        }
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+
+                    },
+
+                },
+                placeholder: 'Busca un Material',
+                minimumInputLength: 1,
+            });
+
+        $('#tblinsumos tbody')
+            .on('click', 'a[rel="remove"]', function () {
+                var tr = tblcompra.cell($(this).closest('td, li')).index();
+                borrar_todo_alert('Alerta de Eliminación',
+                    'Esta seguro que desea eliminar este producto de tu detalle?', function () {
+                        var p = compras.items.productos[tr.row];
+                        compras.items.productos.splice(tr.row, 1);
+                        $('#id_material').append('<option value="' + p.id + '">' + p.nombre + '</option>');
+                        menssaje_ok('Confirmacion!', 'Material eliminado', 'far fa-smile-wink', function () {
+                            compras.list();
+                        });
+                    })
+            })
+            .on('change keyup', 'input[name="cantidad"]', function () {
+                var cantidad = parseInt($(this).val());
+                var tr = tblmateriales.cell($(this).closest('td, li')).index();
+                produccion.items.materiales[tr.row].cantidad = cantidad;
+            });
+
+    }
+    //seleccionar producto del select producto
+
 
     $('#id_asignacion').select2({
         theme: "classic",
@@ -750,26 +857,6 @@ $(function () {
     });
 
 
-
-        $('#tblinsumos tbody')
-        .on('click', 'a[rel="remove"]', function () {
-            var tr = tblcompra.cell($(this).closest('td, li')).index();
-            borrar_todo_alert('Alerta de Eliminación',
-                'Esta seguro que desea eliminar este producto de tu detalle?', function () {
-                    var p = compras.items.productos[tr.row];
-                    compras.items.productos.splice(tr.row, 1);
-                    $('#id_material').append('<option value="' + p.id + '">' + p.nombre + '</option>');
-                    menssaje_ok('Confirmacion!', 'Material eliminado', 'far fa-smile-wink', function () {
-                        compras.list();
-                    });
-                })
-        })
-        .on('change keyup', 'input[name="cantidad"]', function () {
-            var cantidad = parseInt($(this).val());
-            var tr = tblmateriales.cell($(this).closest('td, li')).index();
-            produccion.items.materiales[tr.row].cantidad = cantidad;
-        });
-
     $('.btnRemoveall').on('click', function () {
         if (compras.items.productos.length === 0) return false;
         borrar_todo_alert('Alerta de Eliminación',
@@ -780,7 +867,6 @@ $(function () {
                 });
             });
     });
-
 
 
     $('#id_inventario_material')

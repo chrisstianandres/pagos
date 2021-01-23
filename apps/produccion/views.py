@@ -444,16 +444,37 @@ def edit(request, id):
     data['form'] = ProduccionForm(instance=produccion)
     data['form_asig'] = Asig_recursoForm(instance=asig)
     data['form_materiales'] = Detalle_Asig_recursoForm()
-    for d in Detalle_asig_recurso.objects\
-            .values('inventario_material__material__producto_base_id').filter(asig_recurso_id=asig.id).annotate(cantidad=Count('id')):
-        mat = Material.objects.get(producto_base_id=d['inventario_material__material__producto_base_id'])
-        array = mat.toJSON()
-        array['cantidad'] = d['cantidad']
-        materiales.append(array)
-    for m in Detalle_asig_maquina.objects.filter(asig_recurso_id=asig.id):
-        maquinas.append(m.maquina.toJSON())
-    print(maquinas)
-    # data = {'materiales': materiales, 'maquinas': maquinas}
-    data['materiales'] =materiales
-    data['maquinas'] =maquinas
+    # for d in Detalle_asig_recurso.objects\
+    #         .values('inventario_material__material__producto_base_id').filter(asig_recurso_id=asig.id).annotate(cantidad=Count('id')):
+    #     mat = Material.objects.get(producto_base_id=d['inventario_material__material__producto_base_id'])
+    #     array = mat.toJSON()
+    #     array['cantidad'] = d['cantidad']
+    #     materiales.append(array)
+    # for m in Detalle_asig_maquina.objects.filter(asig_recurso_id=asig.id):
+    #     maquinas.append(m.maquina.toJSON())
+    # print(maquinas)
+    # # data = {'materiales': materiales, 'maquinas': maquinas}
+    # data['materiales'] =materiales
+    # data['maquinas'] =maquinas
+    return render(request, 'front-end/produccion/produccion_form.html', data)
+
+def finalizar(request, id):
+    data = {}
+    productos = []
+    materiales = []
+    produccion = Produccion.objects.get(id=id)
+    asig = Asig_recurso.objects.get(id=produccion.id)
+    data['titulo'] = 'Ingreso de materiales'
+    data['icono'] = opc_icono
+    data['entidad'] = opc_entidad
+    data['boton'] = 'Guardar Produccion'
+    data['form'] = ProduccionForm(instance=produccion)
+    data['form_asig'] = Asig_recursoForm(instance=asig)
+    data['form_materiales'] = Detalle_Asig_recursoForm()
+    data['action'] = 'finalizar'
+    for d in Detalle_produccion.objects.filter(produccion_id=produccion.id):
+        pro = d.producto.toJSON()
+        pro['cantidad'] = d.cantidad
+        productos.append(pro)
+    data['productos'] = productos
     return render(request, 'front-end/produccion/produccion_form.html', data)

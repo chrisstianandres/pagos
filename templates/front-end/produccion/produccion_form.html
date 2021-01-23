@@ -31,29 +31,29 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="form-group col-lg-4">
-                            <label for="id_fecha_asig">{{ form_asig.fecha_asig.label_tag }}</label>
-                            <div class="input-group">
-                                {{ form_asig.fecha_asig }}
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                <label for="id_fecha_asig">{{ form_asig.fecha_asig.label_tag }}</label>
+                                <div class="input-group">
+                                    {{ form_asig.fecha_asig }}
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                         <div class="form-group col-lg-4">
-                            <label for="id_fecha_ingreso">{{ form.fecha_ingreso.label_tag }}</label>
-                            <div class="input-group">
-                                {{ form.fecha_ingreso }}
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                            <div class="form-group col-lg-4">
+                                <label for="id_fecha_ingreso">{{ form.fecha_ingreso.label_tag }}</label>
+                                <div class="input-group">
+                                    {{ form.fecha_ingreso }}
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group col-lg-4">
-                            <label for="id_lote">{{ form_asig.lote.label_tag }}</label>
-                            <div class="input-group">
-                                {{ form_asig.lote }}
+                            <div class="form-group col-lg-4">
+                                <label for="id_lote">{{ form_asig.lote.label_tag }}</label>
+                                <div class="input-group">
+                                    {{ form_asig.lote }}
+                                </div>
                             </div>
-                        </div>
                         </div>
 
 
@@ -70,105 +70,105 @@
                 </div>
             </div>
             <div class="col-lg-12 col-md-12">
-                 <div class="card card-primary">
-                        <div class="card-header">
-                            <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" id="mat-tab" data-toggle="tab" href="#materiales">
-                                        <i class="fas fa-hat-cowboy-side"></i>
-                                        &nbsp;<strong>Materiales</strong></a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="maq-tab" data-toggle="tab" href="#maquinas"
-                                       role="tab" aria-controls="machines" aria-selected="false">
-                                        <i class="fas fa-subway"></i>&nbsp;Maquinas</a>
-                                </li>
-                                <li class="nav-item">
+                <div class="card card-primary" id="ingreso_materiales">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="mat-tab" data-toggle="tab" href="#materiales">
+                                    <i class="fas fa-hat-cowboy-side"></i>
+                                    &nbsp;<strong>Materiales</strong></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="maq-tab" data-toggle="tab" href="#maquinas"
+                                   role="tab" aria-controls="machines" aria-selected="false">
+                                    <i class="fas fa-subway"></i>&nbsp;Maquinas</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" id="est-tab" data-toggle="tab" href="#estimado">
                                     <i class="fas fa-hammer"></i>
                                     &nbsp;<strong>Productos a Producir</strong></a>
                             </li>
-                            </ul>
-                        </div>
-                        <div class="card-body">
-                            <div class="tab-content" id="myTabContent" role="tablist">
-                                <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="mat-tab"
-                                     id="materiales">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5><i class="fas fa-hat-cowboy-side"></i> Detalle de Materiales</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="form-group">
-                                                <label> Buscar Materiales:</label>
-                                                {{ form_materiales.inventario_material }}
-                                                <br><br>
-                                                <button type="button"
-                                                        class="btn btn-danger btn-sm btn-flat btnRemoveall">
-                                                    <i class="far fa-trash-alt"></i> Quitar todo
-                                                </button>
-                                                <br><br>
-                                                <div class="table-responsive">
-                                                    <table class="table" id="tblinsumos">
-                                                        <thead>
-                                                        <tr>
-                                                            <th><em class="fas fa-trash-alt"></em></th>
-                                                            <th>Material</th>
-                                                            <th>Catg</th>
-                                                            <th>Calidad</th>
-                                                            <th>Color</th>
-                                                            <th>Tipo</th>
-                                                            <th>Medida</th>
-                                                            <th>Unidad de medida</th>
-                                                            <th>Stock</th>
-                                                            <th>Cantidad</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="myTabContent" role="tablist">
+                            <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="mat-tab"
+                                 id="materiales">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5><i class="fas fa-hat-cowboy-side"></i> Detalle de Materiales</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label> Buscar Materiales:</label>
+                                            {{ form_materiales.inventario_material }}
+                                            <br><br>
+                                            <button type="button"
+                                                    class="btn btn-danger btn-sm btn-flat btnRemoveall">
+                                                <i class="far fa-trash-alt"></i> Quitar todo
+                                            </button>
+                                            <br><br>
+                                            <div class="table-responsive">
+                                                <table class="table" id="tblinsumos">
+                                                    <thead>
+                                                    <tr>
+                                                        <th><em class="fas fa-trash-alt"></em></th>
+                                                        <th>Material</th>
+                                                        <th>Catg</th>
+                                                        <th>Calidad</th>
+                                                        <th>Color</th>
+                                                        <th>Tipo</th>
+                                                        <th>Medida</th>
+                                                        <th>Unidad de medida</th>
+                                                        <th>Stock</th>
+                                                        <th>Cantidad</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" role="tabpanel" aria-labelledby="maq-tab"
-                                     id="maquinas">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5><i class="fas fa-hat-cowboy-side"></i> Detalle de Maquinas</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="form-group">
-                                                <label> Buscar Maquinas:</label>
-                                                <br>
-                                                {{ form_maquinas.maquina }}
-                                                <br><br>
-                                                <button type="button"
-                                                        class="btn btn-danger btn-sm btn-flat btnRemoveall">
-                                                    <i class="far fa-trash-alt"></i> Quitar todo
-                                                </button>
-                                                <br><br>
-                                                <div class="table-responsive">
-                                                    <table class="table" id="tblmaquinas">
-                                                        <thead>
-                                                        <tr>
-                                                            <th><em class="fas fa-trash-alt"></em></th>
-                                                            <th>Maquina</th>
-                                                            <th>Descripcion</th>
-                                                            <th>Serie</th>
-                                                            <th>Estado</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                            </div>
+                            <div class="tab-pane fade" role="tabpanel" aria-labelledby="maq-tab"
+                                 id="maquinas">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5><i class="fas fa-hat-cowboy-side"></i> Detalle de Maquinas</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label> Buscar Maquinas:</label>
+                                            <br>
+                                            {{ form_maquinas.maquina }}
+                                            <br><br>
+                                            <button type="button"
+                                                    class="btn btn-danger btn-sm btn-flat btnRemoveall">
+                                                <i class="far fa-trash-alt"></i> Quitar todo
+                                            </button>
+                                            <br><br>
+                                            <div class="table-responsive">
+                                                <table class="table" id="tblmaquinas">
+                                                    <thead>
+                                                    <tr>
+                                                        <th><em class="fas fa-trash-alt"></em></th>
+                                                        <th>Maquina</th>
+                                                        <th>Descripcion</th>
+                                                        <th>Serie</th>
+                                                        <th>Estado</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" role="tabpanel" aria-labelledby="est-tab"
+                            </div>
+                            <div class="tab-pane fade" role="tabpanel" aria-labelledby="est-tab"
                                  id="estimado">
                                 <div class="card">
                                     <div class="card-header">
@@ -205,19 +205,19 @@
                                     </div>
                                 </div>
                             </div>
-                            </div>
                         </div>
                     </div>
+                </div>
                 <div class="card card-danger" id="ingreso_productos" style="display: none">
                     <div class="card-header">
                         <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
-                            <li class="nav-item active">
-                                <a class="nav-link" id="mat-tab" data-toggle="tab" href="#inventario">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="prod-tab" data-toggle="tab" href="#inventario">
                                     <i class="fas fa-warehouse"></i>
                                     &nbsp;<strong>Ingreso de Productos</strong></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="maq-tab" data-toggle="tab" href="#maquinas"
+                                <a class="nav-link" id="maq_perd-tab" data-toggle="tab" href="#perdidas"
                                    role="tab" aria-controls="machines" aria-selected="false">
                                     <i class="fas fa-ban"></i>&nbsp;Perdidas</a>
                             </li>
@@ -225,7 +225,7 @@
                     </div>
                     <div class="card-body">
                         <div class="tab-content" id="myTabContent" role="tablist">
-                            <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="mat-tab"
+                            <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="prod-tab"
                                  id="inventario">
                                 <div class="card">
                                     <div class="card-header">
@@ -234,6 +234,9 @@
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label> Buscar Productos:</label>
+                                            <select class="form-control" id="id_producto_produccion"
+                                                    style="width: 100%">
+                                            </select>
 
                                             <br><br>
                                             <button type="button"
@@ -249,6 +252,7 @@
                                                         <th>Producto</th>
                                                         <th>Categoria</th>
                                                         <th>Presentacion</th>
+                                                        <th>Color</th>
                                                         <th>Cantidad</th>
                                                     </tr>
                                                     </thead>
@@ -260,8 +264,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" role="tabpanel" aria-labelledby="maq-tab"
-                                 id="maquinas">
+                            <div class="tab-pane fade show" role="tabpanel" aria-labelledby="maq_perd-tab"
+                                 id="perdidas">
                                 <div class="card card-default">
                                     <div class="card-header">
                                         <ul class="nav nav-tabs nav-justified" id="myTab2" role="tablist">
@@ -377,7 +381,6 @@
                     onclick="window.history.back();">
                 <i class="fas fa-times"></i> Cancelar
             </button>
-
         </div>
         <br>
     </div>
@@ -394,12 +397,17 @@
     <script src="{% static 'apps/produccion/produccion.js' %}"></script>
     <script>
         {#compras.items.insumos = {{ detalle|safe }};#}
-        produccion.items.materiales = {{ materiales|safe }};
-        produccion.items.maquinas = {{ maquinas|safe }};
+        {#produccion.items.materiales = {{ materiales|safe }};#}
+        {#produccion.items.maquinas = {{ maquinas|safe }};#}
         produccion.list_estimado();
         produccion.list_material();
         produccion.list_machine();
-        produccion.list_perdidas_productos();
-        produccion.list_perdidas_materiales();
+
+        {% if action == 'finalizar' %}
+            produccion.items.productos = {{ productos|safe }};
+            produccion.list_perdidas_productos();
+            produccion.list_perdidas_materiales();
+            produccion.list_productos();
+        {% endif %}
     </script>
 {% endblock %}
