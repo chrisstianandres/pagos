@@ -471,11 +471,13 @@ def finalizar(request, id):
     data['form'] = ProduccionForm(instance=produccion)
     data['form_asig'] = Asig_recursoForm(instance=asig)
     data['form_materiales'] = Detalle_Asig_recursoForm()
+    data['form_materiales_perdida'] = Detalle_perdidas_materialesForm()
     data['action'] = 'finalizar'
     for d in Detalle_produccion.objects.filter(produccion_id=produccion.id):
         pro = d.producto.toJSON()
         pro['cantidad'] = d.cantidad
         pro['cantidad_estimada'] = d.cantidad
+        pro['perdida'] = 0
         productos.append(pro)
     data['productos'] = productos
     return render(request, 'front-end/produccion/produccion_form.html', data)

@@ -233,17 +233,6 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label> Buscar Productos:</label>
-                                            <select class="form-control" id="id_producto_produccion"
-                                                    style="width: 100%">
-                                            </select>
-
-                                            <br><br>
-                                            <button type="button"
-                                                    class="btn btn-danger btn-sm btn-flat" id="btnRemoveall_inventario">
-                                                <i class="far fa-trash-alt"></i> Quitar todo
-                                            </button>
-                                            <br><br>
                                             <div class="table-responsive">
                                                 <table class="table" id="tblinventario">
                                                     <thead>
@@ -296,16 +285,6 @@
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="form-group">
-                                                            <label> Buscar Productos:</label>
-                                                            <br>
-                                                            {{ form3.producto }}
-                                                            <br><br>
-                                                            <button type="button"
-                                                                    class="btn btn-danger btn-sm btn-flat"
-                                                                    id="btnRemoveall_perdidas_productos">
-                                                                <i class="far fa-trash-alt"></i> Quitar todo
-                                                            </button>
-                                                            <br><br>
                                                             <div class="table-responsive">
                                                                 <table class="table" id="tblperdidas_productos">
                                                                     <thead>
@@ -335,7 +314,7 @@
                                                     <div class="card-body">
                                                         <div class="form-group">
                                                             <label> Buscar Materiales:</label>
-                                                            {{ form4.material }}
+                                                            {{ form_materiales_perdida.material }}
                                                             <br><br>
                                                             <button type="button"
                                                                     class="btn btn-danger btn-sm btn-flat"
@@ -350,7 +329,11 @@
                                                                         <th><em class="fas fa-trash-alt"></em></th>
                                                                         <th>Material</th>
                                                                         <th>Categoria</th>
-                                                                        <th>Presentacion</th>
+                                                                        <th>Calidad</th>
+                                                                        <th>Color</th>
+                                                                        <th>Tipo</th>
+                                                                        <th>Medida</th>
+                                                                        <th>Ud Med</th>
                                                                         <th>Cantidad</th>
                                                                     </tr>
                                                                     </thead>
@@ -405,6 +388,7 @@
 
         {% if action == 'finalizar' %}
             produccion.items.productos = {{ productos|safe }};
+            produccion.items.perdidas_productos = {{ productos|safe }};
             produccion.list_perdidas_productos();
             produccion.list_perdidas_materiales();
             produccion.list_productos();

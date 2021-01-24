@@ -118,9 +118,13 @@ var produccion = {
                 },
             ],
             rowCallback: function (row, data) {
+                var cant = $(row).find('input[name="cantidad"]').val();
+                if (cant <= 0) {
+                    $(row).hide();
+                }
                 $(row).find('input[name="cantidad"]').TouchSpin({
-                    min: 1,
-                    max: 10000000,
+                    min: 0,
+                    max: data.cantidad,
                     step: 1
                 });
             },
@@ -148,7 +152,7 @@ var produccion = {
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
                 {data: "presentacion.nombre"},
-                {data: "cantidad"}
+                {data: "perdida"}
             ],
             columnDefs: [
                 {
@@ -173,8 +177,12 @@ var produccion = {
                 },
             ],
             rowCallback: function (row, data) {
+                var cant = $(row).find('input[name="cantidad"]').val();
+                if (cant <= 0) {
+                    $(row).hide();
+                }
                 $(row).find('input[name="cantidad"]').TouchSpin({
-                    min: 1,
+                    min: 0,
                     max: 10000000,
                     step: 1
                 });
@@ -202,7 +210,11 @@ var produccion = {
                 {data: 'id'},
                 {data: "nombre"},
                 {data: "categoria.nombre"},
-                {data: "presentacion.nombre"},
+                {data: "calidad"},
+                {data: "color.nombre"},
+                {data: "tipo"},
+                {data: "medida"},
+                {data: "ud_medida"},
                 {data: "cantidad"},
             ],
             columnDefs: [
@@ -210,6 +222,7 @@ var produccion = {
                     targets: [0],
                     orderable: false,
                     render: function (data, type, row) {
+                        console.log(row);
                         return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Insumo"><i class="fa fa-trash-alt"></i></a>';
                         //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
                     }
@@ -466,17 +479,27 @@ $(function () {
                 var tr = tblperdidas_productos.cell($(this).closest('td, li')).index();
                 borrar_todo_alert('Alerta de Eliminación',
                     'Esta seguro que desea eliminar este producto de tu detalle de perdidas?', function () {
-                        var p = produccion.items.perdidas_productos[tr.row];
-                        produccion.items.perdidas_productos.splice(tr.row, 1);
+                        produccion.items.productos[tr.row].cantidad = produccion.items.perdidas_productos[tr.row].perdida;
+                        produccion.items.perdidas_productos[tr.row].perdida = 0;
                         menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
                             produccion.list_perdidas_productos();
+                            produccion.list_productos();
                         });
                     })
             })
             .on('change keyup', 'input[name="cantidad"]', function () {
                 var cantidad = parseInt($(this).val());
                 var tr = tblperdidas_productos.cell($(this).closest('td, li')).index();
-                produccion.items.perdidas_productos[tr.row].cantidad = cantidad;
+                var estimada = parseInt(produccion.items.productos[tr.row].cantidad_estimada);
+                produccion.items.perdidas_productos[tr.row].perdida = cantidad;
+                var suma = produccion.items.productos[tr.row].cantidad + cantidad;
+                if (estimada >= suma) {
+                    produccion.items.productos[tr.row].cantidad = parseInt(estimada - cantidad);
+                    produccion.list_productos();
+                }
+                if (cantidad === 0) {
+                    produccion.list_perdidas_productos();
+                }
             });
 
         //cantidad de productos
@@ -485,10 +508,11 @@ $(function () {
                 var tr = tblproductos.cell($(this).closest('td, li')).index();
                 borrar_todo_alert('Alerta de Eliminación',
                     'Esta seguro que desea eliminar este producto de tu detalle?', function () {
-                        var p = produccion.items.productos[tr.row];
-                        produccion.items.productos.splice(tr.row, 1);
+                        produccion.items.perdidas_productos[tr.row].perdida = produccion.items.productos[tr.row].cantidad;
+                        produccion.items.productos[tr.row].cantidad = 0;
                         menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
-                            produccion.list();
+                            produccion.list_productos();
+                            produccion.list_perdidas_productos();
                         });
                     })
             })
@@ -498,22 +522,12 @@ $(function () {
                 var estimada = parseInt(produccion.items.productos[tr.row].cantidad_estimada);
                 produccion.items.productos[tr.row].cantidad = cantidad;
                 if (estimada >= cantidad) {
-                    var perdida = parseInt(estimada - parseInt(produccion.items.productos[tr.row].cantidad));
-                    var nuevo = produccion.items.productos[tr.row];
-                    nuevo['cantidad'] = perdida;
-                    if (perdida === 1) {
-                        produccion.add_perdida_producto(nuevo);
-                    } else if (perdida === 0){
-                        alert(15);
-                         produccion.items.perdidas_productos.splice(tr.row, 1);
-                    }
-                    else {
-                        produccion.items.perdidas_productos[tr.row].cantidad = perdida;
-                    }
-                     produccion.list_perdidas_productos();
+                    produccion.items.perdidas_productos[tr.row].perdida = parseInt(estimada - parseInt(produccion.items.productos[tr.row].cantidad));
+                    produccion.list_perdidas_productos();
                 }
-
-
+                if (cantidad === 0) {
+                    produccion.list_productos();
+                }
             });
 
         $('#tblperdidas_materiales tbody')
@@ -632,15 +646,109 @@ $(function () {
             if (produccion.items.productos.length === 0) {
                 menssaje_error('Error!', "Debe Ingresar los productos resultantes de la prdoduccion", 'far fa-times-circle');
                 return false
-            }
-            var parametros;
-            parametros = {'ingresos': JSON.stringify(produccion.items)};
-            parametros['action'] = 'finalizar';
-            save_with_ajax('Alerta',
-                window.location.pathname, 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
-                    window.location.href = '/produccion/lista'
+            } else if (produccion.items.productos.length > 0 && produccion.items.perdidas_materiales.length > 0) {
+                $.confirm({
+                    theme: 'modern',
+                    icon: 'fas fa-exclamation-circle',
+                    title: 'Alerta!',
+                    type: 'blue',
+                    content: 'Estas ingresando productos producidos y materiales perdidos, por favor verifica que los ' +
+                        'materiales perdidos que estas ingresando no sean el 100%, ya que no puede haber una perdida ' +
+                        'total de materiales y productos producidos y esto ocacionaría errores en los reportes de produccion <br>' +
+                        '<strong><h3>Esta todo Correcto?</h3></strong>',
+                    columnClass: 'small',
+                    draggable: true,
+                    buttons: {
+                        si: {
+                            text: '<i class="fas fa-check"></i> Si',
+                            btnClass: 'btn-blue',
+                            action: function () {
+                                var parametros;
+                                parametros = {'ingresos': JSON.stringify(produccion.items)};
+                                parametros['action'] = 'finalizar';
+                                save_with_ajax('Alerta',
+                                    window.location.pathname, 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
+                                        window.location.href = '/produccion/lista'
+                                    });
+                            }
+                        },
+                        no: {
+                            text: '<i class="fas fa-times"></i> No',
+                            btnClass: 'btn-red',
+                            action: function () {
+
+                            }
+                        }
+                    }
                 });
+
+
+            }
+
         });
+
+        $('#id_material')
+            .on('select2:select', function (e) {
+                $.ajax({
+                    type: "POST",
+                    url: '/material/lista',
+                    data: {
+                        "id": $('#id_material option:selected').val(),
+                        "action": 'get_perd'
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        produccion.add_perdida_materiales(data[0]);
+                        $('#id_material').val(null).trigger('change');
+                    },
+                    error: function (xhr, status, data) {
+                        menssaje_error('Error', data[0], 'fa fa-times', function () {
+
+                        });
+                    },
+
+                })
+            })
+            .select2({
+                theme: "classic",
+                language: {
+                    inputTooShort: function () {
+                        return "Ingresa al menos un caracter...";
+                    },
+                    "noResults": function () {
+                        return "Sin resultados";
+                    },
+                    "searching": function () {
+                        return "Buscando...";
+                    }
+                },
+                allowClear: true,
+                ajax: {
+                    delay: 250,
+                    type: 'POST',
+                    url: '/material/lista',
+                    data: function (params) {
+                        data_asig = $('#id_lote').val();
+                        var queryParameters = {
+                            term: params.term,
+                            'action': 'search_perd',
+                            "asig": data_asig,
+                        };
+                        return queryParameters;
+
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+
+                    },
+
+                },
+                placeholder: 'Busca un Material',
+                minimumInputLength: 1,
+            });
+
     } else {
         $('#save').on('click', function () {
             if ($('#id_lote').val() === "") {
@@ -732,73 +840,6 @@ $(function () {
                 minimumInputLength: 1,
             });
 
-        $('#id_material')
-            .on('select2:select', function (e) {
-                $.ajax({
-                    type: "POST",
-                    url: '/material/lista',
-                    data: {
-                        "id": $('#id_material option:selected').val(),
-                        "action": 'get_perd'
-                    },
-                    dataType: 'json',
-                    success: function (data) {
-                        produccion.add_perdida_materiales(data[0]);
-                        $('#id_material').val(null).trigger('change');
-                    },
-                    error: function (xhr, status, data) {
-                        menssaje_error('Error', data[0], 'fa fa-times', function () {
-
-                        });
-                    },
-
-                })
-            })
-            .select2({
-                theme: "classic",
-                language: {
-                    inputTooShort: function () {
-                        return "Ingresa al menos un caracter...";
-                    },
-                    "noResults": function () {
-                        return "Sin resultados";
-                    },
-                    "searching": function () {
-                        return "Buscando...";
-                    }
-                },
-                allowClear: true,
-                ajax: {
-                    delay: 250,
-                    type: 'POST',
-                    url: '/material/lista',
-                    data: function (params) {
-                        if (data_asig !== '') {
-                            var queryParameters = {
-                                term: params.term,
-                                'action': 'search_perd',
-                                "asig": data_asig,
-                            };
-                            return queryParameters;
-                        } else {
-                            menssaje_error('Error', 'Debe buscar un lote para poder ingresar perdidas de materiales', 'fa fa-times',
-                                function () {
-
-                                })
-                        }
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data
-                        };
-
-                    },
-
-                },
-                placeholder: 'Busca un Material',
-                minimumInputLength: 1,
-            });
-
         $('#tblinsumos tbody')
             .on('click', 'a[rel="remove"]', function () {
                 var tr = tblmateriales.cell($(this).closest('td, li')).index();
@@ -817,7 +858,7 @@ $(function () {
                 produccion.items.materiales[tr.row].cantidad = cantidad;
             });
 
-           $('#tblproductos_estimado tbody')
+        $('#tblproductos_estimado tbody')
             .on('click', 'a[rel="remove"]', function () {
                 var tr = tblproductos_estimado.cell($(this).closest('td, li')).index();
                 borrar_todo_alert('Alerta de Eliminación',

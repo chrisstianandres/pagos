@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
-from apps.asignar_recursos.models import Detalle_asig_recurso
+from apps.asignar_recursos.models import Detalle_asig_recurso, Asig_recurso
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
 from apps.inventario_material.models import Inventario_material
@@ -51,18 +51,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'search_perd':
                 data = []
                 term = request.POST['term']
-                asig = request.POST['asig[id]']
-
+                lote = request.POST['asig']
+                asig = Asig_recurso.objects.get(lote=lote)
                 query = Detalle_asig_recurso.\
-                            objects.filter(inventario_material__material__producto_base__nombre__icontains=term, asig_recurso_id=int(asig)).\
+                            objects.filter(inventario_material__material__producto_base__nombre__icontains=term, asig_recurso_id=int(asig.id)).\
                             values('inventario_material__material__producto_base_id',
                                    'asig_recurso_id',
                                    'inventario_material__material_id'
                                    ).annotate(total=Count('id')).\
                             order_by('-total')[0:10]
                 for i in query:
-                    px = Producto_base.objects.get(id=int(i['inventario_material__material__producto_base_id']))
-                    result = {'id': int(i['asig_recurso_id']), 'text': str(px.nombre)}
+                    px = Material.objects.get(id=int(i['inventario_material__material_id']))
+                    result = {'id': int(px.id), 'text': str(px.producto_base.nombre)}
                     data.append(result)
             elif action == 'get':
                 print(request.POST)
@@ -102,23 +102,30 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     data.append(item)
             elif action == 'get_perd':
                 id = request.POST['id']
-                material = Detalle_asig_recurso.objects.filter(asig_recurso_id=id).\
-                    values('inventario_material__material__producto_base_id').annotate(total=Count('id')).\
-                            order_by('-total')
-                producto = Detalle_asig_recurso.objects.filter(asig_recurso_id=id). \
-                    values('inventario_material__material_id').annotate(total=Count('id')). \
-                    order_by('-total')
-                py = ''
-                for x in producto:
-                    py = int(x['inventario_material__material_id'])
+                max = Detalle_asig_recurso.objects.filter(inventario_material__material_id=id).count()
+                # material = Detalle_asig_recurso.objects.filter(asig_recurso_id=id).\
+                #     values('inventario_material__material__producto_base_id').annotate(total=Count('id')).\
+                #             order_by('-total')
+                # producto = Detalle_asig_recurso.objects.filter(asig_recurso_id=id). \
+                #     values('inventario_material__material_id').annotate(total=Count('id')). \
+                #     order_by('-total')
+                # py = ''
+                # for x in producto:
+                #     py = int(x['inventario_material__material_id'])
                 data = []
-                for i in material:
-                    px = Producto_base.objects.get(id=int(i['inventario_material__material__producto_base_id']))
-                    item = px.toJSON()
-                    item['id'] = py
-                    item['cantidad'] = 1
-                    item['max'] = int(i['total'])
-                    data.append(item)
+                m = Material.objects.get(id=id)
+                # for i in material:
+                #     px = Producto_base.objects.get(id=int(i['inventario_material__material__producto_base_id']))
+                #     m = Material.objects.get(id=py)
+                item = m.producto_base.toJSON()
+                item['id'] = m.id
+                item['calidad'] = m.get_calidad_display()
+                item['tipo'] = m.tipo_material.nombre
+                item['medida'] = m.medida
+                item['ud_medida'] = m.ud_medida
+                item['cantidad'] = 1
+                item['max'] = int(max)
+                data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
