@@ -15,6 +15,7 @@ from apps.backEnd import nombre_empresa
 from apps.empresa.models import Empresa
 from apps.inventario_material.models import Inventario_material
 from apps.inventario_productos.models import Inventario_producto
+from apps.maquina.models import Tipo_maquina
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.produccion.forms import *
 from apps.produccion.models import Produccion, Detalle_perdidas_materiales, Detalle_perdidas_productos, \
@@ -52,6 +53,48 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     produccion = Produccion.objects.all()
                 for c in produccion:
                     data.append(c.toJSON())
+            elif action == 'detalle_materiales':
+                id = request.POST['id']
+                if id:
+                    data = []
+                    prod = Produccion.objects.get(id=id)
+                    asig = Asig_recurso.objects.get(id=prod.asignacion_id)
+                    det = Detalle_asig_recurso.objects.filter(asig_recurso_id=asig.id).values('inventario_material__material_id').annotate(
+                        total=Count('inventario_material__material_id')). \
+                        order_by('-total')
+                    for p in det:
+                        px = Material.objects.get(id=int(p['inventario_material__material_id']))
+                        item = px.toJSON()
+                        item['total'] = int(p['total'])
+                        data.append(item)
+                else:
+                    data['error'] = 'Ha ocurrido un error'
+            elif action == 'detalle_maquinas':
+                id = request.POST['id']
+                if id:
+                    data = []
+                    prod = Produccion.objects.get(id=id)
+                    asig = Asig_recurso.objects.get(id=prod.asignacion_id)
+                    det = Detalle_asig_maquina.objects.filter(asig_recurso_id=asig.id)
+                    for p in det:
+                        item = p.toJSON()
+                        data.append(item)
+                else:
+                    data['error'] = 'Ha ocurrido un error'
+            elif action == 'detalle_estimados':
+                id = request.POST['id']
+                if id:
+                    data = []
+                    det = Detalle_produccion.objects.filter(produccion_id=id).values('producto_id').annotate(
+                        total=Count('id')). \
+                        order_by('-total')
+                    for p in det:
+                        px = Producto.objects.get(id=int(p['producto_id']))
+                        item = px.toJSON()
+                        item['total'] = int(p['total'])
+                        data.append(item)
+                else:
+                    data['error'] = 'Ha ocurrido un error'
             elif action == 'detalle':
                 id = request.POST['id']
                 if id:
@@ -180,6 +223,43 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dtp.cantidad = int(p['cantidad'])
                             dtp.save()
                         data['id'] = c.id
+                        data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            if action == 'agg_more':
+                datos = json.loads(request.POST['ingresos'])
+                if datos:
+                    with transaction.atomic():
+                        a = Asig_recurso.objects.get(lote=datos['lote'])
+                        for i in datos['materiales']:
+                            for inv in Inventario_material.objects.filter(material_id=i['id'], estado=1)[:i['cantidad']]:
+                                dv = Detalle_asig_recurso()
+                                dv.asig_recurso_id = a.id
+                                dv.inventario_material_id = inv.id
+                                inv.estado = 0
+                                inv.save()
+                                dv.save()
+                            s = Material.objects.get(pk=i['id'])
+                            pb = Producto_base.objects.get(pk=s.producto_base.id)
+                            stock = int(Inventario_material.objects.filter(material_id=i['id'], estado=1).count())
+                            pb.stock = stock
+                            pb.save()
+                        for m in datos['maquinas']:
+                            dm = Detalle_asig_maquina()
+                            dm.asig_recurso_id = a.id
+                            dm.maquina_id = m['id']
+                            dm.save()
+                            x = Maquina.objects.get(pk=m['id'])
+                            x.estado = 1
+                            x.save()
+                        for p in datos['productos_estimados']:
+                            dtp = Detalle_produccion()
+                            dtp.produccion_id = a.id
+                            dtp.producto_id = p['id']
+                            dtp.cantidad = int(p['cantidad'])
+                            dtp.save()
+                        data['id'] = a.id
                         data['resp'] = True
                 else:
                     data['resp'] = False
@@ -431,10 +511,9 @@ class report_perdida_materiales(ValidatePermissionRequiredMixin, ListView):
         return data
 
 
+@csrf_exempt
 def edit(request, id):
     data = {}
-    materiales = []
-    maquinas = []
     produccion = Produccion.objects.get(id=id)
     asig = Asig_recurso.objects.get(id=produccion.id)
     data['titulo'] = 'Ingreso de materiales'
@@ -444,6 +523,7 @@ def edit(request, id):
     data['form'] = ProduccionForm(instance=produccion)
     data['form_asig'] = Asig_recursoForm(instance=asig)
     data['form_materiales'] = Detalle_Asig_recursoForm()
+    data['action'] = 'agg_more'
     # for d in Detalle_asig_recurso.objects\
     #         .values('inventario_material__material__producto_base_id').filter(asig_recurso_id=asig.id).annotate(cantidad=Count('id')):
     #     mat = Material.objects.get(producto_base_id=d['inventario_material__material__producto_base_id'])
@@ -458,6 +538,8 @@ def edit(request, id):
     # data['maquinas'] =maquinas
     return render(request, 'front-end/produccion/produccion_form.html', data)
 
+
+@csrf_exempt
 def finalizar(request, id):
     data = {}
     productos = []

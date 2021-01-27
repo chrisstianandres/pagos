@@ -103,20 +103,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'get_perd':
                 id = request.POST['id']
                 max = Detalle_asig_recurso.objects.filter(inventario_material__material_id=id).count()
-                # material = Detalle_asig_recurso.objects.filter(asig_recurso_id=id).\
-                #     values('inventario_material__material__producto_base_id').annotate(total=Count('id')).\
-                #             order_by('-total')
-                # producto = Detalle_asig_recurso.objects.filter(asig_recurso_id=id). \
-                #     values('inventario_material__material_id').annotate(total=Count('id')). \
-                #     order_by('-total')
-                # py = ''
-                # for x in producto:
-                #     py = int(x['inventario_material__material_id'])
                 data = []
                 m = Material.objects.get(id=id)
-                # for i in material:
-                #     px = Producto_base.objects.get(id=int(i['inventario_material__material__producto_base_id']))
-                #     m = Material.objects.get(id=py)
                 item = m.producto_base.toJSON()
                 item['id'] = m.id
                 item['calidad'] = m.get_calidad_display()

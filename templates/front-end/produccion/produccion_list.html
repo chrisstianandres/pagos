@@ -50,12 +50,14 @@
                                 <li class="nav-item">
                                     <a class="nav-link" id="perd_mat-tab" data-toggle="tab" href="#perd_mat"
                                        role="tab" aria-controls="perd_mat" aria-selected="false"
-                                       style="color: black"> <i class="fas fa-window-close"></i>&nbsp;Materiales Perdidos</a>
+                                       style="color: black"> <i class="fas fa-window-close"></i>&nbsp;Materiales
+                                        Perdidos</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" id="perd_prod-tab" data-toggle="tab" href="#perd_prod"
                                        role="tab" aria-controls="perd_prod" aria-selected="false"
-                                       style="color: black"> <i class="fas fa-backspace"></i>&nbsp;Productos Perdidos</a>
+                                       style="color: black"> <i class="fas fa-backspace"></i>&nbsp;Productos
+                                        Perdidos</a>
                                 </li>
                             </ul>
                         </div>
@@ -99,6 +101,103 @@
                                             <th>Producto</th>
                                             <th>Categoria</th>
                                             <th>Presentacion</th>
+                                            <th>Cantidad</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="Modal_materiales" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle"><i class="fas fa-cart-arrow-down"></i> Detalle de
+                        Recursos y Productos a producir </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="mat-tab" data-toggle="tab" href="#mat"
+                                       style="color: black">
+                                        <i class="fab fa-amazon"></i>
+                                        &nbsp;<strong>Materiales Agregados</strong></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="mac-tab" data-toggle="tab" href="#mac"
+                                       role="tab" aria-controls="mac" aria-selected="false"
+                                       style="color: black"> <i class="fas fa-window-close"></i>&nbsp;Maquinas Agregados</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="prod_est-tab" data-toggle="tab" href="#prod_est"
+                                       role="tab" aria-controls="prod_est" aria-selected="false"
+                                       style="color: black"> <i class="fas fa-backspace"></i>&nbsp;Productos
+                                        a Producir</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="myTabContent" role="tablist">
+                                <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="mat-tab"
+                                     id="mat">
+                                    <table class="table" id="tbldetalle_materiales">
+                                        <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Categoria</th>
+                                            <th>Calidad</th>
+                                            <th>Color</th>
+                                            <th>Tipo</th>
+                                            <th>Medida</th>
+                                            <th>Ud Med</th>
+                                            <th>Cantidad</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane fade" role="tabpanel" aria-labelledby="mac-tab"
+                                     id="mac">
+                                    <table class="table" id="tbldetalle_maquinas">
+                                        <thead>
+                                        <tr>
+                                            <th>Maquina</th>
+                                            <th>Serie</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane fade" role="tabpanel" aria-labelledby="prod_est-tab"
+                                     id="prod_est">
+                                    <table class="table" id="tblproductos_estimados">
+                                        <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Categoria</th>
+                                            <th>Presentacion</th>
+                                            <th>Color</th>
+                                            <th>Talla</th>
                                             <th>Cantidad</th>
                                         </tr>
                                         </thead>

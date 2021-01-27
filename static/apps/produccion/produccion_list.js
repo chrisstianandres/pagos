@@ -301,6 +301,86 @@ $(function () {
             });
 
         })
+        .on('click', 'a[rel="detalle_asig"]', function () {
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            $('#Modal_materiales').modal('show');
+            $("#tbldetalle_materiales").DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+                },
+                destroy: true,
+                ajax: {
+                    url: window.location.pathname,
+                    type: 'Post',
+                    data: {
+                        'action': 'detalle_materiales',
+                        'id': data.id
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {data: 'producto_base.nombre'},
+                    {data: 'producto_base.categoria.nombre'},
+                    {data: 'calidad'},
+                    {data: 'producto_base.color.nombre'},
+                    {data: 'tipo_material.nombre'},
+                    {data: 'medida'},
+                    {data: 'ud_medida'},
+                    {data: 'total'}
+                ]
+            });
+            $("#tbldetalle_maquinas").DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+                },
+                destroy: true,
+                ajax: {
+                    url: window.location.pathname,
+                    type: 'Post',
+                    data: {
+                        'action': 'detalle_maquinas',
+                        'id': data.id
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {data: 'maquina.tipo.nombre'},
+                    {data: 'maquina.serie'}
+                ]
+            });
+            $("#tblproductos_estimados").DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+                },
+                destroy: true,
+                ajax: {
+                    url: window.location.pathname,
+                    type: 'Post',
+                    data: {
+                        'action': 'detalle_estimados',
+                        'id': data.id
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {data: 'producto_base.nombre'},
+                    {data: 'producto_base.categoria.nombre'},
+                    {data: 'presentacion.nombre'},
+                    {data: 'producto_base.color.nombre'},
+                    {data: 'talla.talla'},
+                    {data: 'total'}
+                ]
+            });
+
+        })
         .on('click', 'a[rel="finalizar"]', function () {
             $('.tooltip').remove();
             var tr = datatable.cell($(this).closest('td, li')).index();

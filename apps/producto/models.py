@@ -27,6 +27,7 @@ class Producto(models.Model):
         item['pvp_alq'] = format(self.pvp_alq, '.2f')
         item['pvp_confec'] = format(self.pvp_confec, '.2f')
         item['imagen'] = self.get_image()
+        item['talla'] = self.talla.toJSON()
         return item
 
     def get_image(self):

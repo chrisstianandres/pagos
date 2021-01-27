@@ -300,22 +300,22 @@ var produccion = {
                     class: 'text-center'
                 },
             ],
-            // rowCallback: function (row, data) {
-            //     $(row).find('input[name="cantidad"]').TouchSpin({
-            //         min: 1,
-            //         max: data.producto_base.stock,
-            //         step: 1
-            //     });
-            // },
-            // createdRow: function (row, data, dataIndex) {
-            //     if (data.producto_base.stock <= 5) {
-            //         $('td', row).eq(8).html('<span class = "badge badge-danger" style="color: white ">' + data.producto_base.stock + '</span>');
-            //     } else if (data.producto_base.stock <= 10) {
-            //         $('td', row).eq(8).html('<span class = "badge badge-warning" style="color: white ">' + data.producto_base.stock + '</span>');
-            //     } else if (data.producto_base.stock > 10) {
-            //         $('td', row).eq(8).html('<span class = "badge badge-success" style="color: white ">' + data.producto_base.stock + '</span>');
-            //     }
-            // }
+            rowCallback: function (row, data) {
+                $(row).find('input[name="cantidad"]').TouchSpin({
+                    min: 1,
+                    max: data.producto_base.stock,
+                    step: 1
+                });
+            },
+            createdRow: function (row, data, dataIndex) {
+                if (data.producto_base.stock <= 5) {
+                    $('td', row).eq(8).html('<span class = "badge badge-danger" style="color: white ">' + data.producto_base.stock + '</span>');
+                } else if (data.producto_base.stock <= 10) {
+                    $('td', row).eq(8).html('<span class = "badge badge-warning" style="color: white ">' + data.producto_base.stock + '</span>');
+                } else if (data.producto_base.stock > 10) {
+                    $('td', row).eq(8).html('<span class = "badge badge-success" style="color: white ">' + data.producto_base.stock + '</span>');
+                }
+            }
         });
     },
 
@@ -749,7 +749,26 @@ $(function () {
                 minimumInputLength: 1,
             });
 
-    } else {
+    }
+    else if (action === 'agg_more'){
+        $('#id_lote').prop('readonly', true);
+        $('#save').on('click', function () {
+            if (produccion.items.materiales.length === 0 && produccion.items.maquinas.length === 0 && produccion.items.productos_estimados.length === 0) {
+                menssaje_error('Error!', "Debe ingresar al menos un material, una maquina o un producto a producir", 'far fa-times-circle');
+                return false
+            }
+            var parametros;
+            produccion.items.lote = $('input[name="lote"]').val();
+            parametros = {'ingresos': JSON.stringify(produccion.items)};
+            parametros['action'] = 'agg_more';
+            parametros['id'] = '';
+            save_with_ajax('Alerta',
+                '/produccion/nuevo', 'Esta seguro que desea agregar estos materiales a la produccion?', parametros, function (response) {
+                    window.location.href='/produccion/lista'
+                });
+        });
+    }
+    else {
         $('#save').on('click', function () {
             if ($('#id_lote').val() === "") {
                 menssaje_error('Error!', "Debe Ingresar un lote", 'far fa-times-circle');
@@ -780,101 +799,6 @@ $(function () {
                     window.location.replace('/produccion/lista')
                 });
         });
-
-        $('#id_producto_estimado')
-            .on('select2:select', function (e) {
-                $.ajax({
-                    type: "POST",
-                    url: '/producto/lista',
-                    data: {
-                        "id": $('#id_producto_estimado option:selected').val(),
-                        "action": 'get_rep'
-                    },
-                    dataType: 'json',
-                    success: function (data) {
-                        produccion.add_estimado(data);
-                        $('#id_producto_estimado').val(null).trigger('change');
-                    },
-                    error: function (xhr, status, data) {
-                        menssaje_error('Error', data[0], 'fa fa-times', function () {
-
-                        });
-                    },
-
-                })
-            })
-            .select2({
-                theme: "classic",
-                language: {
-                    inputTooShort: function () {
-                        return "Ingresa al menos un caracter...";
-                    },
-                    "noResults": function () {
-                        return "Sin resultados";
-                    },
-                    "searching": function () {
-                        return "Buscando...";
-                    }
-                },
-                allowClear: true,
-                ajax: {
-                    delay: 250,
-                    type: 'POST',
-                    url: '/producto/lista',
-                    data: function (params) {
-                        var queryParameters = {
-                            term: params.term,
-                            'action': 'search_rep'
-                        };
-                        return queryParameters;
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data
-                        };
-
-                    },
-
-                },
-                placeholder: 'Busca un Producto',
-                minimumInputLength: 1,
-            });
-
-        $('#tblinsumos tbody')
-            .on('click', 'a[rel="remove"]', function () {
-                var tr = tblmateriales.cell($(this).closest('td, li')).index();
-                borrar_todo_alert('Alerta de Eliminación',
-                    'Esta seguro que desea eliminar este material de tu detalle?', function () {
-                        var p = produccion.items.materiales[tr.row];
-                        produccion.items.materiales.splice(tr.row, 1);
-                        menssaje_ok('Confirmacion!', 'Material eliminado', 'far fa-smile-wink', function () {
-                            produccion.list_material();
-                        });
-                    })
-            })
-            .on('change keyup', 'input[name="cantidad"]', function () {
-                var cantidad = parseInt($(this).val());
-                var tr = tblmateriales.cell($(this).closest('td, li')).index();
-                produccion.items.materiales[tr.row].cantidad = cantidad;
-            });
-
-        $('#tblproductos_estimado tbody')
-            .on('click', 'a[rel="remove"]', function () {
-                var tr = tblproductos_estimado.cell($(this).closest('td, li')).index();
-                borrar_todo_alert('Alerta de Eliminación',
-                    'Esta seguro que desea eliminar este producto de tu detalle?', function () {
-                        var p = produccion.items.productos_estimados[tr.row];
-                        produccion.items.productos_estimados.splice(tr.row, 1);
-                        menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
-                            produccion.list_estimado();
-                        });
-                    })
-            })
-            .on('change keyup', 'input[name="cantidad"]', function () {
-                var cantidad = parseInt($(this).val());
-                var tr = tblproductos_estimado.cell($(this).closest('td, li')).index();
-                produccion.items.productos_estimados[tr.row].cantidad = cantidad;
-            });
 
     }
     //seleccionar producto del select producto
@@ -1051,6 +975,101 @@ $(function () {
 
             })
         });
+
+     $('#id_producto_estimado')
+            .on('select2:select', function (e) {
+                $.ajax({
+                    type: "POST",
+                    url: '/producto/lista',
+                    data: {
+                        "id": $('#id_producto_estimado option:selected').val(),
+                        "action": 'get_rep'
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        produccion.add_estimado(data);
+                        $('#id_producto_estimado').val(null).trigger('change');
+                    },
+                    error: function (xhr, status, data) {
+                        menssaje_error('Error', data[0], 'fa fa-times', function () {
+
+                        });
+                    },
+
+                })
+            })
+            .select2({
+                theme: "classic",
+                language: {
+                    inputTooShort: function () {
+                        return "Ingresa al menos un caracter...";
+                    },
+                    "noResults": function () {
+                        return "Sin resultados";
+                    },
+                    "searching": function () {
+                        return "Buscando...";
+                    }
+                },
+                allowClear: true,
+                ajax: {
+                    delay: 250,
+                    type: 'POST',
+                    url: '/producto/lista',
+                    data: function (params) {
+                        var queryParameters = {
+                            term: params.term,
+                            'action': 'search_rep'
+                        };
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+
+                    },
+
+                },
+                placeholder: 'Busca un Producto',
+                minimumInputLength: 1,
+            });
+
+        $('#tblinsumos tbody')
+            .on('click', 'a[rel="remove"]', function () {
+                var tr = tblmateriales.cell($(this).closest('td, li')).index();
+                borrar_todo_alert('Alerta de Eliminación',
+                    'Esta seguro que desea eliminar este material de tu detalle?', function () {
+                        var p = produccion.items.materiales[tr.row];
+                        produccion.items.materiales.splice(tr.row, 1);
+                        menssaje_ok('Confirmacion!', 'Material eliminado', 'far fa-smile-wink', function () {
+                            produccion.list_material();
+                        });
+                    })
+            })
+            .on('change keyup', 'input[name="cantidad"]', function () {
+                var cantidad = parseInt($(this).val());
+                var tr = tblmateriales.cell($(this).closest('td, li')).index();
+                produccion.items.materiales[tr.row].cantidad = cantidad;
+            });
+
+        $('#tblproductos_estimado tbody')
+            .on('click', 'a[rel="remove"]', function () {
+                var tr = tblproductos_estimado.cell($(this).closest('td, li')).index();
+                borrar_todo_alert('Alerta de Eliminación',
+                    'Esta seguro que desea eliminar este producto de tu detalle?', function () {
+                        var p = produccion.items.productos_estimados[tr.row];
+                        produccion.items.productos_estimados.splice(tr.row, 1);
+                        menssaje_ok('Confirmacion!', 'Producto eliminado', 'far fa-smile-wink', function () {
+                            produccion.list_estimado();
+                        });
+                    })
+            })
+            .on('change keyup', 'input[name="cantidad"]', function () {
+                var cantidad = parseInt($(this).val());
+                var tr = tblproductos_estimado.cell($(this).closest('td, li')).index();
+                produccion.items.productos_estimados[tr.row].cantidad = cantidad;
+            });
 
 });
 
