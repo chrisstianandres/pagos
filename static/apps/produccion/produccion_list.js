@@ -331,7 +331,21 @@ $(function () {
                     {data: 'medida'},
                     {data: 'ud_medida'},
                     {data: 'total'}
-                ]
+                ],
+                columnDefs: [
+                {
+                    targets: [-1, -3],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return parseInt(data);
+
+                    }
+                },
+                {
+                    targets: '_all',
+                    class: 'text-center'
+                },
+            ],
             });
             $("#tbldetalle_maquinas").DataTable({
                 responsive: true,

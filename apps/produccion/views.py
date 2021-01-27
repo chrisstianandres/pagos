@@ -195,7 +195,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.asignacion_id = a.id
                         c.save()
                         for i in datos['materiales']:
-                            print(datos['materiales'])
                             for inv in Inventario_material.objects.filter(material_id=i['id'], estado=1)[:i['cantidad']]:
                                 dv = Detalle_asig_recurso()
                                 dv.asig_recurso_id = c.id
@@ -261,6 +260,49 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dtp.save()
                         data['id'] = a.id
                         data['resp'] = True
+                else:
+                    data['resp'] = False
+                    data['error'] = "Datos Incompletos"
+            if action == 'finalizar':
+                datos = json.loads(request.POST['ingresos'])
+                if datos:
+                    with transaction.atomic():
+                        lote = datos['lote']
+                        asig = Asig_recurso.objects.get(lote=lote)
+                        c = Produccion.objects.get(id=asig.id)
+                        print(c)
+                        # if datos['productos']:
+                        #     for i in datos['productos']:
+                        #         for p in range(0, i['cantidad']):
+                        #             dv = Inventario_producto()
+                        #             dv.produccion_id = c.id
+                        #             dv.producto_id = i['id']
+                        #             dv.save()
+                        #         st = Inventario_producto.objects.filter(producto_id=int(i['id']), estado=1).count()
+                        #         pp = Producto.objects.get(id=int(i['id']))
+                        #         pb = Producto_base.objects.get(id=pp.producto_base.id)
+                        #         pb.stock = int(st)
+                        #         pb.save()
+                        #     asig = Asig_recurso.objects.get(id=int(datos['asignacion']))
+                        #     asig.inventariado = 1
+                        #     asig.save()
+                        # if datos['perdidas_productos']:
+                        #     for m in datos['perdidas_productos']:
+                        #         dm = Detalle_perdidas_productos()
+                        #         dm.produccion_id = c.id
+                        #         dm.producto_id = m['id']
+                        #         dm.cantidad = m['cantidad']
+                        #         dm.save()
+                        # if datos['perdidas_materiales']:
+                        #     for p in datos['perdidas_materiales']:
+                        #         print(p['id'])
+                        #         dp = Detalle_perdidas_materiales()
+                        #         dp.produccion_id = c.id
+                        #         dp.material_id = p['id']
+                        #         dp.cantidad = p['cantidad']
+                        #         dp.save()
+                        # data['id'] = c.id
+                        # data['resp'] = True
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
