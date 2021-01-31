@@ -505,7 +505,7 @@ def data_tarjets():
     ventas = Venta.objects.filter(transaccion__fecha_trans__year=year, estado=1).aggregate(
         r=Coalesce(Count('id'), 0)).get('r')
     compras = Compra.objects.filter(fecha_compra__year=year, estado=1).aggregate(r=Coalesce(Count('id'), 0)).get('r')
-    inventario = Inventario_producto.objects.filter(produccion__fecha_ingreso__year=year, estado=1).aggregate(
+    inventario = Inventario_producto.objects.filter(produccion__produccion__fecha_ingreso__year=year, estado=1).aggregate(
         r=Coalesce(Count('id'), 0)).get('r')
     agotados = Producto.objects.filter(producto_base__stock__lte=0).count()
     data = {
@@ -525,12 +525,13 @@ def dataChart2():
     for p in producto:
         total = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__year=year,
                                              venta__transaccion__fecha_trans__month=month,
-                                             inventario__producto_id=p).aggregate(
+                                             inventario__produccion__producto_id=p).aggregate(
             r=Coalesce(Sum('venta__transaccion__total'), 0)).get('r')
         data.append({
             'name': p.producto_base.nombre,
             'y': float(total)
         })
+
     return data
 
 

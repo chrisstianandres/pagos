@@ -222,7 +222,6 @@ var produccion = {
                     targets: [0],
                     orderable: false,
                     render: function (data, type, row) {
-                        console.log(row);
                         return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Insumo"><i class="fa fa-trash-alt"></i></a>';
                         //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
                     }
@@ -414,7 +413,6 @@ $(function () {
         $('#ingreso_productos').show();
         $('#ingreso_materiales').hide();
         $('#id_lote').prop('readonly', true);
-        $('#id_novedades').prop('readonly', true);
 
         $('#id_productos_perdida').on('select2:select', function (e) {
             $.ajax({
@@ -664,10 +662,11 @@ $(function () {
                             btnClass: 'btn-blue',
                             action: function () {
                                 var parametros;
+                                produccion.items.lote = $('#id_lote').val();
                                 parametros = {'ingresos': JSON.stringify(produccion.items)};
                                 parametros['action'] = 'finalizar';
                                 save_with_ajax('Alerta',
-                                    window.location.pathname, 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
+                                    '/produccion/nuevo', 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
                                         window.location.href = '/produccion/lista'
                                     });
                             }
@@ -688,7 +687,7 @@ $(function () {
                 parametros['action'] = 'finalizar';
                 save_with_ajax('Alerta',
                     '/produccion/nuevo', 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
-                        window.location.href = '/produccion/finalizar/13'
+                        window.location.href = '/produccion/lista'
                     });
             }
 
@@ -773,7 +772,8 @@ $(function () {
                     window.location.href = '/produccion/lista'
                 });
         });
-    } else {
+    }
+    else {
         $('#save').on('click', function () {
             if ($('#id_lote').val() === "") {
                 menssaje_error('Error!', "Debe Ingresar un lote", 'far fa-times-circle');

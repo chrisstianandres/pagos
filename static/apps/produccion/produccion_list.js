@@ -195,11 +195,19 @@ $(function () {
             },
         ],
         createdRow: function (row, data, dataIndex) {
+            console.log(data.estado_text);
+            console.log(data.estado);
             if (data.estado === 0) {
                 $('td', row).eq(3).find('span').addClass('badge bg-success').attr("style", "color: white");
+                $('td', row).eq(4).find('a[rel="anular"]').hide();
+                $('td', row).eq(4).find('a[rel="agregar"]').hide();
+                $('td', row).eq(4).find('a[rel="finalizar"]').hide();
             } else if (data.estado === 2) {
                 $('td', row).eq(3).find('span').addClass('badge bg-danger').attr("style", "color: white");
                 $('td', row).eq(4).find('a[rel="anular"]').hide();
+                $('td', row).eq(4).find('a[rel="detalle"]').hide();
+                $('td', row).eq(4).find('a[rel="agregar"]').hide();
+                $('td', row).eq(4).find('a[rel="finalizar"]').hide();
                 $('td', row).eq(4).find('a[rel="detalle_asig"]').hide();
 
             } else if (data.estado === 1) {
@@ -248,7 +256,7 @@ $(function () {
                 columns: [
                     {data: 'producto_base.nombre'},
                     {data: 'producto_base.categoria.nombre'},
-                    {data: 'producto_base.presentacion.nombre'},
+                    {data: 'presentacion.nombre'},
                     {data: 'total'}
                 ]
             });
@@ -271,11 +279,10 @@ $(function () {
                 columns: [
                     {data: 'producto_base.nombre'},
                     {data: 'producto_base.categoria.nombre'},
-                    {data: 'producto_base.presentacion.nombre'},
-                    {data: 'id'}
+                    {data: 'presentacion.nombre'},
+                    {data: 'total'}
                 ]
             });
-
             $("#tblperdida_materiales").DataTable({
                 responsive: true,
                 autoWidth: false,
@@ -295,8 +302,12 @@ $(function () {
                 columns: [
                     {data: 'material.producto_base.nombre'},
                     {data: 'material.producto_base.categoria.nombre'},
-                    {data: 'material.producto_base.presentacion.nombre'},
-                    {data: 'id'}
+                    {data: 'material.calidad'},
+                    {data: 'material.producto_base.color.nombre'},
+                    {data: 'material.tipo_material.nombre'},
+                    {data: 'material.medida'},
+                    {data: 'material.ud_medida'},
+                    {data: 'cantidad'}
                 ]
             });
 
@@ -390,25 +401,26 @@ $(function () {
                     {data: 'presentacion.nombre'},
                     {data: 'producto_base.color.nombre'},
                     {data: 'talla.talla'},
-                    {data: 'total'}
+                    {data: 'cantidad'}
                 ]
             });
 
         })
-        .on('click', 'a[rel="finalizar"]', function () {
-            $('.tooltip').remove();
-            var tr = datatable.cell($(this).closest('td, li')).index();
-            var data = datatable.row(tr.row).data();
-            var parametros = {'id': data.id, 'action': 'finalizar'};
-            save_estado('Alerta',
-                window.location.pathname, 'Esta seguro que desea finalizar esta asignacion?', parametros,
-                function () {
-                    menssaje_ok('Exito!', 'Exito al finalizar esta asignacion', 'far fa-smile-wink', function () {
-                        datatable.ajax.reload(null, false);
-                    })
-                });
-
-        });
+        // .on('click', 'a[rel="finalizar"]', function () {
+        //     $('.tooltip').remove();
+        //     var tr = datatable.cell($(this).closest('td, li')).index();
+        //     var data = datatable.row(tr.row).data();
+        //     var parametros = {'id': data.id, 'action': 'finalizar'};
+        //     save_estado('Alerta',
+        //         window.location.pathname, 'Esta seguro que desea finalizar esta asignacion?', parametros,
+        //         function () {
+        //             menssaje_ok('Exito!', 'Exito al finalizar esta asignacion', 'far fa-smile-wink', function () {
+        //                 datatable.ajax.reload(null, false);
+        //             })
+        //         });
+        //
+        // })
+    ;
 
     $('#nuevo').on('click', function () {
         window.location.href = '/produccion/nuevo';
