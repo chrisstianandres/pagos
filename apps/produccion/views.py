@@ -123,7 +123,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     data = []
                     producto = Detalle_perdidas_productos.objects.filter(produccion__produccion_id=id)
                     for m in producto:
-                        print(m.cantidad)
                         px = Producto.objects.get(id=int(m.produccion.producto.id))
                         item = px.toJSON()
                         item['total'] = int(m.cantidad)
@@ -199,10 +198,9 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                 inv.save()
                                 dv.save()
                             s = Material.objects.get(pk=i['id'])
-                            pb = Producto_base.objects.get(pk=s.producto_base.id)
                             stock = int(Inventario_material.objects.filter(material_id=i['id'], estado=1).count())
-                            pb.stock = stock
-                            pb.save()
+                            s.stock = stock
+                            s.save()
                         for m in datos['maquinas']:
                             dm = Detalle_asig_maquina()
                             dm.asig_recurso_id = c.id
@@ -216,7 +214,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dtp.produccion_id = c.id
                             dtp.producto_id = p['id']
                             dtp.cantidad = int(p['cantidad'])
-                            print(p['cantidad'])
                             dtp.save()
                         data['id'] = c.id
                         data['resp'] = True
@@ -237,10 +234,9 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                 inv.save()
                                 dv.save()
                             s = Material.objects.get(pk=i['id'])
-                            pb = Producto_base.objects.get(pk=s.producto_base.id)
                             stock = int(Inventario_material.objects.filter(material_id=i['id'], estado=1).count())
-                            pb.stock = stock
-                            pb.save()
+                            s.stock = stock
+                            s.save()
                         for m in datos['maquinas']:
                             dm = Detalle_asig_maquina()
                             dm.asig_recurso_id = a.id
@@ -286,9 +282,8 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                         dv.save()
                                     st = Inventario_producto.objects.filter(produccion__producto_id=int(i['id']), estado=1).count()
                                     pp = Producto.objects.get(id=int(i['id']))
-                                    pb = Producto_base.objects.get(id=pp.producto_base.id)
-                                    pb.stock = int(st)
-                                    pb.save()
+                                    pp.stock = int(st)
+                                    pp.save()
                         if datos['perdidas_productos']:
                             for m in datos['perdidas_productos']:
                                 if m['perdida'] >= 1:

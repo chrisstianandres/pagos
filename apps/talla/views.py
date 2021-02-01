@@ -63,16 +63,17 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 f = TallaForm(request.POST)
                 data = self.save_data(f)
             elif action == 'edit':
+                pk = request.POST['id']
                 cat = Talla.objects.get(pk=int(pk))
                 f = TallaForm(request.POST, instance=cat)
                 data = self.edit_data(f, pk)
             elif action == 'delete':
+                pk = request.POST['id']
                 cat = Talla.objects.get(pk=pk)
                 cat.delete()
                 data['resp'] = True

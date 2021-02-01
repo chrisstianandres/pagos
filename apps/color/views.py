@@ -54,6 +54,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = ColorForm
+    template_name = 'front-end/color/color_list.html'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -62,16 +63,18 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
+
         try:
             if action == 'add':
                 f = ColorForm(request.POST)
                 data = self.save_data(f)
             elif action == 'edit':
+                pk = request.POST['id']
                 cat = Color.objects.get(pk=int(pk))
                 f = ColorForm(request.POST, instance=cat)
                 data = self.edit_data(f, pk)
             elif action == 'delete':
+                pk = request.POST['id']
                 cat = Color.objects.get(pk=pk)
                 cat.delete()
                 data['resp'] = True

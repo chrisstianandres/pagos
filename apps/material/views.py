@@ -41,11 +41,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for c in Material.objects.all():
                     data.append(c.toJSON())
+            elif action == 'list_compra':
+                data = []
+                ids = json.loads(request.POST['ids'])
+                query = Material.objects.all()
+                for c in query.exclude(producto_base_id__in=ids):
+                    data.append(c.toJSON())
             elif action == 'search':
                 data = []
                 term = request.POST['term']
-                query = Material.objects.filter(Q(producto_base__nombre__icontains=term))[0:10]
-                for a in query:
+                ids = json.loads(request.POST['ids'])
+                query = Material.objects.filter(producto_base__nombre__icontains=term)
+                for a in query.exclude(producto_base_id__in=ids)[0:10]:
                     result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
                     data.append(result)
             elif action == 'search_perd':
@@ -83,8 +90,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 term = request.POST['term']
                 query = Material.objects.filter(Q(producto_base__nombre__icontains=term) |
-                                                Q(producto_base__color__nombre__icontains=term),
-                                                producto_base__stock__gte=1)[0:10]
+                                                Q(producto_base__color__nombre__icontains=term), stock__gte=1)[0:10]
                 for a in query:
                     result = {'id': int(a.id), 'text': str(str(a.producto_base.nombre) + ' / ' + str(a.producto_base.color) )}
                     data.append(result)

@@ -18,7 +18,7 @@
         <div class="card-body">
             <div class="container col-lg-12">
                 <div class="row">
-                    <div class="col-lg-4 col-md-12">
+                    <div class="col-lg-3 col-md-12">
                         <div class="card card-primary">
                             <div class="card-header">
                                 <h4>&nbsp;<i class="fa fa-book-open"></i> Datos de la compra</h4>
@@ -37,7 +37,7 @@
                                     <label for="id_proveedor">{{ form.proveedor.label_tag }}</label>
                                     <div class="input-group form-group-lg">
                                         {{ form.proveedor }}
-                                         <div class="input-group-append">
+                                        <div class="input-group-append">
                                             <button class="btn btn-primary btn-xs" id="id_new_proveedor" type="button">
                                                 <i class="fas fa-user-plus"></i></button>
                                         </div>
@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-8 col-md-12">
+                    <div class="col-lg-9 col-md-12">
                         <div class="card card-primary">
                             <div class="card-header">
                                 <h3><i class="fab fa-amazon"></i> Detalle de Materiales</h3>
@@ -85,7 +85,14 @@
                                 <div class="panel-group">
                                     <div class="form-group">
                                         <label> Buscar Materiales:</label>
-                                        {{ form2.material }}
+                                        <div class="input-group form-group-lg col-lg-10">
+                                            {{ form2.material }}
+                                            <div class="input-group-append">
+                                                <button class="btn btn-success btn-xs" id="id_search_material"
+                                                        type="button"><i
+                                                        class="fas fa-search"></i></button>&nbsp;
+                                            </div>
+                                        </div>
                                     </div>
                                     <br>
                                     <button type="button" class="btn btn-danger btn-sm btn-flat btnRemoveall">
@@ -99,7 +106,8 @@
                                                 <th><em class="fas fa-trash-alt"></em></th>
                                                 <th>Material</th>
                                                 <th>Catg</th>
-                                                <th>Prst</th>
+                                                <th>Calidad</th>
+                                                <th>Med</th>
                                                 <th>Cant</th>
                                                 <th>P. Compra</th>
                                                 <th>Subtotal</th>
@@ -165,11 +173,45 @@
         </form>
 
     </div>
-<div hidden="hidden">
- <form method="POST" action="/inventario/nuevo" id="form_in">
-     <input type="text" name="datos">
- </form>
-</div>
+    <div class="modal fade" id="Modal_material" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-check-circle"></i>&nbsp;Selecionar un material</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <table id="tbl_mat" class="table table-bordered table-hover" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th style="width: 15%">Nombre</th>
+                                <th style="width: 10%">Categoria</th>
+                                <th style="width: 10%;">Calidad</th>
+                                <th style="width: 10%;">Medida</th>
+                                <th style="width: 10%;">Tipo</th>
+                                <th style="width: 5%">Stock</th>
+                                <th style="width: 15%">Descripcion</th>
+                                <th style="width: 8%">P. Compra</th>
+                                <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div hidden="hidden">
+        <form method="POST" action="/inventario/nuevo" id="form_in">
+            <input type="text" name="datos">
+        </form>
+    </div>
 
 
 {% endblock %}

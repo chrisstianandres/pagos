@@ -15,6 +15,7 @@ class Producto(models.Model):
     pvp_alq = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     pvp_confec = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     imagen = models.ImageField(upload_to='producto/imagen', blank=True, null=True)
+    stock = models.IntegerField(default=0)
 
     def __str__(self):
         return '%s' % self.producto_base.nombre

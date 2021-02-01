@@ -10,7 +10,6 @@ class Producto_base(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
     color = models.ForeignKey(Color, on_delete=models.PROTECT, null=True, blank=True)
     nombre = models.CharField(max_length=50)
-    stock = models.IntegerField(default=0)
     descripcion = models.CharField(max_length=50)
 
     def __str__(self):

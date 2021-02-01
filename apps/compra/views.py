@@ -67,7 +67,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     data = []
                     for p in Detalle_compra.objects.filter(compra_id=id):
                         item = p.toJSON()
-                        item['p_compra'] = p.p_compra_actual
+                        cal = format(float((p.p_compra_actual * 100) / 112), '.2f')
+                        item['p_compra'] = cal
                         item['subtotal'] = float(p.subtotal)
                         data.append(item)
                 else:
@@ -124,9 +125,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dv.subtotal = float(i['subtotal'])
                             x = Material.objects.get(pk=i['id'])
                             dv.p_compra_actual = float(x.p_compra)
-                            pb = Producto_base.objects.get(material=x.id)
-                            pb.stock = pb.stock + int(i['cantidad'])
-                            pb.save()
+                            x.stock = Inventario_material.objects.filter(material_id=x.id).count()
                             x.save()
                             dv.save()
                             for p in range(0, i['cantidad']):

@@ -26,8 +26,8 @@ $(function () {
         columns: [
             {"data": "producto_base.nombre"},
             {"data": "producto_base.categoria.nombre"},
-            {"data": "producto_base.presentacion.nombre"},
-            {"data": "producto_base.stock"},
+            {"data": "presentacion.nombre"},
+            {"data": "stock"},
             {"data": "producto_base.descripcion"},
             {"data": "pvp"},
             {"data": "pvp_alq"},
@@ -186,18 +186,19 @@ $(function () {
             },
         ],
         createdRow: function (row, data, dataIndex) {
-            if (data.producto_base.stock >= 51) {
+            if (data.stock >= 51) {
                 $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
-            } else if (data.producto_base.stock >= 10) {
+            } else if (data.stock >= 10) {
                 $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
-            } else if (data.producto_base.stock <= 9) {
+            } else if (data.stock <= 9) {
                 $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
 
         }
 
     });
-    $('#datatable tbody').on('click', 'a[rel="del"]', function () {
+    $('#datatable tbody')
+        .on('click', 'a[rel="del"]', function () {
         var tr = datatable.cell($(this).closest('td, li')).index();
         var data = datatable.row(tr.row).data();
         var parametros = {'id': data.id, 'action': 'delete'};

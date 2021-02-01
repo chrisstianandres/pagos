@@ -1,3 +1,4 @@
+var datatable;
 $(document).ready(function () {
     edit_cat();
     var action = '';
@@ -82,6 +83,130 @@ $(document).ready(function () {
         action = 'add';
         pk = '';
     });
+    $('#id_new_talla').on('click', function () {
+        $('#Modal_talla').modal('show');
+        action = 'add';
+        pk = '';
+    });
+
+    $('#id_new_color').on('click', function () {
+        $('#Modal_color').modal('show');
+        action = 'add';
+        pk = '';
+    });
+
+
+    $('#id_search_producto').on('click', function () {
+        $('#Modal_prod_table').modal('show');
+        datatable = $('#datatable').DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+            },
+            ajax: {
+                url: '/producto/lista',
+                type: 'POST',
+                data: {'action': 'list'},
+                dataSrc: ""
+            },
+            columns: [
+                {"data": "producto_base.nombre"},
+                {"data": "producto_base.categoria.nombre"},
+                {"data": "presentacion.nombre"},
+                {"data": "stock"},
+                {"data": "producto_base.descripcion"},
+                {"data": "pvp"},
+                {"data": "pvp_alq"},
+                {"data": "pvp_confec"},
+                {"data": "imagen"},
+                {"data": "producto_base.id"}
+            ],
+            columnDefs: [
+                {
+                    targets: [-7],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>' + data + '</span>';
+                    }
+                },
+                {
+                    targets: [-3, -4, -5],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>$ ' + parseFloat(data).toFixed(2) + '</span>';
+                    }
+                },
+                {
+                    targets: '__all',
+                    class: 'text-center'
+                },
+                {
+                    targets: [-2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
+                    }
+                },
+                {
+                    targets: [-1],
+                    class: 'text-center',
+                    width: '10%',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var select = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="select" ' +
+                            'data-toggle="tooltip" title="Selcionar producto"><i class="fa fa-check"></i></a>' + ' ';
+                        return select;
+
+                    }
+                },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.stock >= 51) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
+                } else if (data.stock >= 10) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
+                } else if (data.stock <= 9) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
+                }
+
+            }
+        })
+    });
+
+    $('#datatable tbody')
+        .on('click', 'a[rel="select"]', function () {
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.producto_base.id, 'action': 'get'};
+            $.ajax({
+                dataType: 'JSON',
+                type: 'POST',
+                url: '/producto/nuevo',
+                data: parametros,
+            }).done(function (data) {
+                if (!data.hasOwnProperty('error')) {
+                    var new_data = {
+                        id: data[0].id,
+                        text: data[0].nombre
+                    };
+                    var newOption = new Option(new_data.text, new_data.id, false, true);
+                    $('#id_producto_base').append(newOption).trigger('change');
+                    $('#id_des').val(data[0].descripcion);
+                    $('#id_cat').val(data[0]['categoria'].nombre);
+                    $('#id_col').val(data[0]['color'].nombre);
+                    $('#Modal_prod_table').modal('hide');
+                    return false;
+                }
+                menssaje_error(data.error, data.content, 'fa fa-times-circle');
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(textStatus + ': ' + errorThrown);
+            });
+        });
     $('#id_new_categoria').on('click', function () {
         $('#Modal').modal('show');
         action = 'add';
@@ -137,10 +262,9 @@ $(document).ready(function () {
                 },
                 dataType: 'json',
                 success: function (data) {
-                  console.log(data[0].descripcion);
                     $('#id_des').val(data[0].descripcion);
                     $('#id_cat').val(data[0]['categoria'].nombre);
-                    $('#id_pres').val(data[0]['presentacion'].nombre);
+                    $('#id_col').val(data[0]['color'].nombre);
                 },
                 error: function (xhr, status, data) {
                     alert(data);
@@ -163,6 +287,10 @@ $(document).ready(function () {
                         $('#Modal_prod').modal('hide');
                         var newOption = new Option(response.producto_base['nombre'], response.producto_base['id'], false, true);
                         $('#id_producto_base').append(newOption).trigger('change');
+                        console.log(response);
+                        $('#id_des').val(response.producto_base.descripcion);
+                        $('#id_cat').val(response.producto_base.categoria.nombre);
+                        $('#id_col').val(response.producto_base.color.nombre);
                     });
                 });
         }
@@ -203,30 +331,64 @@ $(document).ready(function () {
                 });
         }
     });
+    $('#form_talla').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', 'add');
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/talla/nuevo', 'Esta seguro que desea guardar esta talla?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar esta talla!', 'far fa-smile-wink', function () {
+                        $('#Modal_talla').modal('hide');
+                        var newOption = new Option(response.talla['talla'], response.talla['id'], false, true);
+                        $('#id_talla').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
+    $('#form_color').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', 'add');
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/color/nuevo', 'Esta seguro que desea guardar este color?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar este color!', 'far fa-smile-wink', function () {
+                        $('#Modal_color').modal('hide');
+                        var newOption = new Option(response.color['nombre'], response.color['id'], false, true);
+                        $('#id_color').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
 
 });
 
 function edit_cat() {
 
-    if ($('#id_producto_base').val() !== ''){
+    if ($('#id_producto_base').val() !== '') {
         $.ajax({
-                type: "POST",
-                url: '/producto/nuevo',
-                data: {
-                    "id": $('#id_producto_base').val(),
-                    'action': 'get'
-                },
-                dataType: 'json',
-                success: function (data) {
-                  console.log(data);
-                    $('#id_des').val(data[0].descripcion);
-                    $('#id_cat').val(data[0]['categoria'].nombre);
-                    $('#id_pres').val(data[0]['presentacion'].nombre);
-                },
-                error: function (xhr, status, data) {
-                    alert(data);
-                },
-            })
+            type: "POST",
+            url: '/producto/nuevo',
+            data: {
+                "id": $('#id_producto_base').val(),
+                'action': 'get'
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log(data[0]);
+                $('#id_des').val(data[0].descripcion);
+                $('#id_cat').val(data[0]['categoria'].nombre);
+                $('#id_col').val(data[0]['color'].nombre);
+            },
+            error: function (xhr, status, data) {
+                alert(data);
+            },
+        })
     }
 
 }

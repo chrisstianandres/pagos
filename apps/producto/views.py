@@ -11,6 +11,7 @@ from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
+from apps.color.forms import ColorForm
 from apps.empresa.models import Empresa
 from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
@@ -18,6 +19,7 @@ from apps.presentacion.forms import PresentacionForm
 from apps.producto.forms import ProductoForm, Producto_baseForm
 from apps.producto.models import Producto
 from apps.producto_base.models import Producto_base
+from apps.talla.forms import TallaForm
 from apps.venta.models import Detalle_venta
 
 opc_icono = 'fab fa-amazon'
@@ -43,19 +45,28 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for c in Producto.objects.all():
                     data.append(c.toJSON())
+            elif action == 'list_venta':
+                data = []
+                vent = Producto.objects.filter(stock__gte=1)
+                ids = json.loads(request.POST['ids'])
+                for c in vent.exclude(producto_base_id__in=ids):
+                    data.append(c.toJSON())
             elif action == 'search':
                 data = []
                 term = request.POST['term']
-                query = Producto.objects.filter(producto_base__nombre__icontains=term, producto_base__stock__gte=1)[0:10]
-                for a in query:
+                ids = json.loads(request.POST['ids'])
+                query = Producto.objects.filter(producto_base__nombre__icontains=term, stock__gte=1)
+                for a in query.exclude(producto_base_id__in=ids)[0:10]:
                     result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
                     data.append(result)
             elif action == 'search_rep':
                 data = []
                 term = request.POST['term']
-                query = Producto.objects.filter(Q(producto_base__nombre__icontains=term) | Q(producto_base__color__nombre__icontains=term))[0:10]
+                query = Producto.objects.filter(
+                    Q(producto_base__nombre__icontains=term) | Q(producto_base__color__nombre__icontains=term))[0:10]
                 for a in query:
-                    result = {'id': int(a.id), 'text': str(str(a.producto_base.nombre) + ' / '+str(a.producto_base.color.nombre))}
+                    result = {'id': int(a.id),
+                              'text': str(str(a.producto_base.nombre) + ' / ' + str(a.producto_base.color.nombre))}
                     data.append(result)
             elif action == 'get':
                 data = []
@@ -96,12 +107,13 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 h = datetime.today()
                 query = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,
-                                                           venta__estado=1).values('inventario__producto__producto_base_id',
-                                                                                   'inventario__producto_id',
-                                                                                   'inventario__producto__pvp',
-                                                                                   'inventario__producto__pvp_alq',
-                                                                                   'inventario__producto__pvp_confec',
-                                                                                   'inventario__producto__imagen').annotate(total=Sum('cantidad')).order_by('-total')[0:3]
+                                                     venta__estado=1).values('inventario__producto__producto_base_id',
+                                                                             'inventario__producto_id',
+                                                                             'inventario__producto__pvp',
+                                                                             'inventario__producto__pvp_alq',
+                                                                             'inventario__producto__pvp_confec',
+                                                                             'inventario__producto__imagen').annotate(
+                    total=Sum('cantidad')).order_by('-total')[0:3]
                 for i in query:
                     px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
                     pr = Producto.objects.get(id=int(i['inventario__producto_id']))
@@ -132,37 +144,37 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
 
 class report(ValidatePermissionRequiredMixin, ListView):
-        model = Producto
-        template_name = 'front-end/producto/producto_report.html'
-        permission_required = 'producto.view_producto'
+    model = Producto
+    template_name = 'front-end/producto/producto_report.html'
+    permission_required = 'producto.view_producto'
 
-        @csrf_exempt
-        def dispatch(self, request, *args, **kwargs):
-            return super().dispatch(request, *args, **kwargs)
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-        def post(self, request, *args, **kwargs):
-            data = {}
-            try:
-                action = request.POST['action']
-                if action == 'report':
-                    data = []
-                    for c in Producto.objects.all():
-                        data.append(c.toJSON())
-                else:
-                    data['error'] = 'No ha seleccionado una opcion'
-            except Exception as e:
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'report':
+                data = []
+                for c in Producto.objects.all():
+                    data.append(c.toJSON())
+            else:
                 data['error'] = 'No ha seleccionado una opcion'
-            return JsonResponse(data, safe=False)
+        except Exception as e:
+            data['error'] = 'No ha seleccionado una opcion'
+        return JsonResponse(data, safe=False)
 
-        def get_context_data(self, **kwargs):
-            data = super().get_context_data(**kwargs)
-            data['icono'] = opc_icono
-            data['entidad'] = opc_entidad
-            data['boton'] = 'Nuevo Producto'
-            data['titulo'] = 'Listado de Productos'
-            data['nuevo'] = '/producto/nuevo'
-            data['empresa'] = empresa
-            return data
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Nuevo Producto'
+        data['titulo'] = 'Listado de Productos'
+        data['nuevo'] = '/producto/nuevo'
+        data['empresa'] = empresa
+        return data
 
 
 class sitio(ListView):
@@ -181,12 +193,13 @@ class sitio(ListView):
                 pop = []
                 h = datetime.today()
                 query = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,
-                                                           venta__estado=1).values('inventario__producto__producto_base_id',
-                                                                                   'inventario__producto_id',
-                                                                                   'inventario__producto__pvp',
-                                                                                   'inventario__producto__pvp_alq',
-                                                                                   'inventario__producto__pvp_confec',
-                                                                                   'inventario__producto__imagen').annotate(total=Sum('cantidad')).order_by('-total')[0:6]
+                                                     venta__estado=1).values('inventario__producto__producto_base_id',
+                                                                             'inventario__producto_id',
+                                                                             'inventario__producto__pvp',
+                                                                             'inventario__producto__pvp_alq',
+                                                                             'inventario__producto__pvp_confec',
+                                                                             'inventario__producto__imagen').annotate(
+                    total=Sum('cantidad')).order_by('-total')[0:6]
                 for i in query:
                     px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
                     pr = Producto.objects.get(id=int(i['inventario__producto_id']))
@@ -203,12 +216,12 @@ class sitio(ListView):
                 data['masvendidos'] = mas
 
                 query2 = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,
-                                                     venta__estado=2).values('inventario__producto__producto_base_id',
-                                                                             'inventario__producto_id',
-                                                                             'inventario__producto__pvp',
-                                                                             'inventario__producto__pvp_alq',
-                                                                             'inventario__producto__pvp_confec',
-                                                                             'inventario__producto__imagen').annotate(
+                                                      venta__estado=2).values('inventario__producto__producto_base_id',
+                                                                              'inventario__producto_id',
+                                                                              'inventario__producto__pvp',
+                                                                              'inventario__producto__pvp_alq',
+                                                                              'inventario__producto__pvp_confec',
+                                                                              'inventario__producto__imagen').annotate(
                     total=Sum('cantidad')).order_by('-total')[0:6]
                 for i in query2:
                     px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
@@ -227,11 +240,11 @@ class sitio(ListView):
             if action == 'categoria':
                 tipo = str(request.POST['tipo'])
                 mas = []
-                query = Producto.objects.filter(producto_base__categoria__nombre__icontains=tipo).\
-                                values('producto_base_id', 'producto_base__nombre', 'producto_base__descripcion', 'id',
-                                       'pvp', 'pvp_alq', 'pvp_confec')
+                query = Producto.objects.filter(producto_base__categoria__nombre__icontains=tipo). \
+                    values('producto_base_id', 'producto_base__nombre', 'producto_base__descripcion', 'id',
+                           'pvp', 'pvp_alq', 'pvp_confec')
                 for i in query:
-                    pb =Producto.objects.get(id=i['id'])
+                    pb = Producto.objects.get(id=i['id'])
                     item = {'info': i['producto_base__nombre'], 'descripcion': i['producto_base__descripcion']}
                     item['id_venta'] = int(i['id'])
                     item['id_reparacion'] = int(i['id'])
@@ -318,7 +331,8 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                 query = Producto_base.objects.filter(nombre__icontains=term)[0:10]
 
                 for a in query:
-                    result = {'id': int(a.id), 'text': 'Nombre: ' + str(a.nombre) + ' / ' + 'Descripcion: ' + str(a.descripcion)}
+                    result = {'id': int(a.id),
+                              'text': 'Nombre: ' + str(a.nombre) + ' / ' + 'Descripcion: ' + str(a.descripcion)}
                     data.append(result)
             elif action == 'add_base':
                 f = Producto_baseForm(request.POST)
@@ -328,6 +342,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                 pk = request.POST['id']
                 query = Producto_base.objects.get(id=pk)
                 item = query.toJSON()
+                # item['presentacion'] = query.toJSON()
                 data.append(item)
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
@@ -359,6 +374,8 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         data['form_cat'] = CategoriaForm
         data['form_pres'] = PresentacionForm
         data['form_prod'] = Producto_baseForm
+        data['form_talla'] = TallaForm
+        data['form_color'] = ColorForm
         data['empresa'] = empresa
         return data
 
@@ -417,12 +434,11 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
 
 
 @csrf_exempt
-
 def index(request):
     data = {}
     try:
         data = []
-        for p in Producto.objects.filter(producto_base__stock__lt=10, producto_base__stock__gt=1):
+        for p in Producto.objects.filter(stock__lt=10, stock__gt=1):
             data.append(p.toJSON())
     except Exception as e:
         data['error'] = str(e)

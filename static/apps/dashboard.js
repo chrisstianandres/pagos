@@ -87,7 +87,6 @@ $.ajax({
         data: {'action': 'chart'},
         dataSrc: "",
     }).done(function (data) {
-        console.log(data);
         chart.addSeries(data['dat']);
         grapie.addSeries(
             {

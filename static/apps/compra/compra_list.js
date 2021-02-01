@@ -246,7 +246,9 @@ $(function () {
                 columns: [
                     {data: 'material.producto_base.nombre'},
                     {data: 'material.producto_base.categoria.nombre'},
-                    {data: 'material.producto_base.presentacion.nombre'},
+                    {data: 'material.calidad'},
+                    {data: 'material.tipo_material.nombre'},
+                    {data: 'material.producto_base.descripcion'},
                     {data: 'cantidad'},
                     {data: 'p_compra'},
                     {data: 'subtotal'}

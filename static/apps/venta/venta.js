@@ -1,4 +1,5 @@
 var tblventa;
+var tbl_prod;
 var ventas = {
     items: {
         fecha_venta: '',
@@ -9,13 +10,20 @@ var ventas = {
         total: 0.00,
         productos: []
     },
+    get_ids: function () {
+        var ids = [];
+        $.each(this.items.productos, function (key, value) {
+            ids.push(value.producto_base.id);
+        });
+        return ids;
+    },
     calculate: function () {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
             dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
-            iva_emp = (dict.iva_emp/100);
+            iva_emp = (dict.iva_emp / 100);
         });
         this.items.subtotal = subtotal;
         this.items.iva = this.items.subtotal * iva_emp;
@@ -28,7 +36,6 @@ var ventas = {
         this.items.productos.push(data[0]);
         this.items.productos = this.exclude_duplicados(this.items.productos);
         this.list();
-        console.log(this.items)
     },
     list: function () {
         this.calculate();
@@ -45,8 +52,8 @@ var ventas = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
-                {data: "producto_base.stock"},
+                {data: "presentacion.nombre"},
+                {data: "stock"},
                 {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
@@ -80,16 +87,16 @@ var ventas = {
 
                     }
                 }
-            ],  rowCallback: function (row, data) {
+            ], rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: data.producto_base.stock,
+                    max: data.stock,
                     step: 1
                 });
             }
         });
     },
-     exclude_duplicados: function (array) {
+    exclude_duplicados: function (array) {
         this.items.productos = [];
         let hash = {};
         result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
@@ -98,7 +105,7 @@ var ventas = {
     }
 };
 $(function () {
-        if (localStorage.getItem('carrito')) {
+    if (localStorage.getItem('carrito')) {
         carro_respaldo = JSON.parse(localStorage.getItem('carrito'));
         ventas.items.productos = carro_respaldo;
         ventas.list();
@@ -107,43 +114,23 @@ $(function () {
     }
     var action = '';
     var pk = '';
-    //seleccionar producto del select producto
-    $('#id_inventario').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $('#id_inventario option:selected').val(),
-                'action': 'get'
-            },
-            dataType: 'json',
-            success: function (data) {
-                ventas.add(data);
-                $('#id_inventario').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                alert(data);
-            },
-
-        })
-    });
     //remover producto del detalle
     $('#tblproductos tbody')
         .on('click', 'a[rel="remove"]', function () {
-        var tr = tblventa.cell($(this).closest('td, li')).index();
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar este producto de tu detalle <br> ' +
-            '<strong>CONTINUAR?</strong>', function () {
-                ventas.items.productos.splice(tr.row, 1);
-                ventas.list();
-            })
-    })
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            borrar_todo_alert('Alerta de Eliminación',
+                'Esta seguro que desea eliminar este producto de tu detalle <br> ' +
+                '<strong>CONTINUAR?</strong>', function () {
+                    ventas.items.productos.splice(tr.row, 1);
+                    ventas.list();
+                })
+        })
         .on('change keyup', 'input[name="cantidad"]', function () {
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
             ventas.items.productos[tr.row].cantidad = cantidad;
             ventas.calculate();
-            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
         });
     //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {
@@ -168,12 +155,12 @@ $(function () {
         ventas.items.fecha_venta = $('input[name="fecha_trans"]').val();
         ventas.items.cliente = $('#id_cliente option:selected').val();
         parametros = {'ventas': JSON.stringify(ventas.items)};
-        parametros['action']='add';
-        parametros['id']='';
+        parametros['action'] = 'add';
+        parametros['id'] = '';
         save_with_ajax('Alerta',
             '/venta/nuevo', 'Esta seguro que desea guardar esta venta?', parametros,
             function (response) {
-            localStorage.clear();
+                localStorage.clear();
                 printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
                     window.open('/venta/printpdf/' + response['id'], '_blank');
                     // location.href = '/venta/printpdf/' + response['id'];
@@ -253,42 +240,167 @@ $(function () {
         $('#form').trigger("reset");
     });
     //buscar produto del select producto
-    $('#id_inventario').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
+    $('#id_inventario')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
             },
-            "noResults": function () {
-                return "Sin resultados";
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/producto/lista',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search',
+                        'ids': JSON.stringify(ventas.get_ids())
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+
+                },
+
             },
-            "searching": function () {
-                return "Buscando...";
+            placeholder: 'Busca un Producto',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/producto/lista',
+                data: {
+                    "id": $('#id_inventario option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    ventas.add(data);
+                    $('#id_inventario').val(null).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        });
+    //modal buscar
+    $('#id_search_producto').on('click', function () {
+        $('#Modal_lista').modal('show');
+        tbl_prod = $("#tbl_prod").DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+            },
+            ajax: {
+                url: '/producto/lista',
+                type: 'POST',
+                data: {'action': 'list_venta', 'ids': JSON.stringify(ventas.get_ids())},
+                dataSrc: ""
+            },
+            columns: [
+                {"data": "producto_base.nombre"},
+                {"data": "producto_base.categoria.nombre"},
+                {"data": "presentacion.nombre"},
+                {"data": "stock"},
+                {"data": "producto_base.descripcion"},
+                {"data": "pvp"},
+                {"data": "pvp_alq"},
+                {"data": "pvp_confec"},
+                {"data": "imagen"},
+                {"data": "id"}
+            ],
+
+            columnDefs: [
+                {
+                    targets: [-7],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>' + data + '</span>';
+                    }
+                },
+                {
+                    targets: [-3, -4, -5],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>$ ' + parseFloat(data).toFixed(2) + '</span>';
+                    }
+                },
+                {
+                    targets: '__all',
+                    class: 'text-center'
+                },
+                {
+                    targets: [-2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
+                    }
+                },
+                {
+                    targets: [-1],
+                    class: 'text-center',
+                    width: '10%',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var check = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
+                            'data-toggle="tooltip" title="Seleccionar producto"><i class="fa fa-check-circle"></i></a>' + ' ';
+                        return check
+
+                    }
+                },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.stock >= 51) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
+                } else if (data.stock >= 10) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
+                } else if (data.stock <= 9) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
+                }
+
             }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
+
+        });
+    });
+    //select producto de table
+    $('#tbl_prod tbody').on('click', 'a[rel="check"]', function () {
+        var tr = tbl_prod.cell($(this).closest('td, li')).index();
+        var data = tbl_prod.row(tr.row).data();
+        var parametros = {'id': data.id, 'action': 'get'};
+        $.ajax({
+            dataType: 'JSON',
             type: 'POST',
             url: '/producto/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search',
-                    'id': ''
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
-
-            },
-
-        },
-        placeholder: 'Busca un Producto',
-        minimumInputLength: 1,
+            data: parametros,
+        }).done(function (data) {
+            if (!data.hasOwnProperty('error')) {
+                ventas.add(data);
+                $('#Modal_lista').modal('hide');
+                return false;
+            }
+            menssaje_error(data.error, data.content, 'fa fa-times-circle');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown);
+        });
     });
 });
 

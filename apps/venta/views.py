@@ -1,5 +1,6 @@
 from django.utils.decorators import method_decorator
 
+from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.compra.models import Compra
 from apps.delvoluciones_venta.models import Devolucion
@@ -173,20 +174,21 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[
+                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1)[
                                              :i['cantidad']]:
                                     dv = Detalle_venta()
                                     dv.venta_id = v.id
                                     dv.inventario_id = in_pr.id
                                     dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.producto.pvp)
+                                    dv.pvp_actual = float(in_pr.produccion.producto.pvp)
                                     dv.subtotal = float(i['subtotal'])
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+
+                                stock = Producto.objects.get(id=i['id'])
                                 stock.stock = int(
-                                    Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1).count())
                                 stock.save()
                         data['id'] = v.id
                         data['resp'] = True
@@ -212,7 +214,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[
+                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1)[
                                              :i['cantidad']]:
                                     dv = Detalle_venta()
                                     dv.venta_id = v.id
@@ -223,9 +225,9 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock = Producto.objects.get(id=i['id'])
                                 stock.stock = int(
-                                    Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1).count())
                                 stock.save()
                         data['id'] = v.id
                         data['resp'] = True
@@ -249,7 +251,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['form'] = TransaccionForm()
         data['form2'] = Detalle_VentaForm()
         data['detalle'] = []
-        data['formc'] = UserForm()
+        data['formc'] = ClienteForm()
         return data
 
 
@@ -284,7 +286,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[
+                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1)[
                                              :i['cantidad']]:
                                     dv = Detalle_venta()
                                     dv.venta_id = v.id
@@ -295,9 +297,9 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock = Producto.objects.get(id=i['id'])
                                 stock.stock = int(
-                                    Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1).count())
                                 stock.save()
                     data['id'] = v.id
                     data['resp'] = True
@@ -323,7 +325,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[
+                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1)[
                                              :i['cantidad']]:
                                     dv = Detalle_venta()
                                     dv.venta_id = v.id
@@ -334,9 +336,9 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock = Producto.objects.get(id=i['id'])
                                 stock.stock = int(
-                                    Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1).count())
                                 stock.save()
                         data['id'] = v.id
                         data['resp'] = True
@@ -507,7 +509,7 @@ def data_tarjets():
     compras = Compra.objects.filter(fecha_compra__year=year, estado=1).aggregate(r=Coalesce(Count('id'), 0)).get('r')
     inventario = Inventario_producto.objects.filter(produccion__produccion__fecha_ingreso__year=year, estado=1).aggregate(
         r=Coalesce(Count('id'), 0)).get('r')
-    agotados = Producto.objects.filter(producto_base__stock__lte=0).count()
+    agotados = Producto.objects.filter(stock__lte=0).count()
     data = {
         'ventas': int(ventas),
         'compras': int(compras),
