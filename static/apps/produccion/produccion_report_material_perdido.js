@@ -26,7 +26,6 @@ var datos = {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
         }
-
         $.ajax({
             url: window.location.pathname,
             type: 'POST',
@@ -43,9 +42,9 @@ $(function () {
     daterange();
     datatable = $("#datatable").DataTable({
         destroy: true,
-        responsive: true,
+        // responsive: true,
         autoWidth: false,
-        order: [[ 2, "asc" ]],
+        order: [[ 0, "asc" ]],
         ajax: {
             url: window.location.pathname,
             type: 'POST',
@@ -72,7 +71,7 @@ $(function () {
             },
             buttons: [
             {
-                text: '<i class="far fa-file-pdf"></i> Reporte PDF</i>',
+                text: '<i class="far fa-file-pdf"></i> Reporte PDF',
                 className: 'btn btn-danger',
                 extend: 'pdfHtml5',
                 footer: true,
@@ -81,7 +80,7 @@ $(function () {
                 pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                 download: 'open',
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5],
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
                     search: 'applied',
                     order: 'applied'
                 },
@@ -150,19 +149,19 @@ $(function () {
                         return 4;
                     };
                     doc.content[0].layout = objLayout;
-                    doc.content[1].table.widths = ["*", "*", "*", "*", "*","*"];
+                    doc.content[1].table.widths = ["*", "*", "*", "*", "*","*","*","*","*"];
                     doc.styles.tableBodyEven.alignment = 'center';
                     doc.styles.tableBodyOdd.alignment = 'center';
                     doc.styles.tableFooter.alignment = 'center';
                 }
             },
             {
-                text: '<i class="far fa-file-excel"></i> Reporte Excel</i>', className: "btn btn-success my_class",
+                text: '<i class="far fa-file-excel"></i> Reporte Excel', className: "btn btn-success my_class",
                 extend: 'excel',
                 footer: true
             },
             {
-                text: '<i class="fas fa-amazon"></i> Reporte por Productos</i>',
+                text: '<i class="fab fa-amazon"></i> Reporte por Productos',
                 className: 'btn btn-primary',
                 action: function (e, dt, node, config) {
                     window.location.href = '/produccion/report_by_product_perd'
@@ -189,24 +188,24 @@ $(function () {
             };
             // Total over this page
             pageTotaliva = api
-                .column(5, {page: 'current'})
+                .column(8, {page: 'current'})
                 .data()
                 .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
             // total full table
             pageTotalconiva = api
-                .column(5, {page: 'current'})
+                .column(8, {page: 'current'})
                 .data()
                 .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
             // total full table
-            totalconiva = api.column(5).data().reduce(function (a, b) {
+            totalconiva = api.column(8).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
             // Update footer
-              $(api.column(5).footer()).html(
+              $(api.column(8).footer()).html(
                 pageTotalconiva + ' (  ' + pageTotalconiva +')'
                 // parseFloat(data).toFixed(2)
             );

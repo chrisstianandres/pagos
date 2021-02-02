@@ -80,17 +80,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'detalle':
                 id = request.POST['id']
                 if id:
+                    # inventario__produccion__producto__producto_base_id
                     data = []
-                    result = Detalle_venta.objects.filter(venta_id=id).values('inventario__producto__producto_base_id',
+                    result = Detalle_venta.objects.filter(venta_id=id).values('inventario__produccion__producto_id',
                                                                               'cantidad', 'pvp_actual', 'subtotal'). \
-                        annotate(Count('inventario__producto__producto_base_id'))
+                        annotate(Count('inventario__produccion__producto_id'))
                     for p in result:
-                        pr = Producto_base.objects.get(id=int(p['inventario__producto__producto_base_id']))
-                        pb = Producto.objects.get(producto_base_id=pr.id)
+                        # pr = Producto_base.objects.get(id=int(p['inventario__produccion__producto__producto_base_id']))
+                        pb = Producto.objects.get(id=p['inventario__produccion__producto_id'])
                         data.append({
-                            'producto': pr.nombre,
-                            'categoria': pr.categoria.nombre,
-                            'presentacion': pr.presentacion.nombre,
+                            'producto': pb.producto_base.nombre,
+                            'categoria': pb.producto_base.categoria.nombre,
+                            'presentacion': pb.presentacion.nombre,
                             'cantidad': p['cantidad'],
                             'pvp': p['pvp_actual'],
                             'subtotal': p['subtotal']
@@ -425,12 +426,11 @@ class printpdf(View):
         data = []
         try:
             result = Detalle_venta.objects.filter(venta_id=self.kwargs['pk']).values(
-                'inventario__producto__producto_base_id',
+                'inventario__produccion__producto_id',
                 'cantidad', 'pvp_actual', 'subtotal'). \
-                annotate(Count('inventario__producto__producto_base_id'))
+                annotate(Count('inventario__produccion__producto_id'))
             for i in result:
-                pr = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
-                pb = Producto.objects.get(producto_base_id=pr.id)
+                pb = Producto.objects.get(id=int(i['inventario__produccion__producto_id']))
                 item = {'producto': {'producto': pb.toJSON()}}
                 item['pvp'] = format(i['pvp_actual'], '.2f')
                 item['cantidad'] = i['cantidad']
@@ -571,12 +571,12 @@ class report(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 if start_date == '' and end_date == '':
                     query = Detalle_venta.objects.values('venta__transaccion__fecha_trans',
-                                                         'inventario__producto__producto_base_id',
+                                                         'inventario__produccion__producto_id',
                                                          'pvp_actual').order_by().annotate(
                         Sum('cantidad')).filter(venta__estado=1)
                 else:
                     query = Detalle_venta.objects.values('venta__transaccion__fecha_trans',
-                                                         'inventario__producto__producto_base_id',
+                                                         'inventario__produccion__producto_id',
                                                          'pvp_actual') \
                         .filter(venta__transaccion__fecha_trans__range=[start_date, end_date],
                                 venta__estado=1).order_by().annotate(
@@ -584,10 +584,10 @@ class report(ValidatePermissionRequiredMixin, ListView):
                 for p in query:
                     total = p['pvp_actual'] * p['cantidad__sum']
                     print(iva)
-                    pr = Producto_base.objects.get(id=int(p['inventario__producto__producto_base_id']))
+                    pr = Producto.objects.get(id=int(p['inventario__produccion__producto_id']))
                     data.append([
                         p['venta__transaccion__fecha_trans'].strftime("%d/%m/%Y"),
-                        pr.nombre,
+                        pr.producto_base.nombre,
                         int(p['cantidad__sum']),
                         format(p['pvp_actual'], '.2f'),
                         format(total, '.2f'),

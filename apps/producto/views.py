@@ -192,26 +192,19 @@ class sitio(ListView):
                 mas = []
                 pop = []
                 h = datetime.today()
-                query = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,
-                                                     venta__estado=1).values('inventario__producto__producto_base_id',
-                                                                             'inventario__producto_id',
-                                                                             'inventario__producto__pvp',
-                                                                             'inventario__producto__pvp_alq',
-                                                                             'inventario__producto__pvp_confec',
-                                                                             'inventario__producto__imagen').annotate(
+                query = Detalle_venta.objects.filter(venta__estado=1).values('inventario__produccion__producto_id').annotate(
                     total=Sum('cantidad')).order_by('-total')[0:6]
                 for i in query:
-                    px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
-                    pr = Producto.objects.get(id=int(i['inventario__producto_id']))
-                    item = {'info': px.nombre, 'descripcion': px.descripcion}
-                    item['id_venta'] = int(i['inventario__producto_id'])
+                    pr = Producto.objects.get(id=int(i['inventario__produccion__producto_id']))
+                    item = {'info': pr.producto_base.nombre, 'descripcion': pr.producto_base.descripcion}
+                    item['id_venta'] = int(i['inventario__produccion__producto_id'])
                     item['id_reparacion'] = int(pr.id)
                     item['id_confeccion'] = int(pr.id)
-                    item['pvp'] = format(i['inventario__producto__pvp'], '.2f')
-                    item['pvp_alq'] = format(i['inventario__producto__pvp_alq'], '.2f')
-                    item['pvp_confec'] = format(i['inventario__producto__pvp_confec'], '.2f')
+                    item['pvp'] = format(pr.pvp, '.2f')
+                    item['pvp_alq'] = format(pr.pvp_alq, '.2f')
+                    item['pvp_confec'] = format(pr.pvp_confec, '.2f')
                     item['imagen'] = pr.get_image()
-                    item['stock'] = px.stock
+                    item['stock'] = pr.stock
                     mas.append(item)
                 data['masvendidos'] = mas
 
@@ -246,14 +239,16 @@ class sitio(ListView):
                 for i in query:
                     pb = Producto.objects.get(id=i['id'])
                     item = {'info': i['producto_base__nombre'], 'descripcion': i['producto_base__descripcion']}
+
                     item['id_venta'] = int(i['id'])
+
                     item['id_reparacion'] = int(i['id'])
                     item['id_confeccion'] = int(i['id'])
                     item['pvp'] = format(i['pvp'], '.2f')
                     item['pvp_alq'] = format(i['pvp_alq'], '.2f')
                     item['pvp_confec'] = format(i['pvp_confec'], '.2f')
                     item['imagen'] = pb.get_image()
-                    item['stock'] = pb.producto_base.stock
+                    item['stock'] = pb.stock
                     mas.append(item)
                 data['result'] = mas
                 # query2 = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,

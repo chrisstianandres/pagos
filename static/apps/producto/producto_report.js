@@ -26,8 +26,8 @@ $(function () {
         columns: [
             {"data": "producto_base.nombre"},
             {"data": "producto_base.categoria.nombre"},
-            {"data": "producto_base.presentacion.nombre"},
-            {"data": "producto_base.stock"},
+            {"data": "presentacion.nombre"},
+            {"data": "stock"},
             {"data": "producto_base.descripcion"},
             {"data": "pvp"},
             {"data": "pvp_alq"},

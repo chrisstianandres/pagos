@@ -455,27 +455,27 @@ class report_perdida(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'report':
                 if start_date == '' and end_date == '':
-                    query = Detalle_perdidas_productos.objects.values('produccion__fecha_ingreso',
-                                                                      'produccion__asignacion__lote',
-                                                                      'producto__producto_base_id').filter(
-                        produccion__estado=0) \
+                    query = Detalle_perdidas_productos.objects.values('produccion__produccion__fecha_ingreso',
+                                                                      'produccion__produccion__asignacion__lote',
+                                                                      'produccion__producto_id').filter(
+                        # producto__producto_base_id
+                        produccion__produccion__estado=0) \
                         .order_by().annotate(Count('id'))
-                    print(query.query)
                 else:
-                    query = Detalle_perdidas_productos.objects.values('produccion__fecha_ingreso',
-                                                                      'produccion__asignacion__lote',
-                                                                      'producto__producto_base_id') \
-                        .filter(produccion__fecha_ingreso__range=[start_date, end_date],
-                                produccion__estado=0).order_by().annotate(
+                    query = Detalle_perdidas_productos.objects.values('produccion__produccion__fecha_ingreso',
+                                                                      'produccion__produccion__asignacion__lote',
+                                                                      'produccion__producto_id') \
+                        .filter(produccion__produccion__fecha_ingreso__range=[start_date, end_date],
+                                produccion__produccion__estado=0).order_by().annotate(
                         Count('id'))
                 for p in query:
-                    pr = Producto_base.objects.get(id=int(p['producto__producto_base_id']))
+                    pr = Producto.objects.get(id=int(p['produccion__producto_id']))
                     data.append([
-                        p['produccion__fecha_ingreso'].strftime("%d/%m/%Y"),
-                        pr.nombre,
-                        pr.categoria.nombre,
+                        p['produccion__produccion__fecha_ingreso'].strftime("%d/%m/%Y"),
+                        pr.producto_base.nombre,
+                        pr.producto_base.categoria.nombre,
                         pr.presentacion.nombre,
-                        p['produccion__asignacion__lote'],
+                        p['produccion__produccion__asignacion__lote'],
                         int(p['id__count']),
                     ])
         except Exception as e:
@@ -512,27 +512,31 @@ class report_perdida_materiales(ValidatePermissionRequiredMixin, ListView):
             empresa = Empresa.objects.first()
             iva = float(empresa.iva / 100)
             action = request.POST['action']
+            print(action)
             if action == 'report':
                 if start_date == '' and end_date == '':
                     query = Detalle_perdidas_materiales.objects.values('produccion__fecha_ingreso',
                                                                        'produccion__asignacion__lote',
-                                                                       'material__producto_base_id').filter(
+                                                                       'material_id').filter(
                         produccion__estado=0) \
                         .order_by().annotate(Count('id'))
                 else:
                     query = Detalle_perdidas_materiales.objects.values('produccion__fecha_ingreso',
                                                                        'produccion__asignacion__lote',
-                                                                       'material__producto_base_id') \
+                                                                       'material_id') \
                         .filter(produccion__fecha_ingreso__range=[start_date, end_date],
                                 produccion__estado=0).order_by().annotate(
                         Count('id'))
                 for p in query:
-                    pr = Producto_base.objects.get(id=int(p['material__producto_base_id']))
+                    pr = Material.objects.get(id=int(p['material_id']))
                     data.append([
                         p['produccion__fecha_ingreso'].strftime("%d/%m/%Y"),
-                        pr.nombre,
-                        pr.categoria.nombre,
-                        pr.presentacion.nombre,
+                        pr.producto_base.nombre,
+                        pr.producto_base.categoria.nombre,
+                        pr.calidad,
+                        '{} / {}'.format(pr.medida, pr.ud_medida),
+                        pr.tipo_material.nombre,
+                        pr.producto_base.descripcion,
                         p['produccion__asignacion__lote'],
                         int(p['id__count']),
                     ])
