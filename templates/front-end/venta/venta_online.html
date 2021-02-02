@@ -88,11 +88,18 @@
                                             <h5><i class="fas fa-piggy-bank"></i> Detalle de Productos</h5>
                                         </div>
                                         <div class="card-body">
-                                            <div class="form-group">
-                                                    <label> Buscar Productos:</label>
-                                                    <br>
+                                           <div class="form-group">
+                                                <label> Buscar Productos:</label>
+                                                <br>
+                                                <div class="input-group form-group-lg col-lg-10">
                                                     {{ form2.inventario }}
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-success btn-xs" id="id_search_producto"
+                                                                type="button"><i
+                                                                class="fas fa-search"></i></button>&nbsp;
+                                                    </div>
                                                 </div>
+                                            </div>
                                                 <br>
                                             <div class="table-responsive">
                                                 <table class="table" id="tblproductos">
@@ -102,6 +109,7 @@
                                                         <th>Producto</th>
                                                         <th>Catg</th>
                                                         <th>Prest</th>
+                                                        <th>Color</th>
                                                         <th>Stock</th>
                                                         <th>Cant</th>
                                                         <th>Pvp</th>
@@ -140,6 +148,43 @@
                                 </div>
                         </div>
 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="Modal_lista" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-search"></i>&nbsp;Buscar Productos
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <table id="tbl_prod" class="table table-bordered table-hover" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th style="width: 18%">Nombre</th>
+                                <th style="width: 10%">Categoria</th>
+                                <th style="width: 10%;">Presentacion</th>
+                                 <th>Color</th>
+                                <th style="width: 8%">Stock</th>
+                                <th style="width: 13%">Descripcion</th>
+                                <th style="width: 8%">Pvp</th>
+                                <th style="width: 8%">Alquiler</th>
+                                <th style="width: 8%">Confeccion</th>
+                                <th style="width: 8%">Imagen</th>
+                                <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

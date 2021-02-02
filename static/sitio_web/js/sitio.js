@@ -75,8 +75,8 @@ var carrito = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
-                {data: "producto_base.stock"},
+                {data: "presentacion.nombre"},
+                {data: "stock"},
                 {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
@@ -114,7 +114,7 @@ var carrito = {
             ], rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: data.producto_base.stock,
+                    max: data.stock,
                     step: 1,
                     buttondown_class: 'btn btn-primary btn-sm',
                     buttonup_class: 'btn btn-primary btn-sm',
@@ -322,7 +322,7 @@ $(function () {
             },
             dataType: 'json',
             success: function (data) {
-                if(data[0].producto_base.stock===0){
+                if(data[0].stock===0){
                     menssaje_error('Error', 'Lo sentimos este producto no tiene stok disponible', 'far fa-sad-tear', function () {
                     })
                 } else {

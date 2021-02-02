@@ -6,6 +6,13 @@ var carrito = {
         total: 0.00,
         productos: [],
     },
+    get_ids: function () {
+        var ids = [];
+        $.each(this.items.productos, function (key, value) {
+            ids.push(value.producto_base.id);
+        });
+        return ids;
+    },
     calculate: function () {
         var subtotal = 0.00;
         var iva_emp = 0.00;
@@ -31,10 +38,10 @@ var carrito = {
     list: function () {
         this.calculate();
         console.log(carrito.items.productos.length);
-        if (carrito.items.productos.length >=1){
+        if (carrito.items.productos.length >= 1) {
             $('#paypal_btn').show();
         } else {
-             $('#paypal_btn').hide();
+            $('#paypal_btn').hide();
         }
         var numero = this.items.productos.length;
         if (numero >= 1) {
@@ -57,8 +64,9 @@ var carrito = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
-                {data: "producto_base.stock"},
+                {data: "presentacion.nombre"},
+                {data: "producto_base.color.nombre"},
+                {data: "stock"},
                 {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
@@ -220,25 +228,7 @@ $(function () {
             });
     });
 
-    $('#id_inventario').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $('#id_inventario option:selected').val(),
-                'action': 'get'
-            },
-            dataType: 'json',
-            success: function (data) {
-                carrito.add(data);
-                $('#id_inventario').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                alert(data);
-            },
-
-        })
-    })
+    $('#id_inventario')
         .select2({
             theme: "classic",
             language: {
@@ -261,7 +251,7 @@ $(function () {
                     var queryParameters = {
                         term: params.term,
                         'action': 'search',
-                        'id': ''
+                        'ids': JSON.stringify(carrito.get_ids())
                     };
                     return queryParameters;
                 },
@@ -275,5 +265,132 @@ $(function () {
             },
             placeholder: 'Busca un Producto',
             minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/producto/lista',
+                data: {
+                    "id": $('#id_inventario option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    carrito.add(data);
+                    $('#id_inventario').val(null).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
         });
+
+
+    //modal buscar
+    $('#id_search_producto').on('click', function () {
+        $('#Modal_lista').modal('show');
+        tbl_prod = $("#tbl_prod").DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+            },
+            ajax: {
+                url: '/producto/lista',
+                type: 'POST',
+                data: {'action': 'list_venta', 'ids': JSON.stringify(carrito.get_ids())},
+                dataSrc: ""
+            },
+            columns: [
+                {"data": "producto_base.nombre"},
+                {"data": "producto_base.categoria.nombre"},
+                {"data": "presentacion.nombre"},
+                {"data": "producto_base.color.nombre"},
+                {"data": "stock"},
+                {"data": "producto_base.descripcion"},
+                {"data": "pvp"},
+                {"data": "pvp_alq"},
+                {"data": "pvp_confec"},
+                {"data": "imagen"},
+                {"data": "id"}
+            ],
+
+            columnDefs: [
+                {
+                    targets: [-7],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>' + data + '</span>';
+                    }
+                },
+                {
+                    targets: [-3, -4, -5],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>$ ' + parseFloat(data).toFixed(2) + '</span>';
+                    }
+                },
+                {
+                    targets: '__all',
+                    class: 'text-center'
+                },
+                {
+                    targets: [-2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
+                    }
+                },
+                {
+                    targets: [-1],
+                    class: 'text-center',
+                    width: '10%',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var check = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
+                            'data-toggle="tooltip" title="Seleccionar producto"><i class="fa fa-check-circle"></i></a>' + ' ';
+                        return check
+
+                    }
+                },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.stock >= 51) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
+                } else if (data.stock >= 10) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
+                } else if (data.stock <= 9) {
+                    $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
+                }
+
+            }
+
+        });
+    });
+    //select producto de table
+    $('#tbl_prod tbody').on('click', 'a[rel="check"]', function () {
+        var tr = tbl_prod.cell($(this).closest('td, li')).index();
+        var data = tbl_prod.row(tr.row).data();
+        var parametros = {'id': data.id, 'action': 'get'};
+        $.ajax({
+            dataType: 'JSON',
+            type: 'POST',
+            url: '/producto/lista',
+            data: parametros,
+        }).done(function (data) {
+            if (!data.hasOwnProperty('error')) {
+                carrito.add(data);
+                $('#Modal_lista').modal('hide');
+                return false;
+            }
+            menssaje_error(data.error, data.content, 'fa fa-times-circle');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown);
+        });
+    });
 });

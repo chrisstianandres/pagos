@@ -44,7 +44,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'NuevO Color'
+        data['boton'] = 'Nuevo Color'
         data['titulo'] = 'Listado de Colores'
         data['nuevo'] = '/color/nuevo'
         data['empresa'] = empresa
@@ -63,7 +63,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-
         try:
             if action == 'add':
                 f = ColorForm(request.POST)
@@ -99,7 +98,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data = {}
         if f.is_valid():
             f.save(commit=False)
-            if Categoria.objects.filter(nombre__icontains=f.data['nombre']).exclude(pk=pk):
+            if Color.objects.filter(nombre__icontains=f.data['nombre']).exclude(pk=pk):
                 f.add_error("nombre", "Ya existe una categoria este nombre")
                 data['error'] = f.errors
             else:

@@ -2,11 +2,11 @@
 {% load static %}
 {% block elements %}
     <br>
-        <div class="row">
+    <div class="row">
         <div class="col-lg-4">
             <label for="fecha"><strong>Rango de Fechas:</strong></label>
             <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm"></div>
-        </div>
+    </div>
     <br>
 {% endblock %}
 {% block table %}
@@ -15,10 +15,19 @@
         <th>Fecha</th>
         <th>Lote</th>
         <th>Novedades</th>
+        <th>Total/Productos</th>
     </tr>
     </thead>
     <tbody>
     </tbody>
+    <tfoot>
+    <tr>
+        <th></th>
+        <th></th>
+        <th>Total</th>
+        <th></th>
+    </tr>
+    </tfoot>
 {% endblock %}
 {% block botones %}
     <a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">

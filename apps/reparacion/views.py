@@ -16,15 +16,11 @@ from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
 from apps.cliente.forms import ClienteForm
-# from apps.compra.models import Compra
-# from apps.delvoluciones_venta.models import Devolucion
-# from apps.inventario.models import Inventario
-# from apps.servicio.models import Servicio
 from apps.producto_base.models import Producto_base
 from apps.reparacion.forms import ReparacionForm, Detalle_reparacionform
 from apps.reparacion.models import Reparacion, Detalle_reparacion
 from apps.empresa.models import Empresa
-from apps.producto.models import Producto
+
 
 import os
 from django.conf import settings
@@ -119,6 +115,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Reparacion
     template_name = 'front-end/reparacion/reparacion_form.html'
+    permission_required = 'reparacion.add_reparacion'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

@@ -78,39 +78,41 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 f = ClienteForm(request.POST)
                 data = self.save_data(f)
             elif action == 'edit':
+                pk = request.POST['id']
                 cliente = Cliente.objects.get(pk=int(pk))
                 f = ClienteForm(request.POST, instance=cliente)
                 data = self.save_data(f)
             elif action == 'delete':
-               cli = Cliente.objects.get(pk=pk)
-               cli.delete()
-               data['resp'] = True
+                pk = request.POST['id']
+                cli = Cliente.objects.get(pk=pk)
+                cli.delete()
+                data['resp'] = True
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-    def save_data(self, f):
-        data = {}
-        if f.is_valid():
-            f.save(commit=False)
-            if verificar(f.data['cedula']):
-                cli = f.save()
-                data['resp'] = True
-                data['cliente'] = cli.toJSON()
-            else:
-                f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
-                data['error'] = f.errors
+
+def save_data(self, f):
+    data = {}
+    if f.is_valid():
+        f.save(commit=False)
+        if verificar(f.data['cedula']):
+            cli = f.save()
+            data['resp'] = True
+            data['cliente'] = cli.toJSON()
         else:
+            f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
             data['error'] = f.errors
-        return data
+    else:
+        data['error'] = f.errors
+    return data
 
 
 class report(ValidatePermissionRequiredMixin, ListView):

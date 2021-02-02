@@ -82,7 +82,7 @@ $(function () {
                 pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                 download: 'open',
                 exportOptions: {
-                    columns: [0, 1, 2],
+                    columns: [0, 1, 2, 3],
                     search: 'applied',
                     order: 'applied'
                 },
@@ -151,7 +151,7 @@ $(function () {
                         return 4;
                     };
                     doc.content[0].layout = objLayout;
-                    doc.content[1].table.widths = ["*", "*", "*"];
+                    doc.content[1].table.widths = ["*", "*", "*", "*"];
                     doc.styles.tableBodyEven.alignment = 'center';
                     doc.styles.tableBodyOdd.alignment = 'center';
                     doc.styles.tableFooter.alignment = 'center';
@@ -176,7 +176,41 @@ $(function () {
                 targets: '_all',
                 class: 'text-center',
             }
-        ]
+        ],
+        footerCallback: function (row, data, start, end, display) {
+            var api = this.api(), data;
+
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+            // Total over this page
+            pageTotaliva = api
+                .column(3, {page: 'current'})
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+            // total full table
+            pageTotalconiva = api
+                .column(3, {page: 'current'})
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+            // total full table
+            totalconiva = api.column(3).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+            // Update footer
+              $(api.column(3).footer()).html(
+                pageTotalconiva + ' (  ' + pageTotalconiva +')'
+                // parseFloat(data).toFixed(2)
+            );
+        },
     });
 });
 

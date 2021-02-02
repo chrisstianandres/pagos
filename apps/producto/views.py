@@ -239,9 +239,7 @@ class sitio(ListView):
                 for i in query:
                     pb = Producto.objects.get(id=i['id'])
                     item = {'info': i['producto_base__nombre'], 'descripcion': i['producto_base__descripcion']}
-
                     item['id_venta'] = int(i['id'])
-
                     item['id_reparacion'] = int(i['id'])
                     item['id_confeccion'] = int(i['id'])
                     item['pvp'] = format(i['pvp'], '.2f')
@@ -433,8 +431,10 @@ def index(request):
     data = {}
     try:
         data = []
-        for p in Producto.objects.filter(stock__lt=10, stock__gt=1):
+        for p in Producto.objects.filter(stock__range=[1,10]):
+
             data.append(p.toJSON())
+        print(data)
     except Exception as e:
         data['error'] = str(e)
     return JsonResponse(data, safe=False)

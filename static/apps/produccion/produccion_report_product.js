@@ -41,6 +41,7 @@ var datos = {
 };
 $(function () {
     daterange();
+    console.log(564);
     datatable = $("#datatable").DataTable({
         destroy: true,
         responsive: true,

@@ -2,6 +2,7 @@ var tblcompra;
 var compras = {
     items: {
         fecha_compra: '',
+        comprobante: '',
         proveedor: '',
         subtotal: 0.00,
         iva: 0.00,
@@ -143,10 +144,15 @@ $(function () {
             menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
             return false
         }
+        else if ($('input[name="comprobante"]').val() === ""){
+            menssaje_error('Error!', "Debe ingresar un numero de comprobante", 'far fa-times-circle');
+            return false
+        }
         var action = $('input[name="action"]').val();
         var key = $('input[name="key"]').val();
         var parametros;
         compras.items.fecha_compra = $('input[name="fecha_compra"]').val();
+        compras.items.comprobante = $('input[name="comprobante"]').val();
         compras.items.proveedor = $('#id_proveedor option:selected').val();
         parametros = {'compras': JSON.stringify(compras.items)};
         parametros['action'] = 'add';

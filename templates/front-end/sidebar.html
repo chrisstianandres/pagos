@@ -1,112 +1,4 @@
 {% load static %}
-{#<div id="layoutSidenav_nav">#}
-{#    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">#}
-{#        <div class="sb-sidenav-menu">#}
-{#            <div class="nav">#}
-{#                <div class="sb-sidenav-menu-heading">Navegacion</div>#}
-{#                <a class="nav-link" href="{% url 'menu' %}">#}
-{#                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>#}
-{#                    Menu Principal#}
-{#                </a>#}
-{#                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLayouts"#}
-{#                   aria-expanded="false" aria-controls="collapseLayouts">#}
-{#                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>#}
-{#                    Transacciones#}
-{#                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>#}
-{#                </a>#}
-{#                <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-parent="#sidenavAccordion">#}
-{#                    <nav class="sb-sidenav-menu-nested nav">#}
-{#                        <a class="nav-link" href="{% url 'venta:lista' %}"><i class="fa fa-shopping-cart"></i> &nbsp;Ventas</a>#}
-{#                        <a class="nav-link" href="{% url 'compra:lista' %}"><i class="fas fa-dollar-sign"></i> &nbsp;Compras</a>#}
-{#                    </nav>#}
-{#                </div>#}
-{#                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"#}
-{#                   aria-expanded="false" aria-controls="collapsePages">#}
-{#                    <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>#}
-{#                    Recursos Humanos#}
-{#                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>#}
-{#                </a>#}
-{#                <div class="collapse" id="collapsePages" aria-labelledby="headingOne" data-parent="#sidenavAccordion">#}
-{#                    <nav class="sb-sidenav-menu-nested nav">#}
-{#                        <a class="nav-link" href="{% url 'empleado:lista' %}"><i class="fa fa-male"></i> &nbsp;Empleados</a>#}
-{#                        <a class="nav-link" href="{% url 'cargo:lista' %}"><i class="fas fa-laptop-house"></i> &nbsp;Cargos</a>#}
-{#                    </nav>#}
-{#                </div>#}
-{##}
-{#                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsecomercial"#}
-{#                   aria-expanded="false" aria-controls="collapsecomercial">#}
-{#                    <div class="sb-nav-link-icon"><i class="fab fa-amazon-pay"></i></div>#}
-{#                    Comercial#}
-{#                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>#}
-{#                </a>#}
-{#                <div class="collapse" id="collapsecomercial" aria-labelledby="headingOne"#}
-{#                     data-parent="#sidenavAccordion">#}
-{#                    <nav class="sb-sidenav-menu-nested nav">#}
-{#                        <a class="nav-link" href="{% url 'cliente:lista' %}"><i class="fas fa-users"></i> &nbsp;Clientes</a>#}
-{#                        <a class="nav-link" href="{% url 'proveedor:lista' %}"><i class="fa fa-truck"></i> &nbsp;Proveedor</a>#}
-{#                        <a class="nav-link" href="{% url 'producto:lista' %}"><i class="fab fa-amazon"></i> &nbsp;Producto</a>#}
-{#                        <a class="nav-link" href="{% url 'servicio:lista' %}"><i class="fas fa-concierge-bell"></i>#}
-{#                            &nbsp;Servicio</a>#}
-{#                        <a class="nav-link" href="{% url 'categoria:lista' %}"><i class="fa fa-boxes"></i> &nbsp;Categoria</a>#}
-{#                        <a class="nav-link" href="{% url 'presentacion:lista' %}"><i class="fab fa-untappd"></i> &nbsp;Presentacion</a>#}
-{#                        <a class="nav-link" href="{% url 'gasto:lista' %}"><i class="fas fa-file-invoice-dollar"></i> &nbsp;Gasto</a>#}
-{#                        <a class="nav-link" href="{% url 'tipo_gasto:lista' %}"><i class="far fa-keyboard"></i> &nbsp;Tipo de Gasto</a>#}
-{#                    </nav>#}
-{#                </div>#}
-{##}
-{#                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsereportes"#}
-{#                   aria-expanded="false" aria-controls="collapsecomercial">#}
-{#                    <div class="sb-nav-link-icon"><i class="far fa-file-pdf"></i></div>#}
-{#                    Reportes#}
-{#                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>#}
-{#                </a>#}
-{#                <div class="collapse" id="collapsereportes" aria-labelledby="headingOne"#}
-{#                     data-parent="#sidenavAccordion">#}
-{#                    <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">#}
-{#                        <a class="nav-link" href="{% url 'cliente:report' %}"><i class="fas fa-user-clock"></i> &nbsp;Clientes</a>#}
-{#                        <a class="nav-link" href="{% url 'proveedor:report' %}"><i class="fas fa-truck-moving"></i> &nbsp;Proveedor</a>#}
-{#                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pagesCollapseAuth"#}
-{#                           aria-expanded="false" aria-controls="pagesCollapseAuth"> <i class="fas fa-search-dollar"></i> &nbsp;#}
-{#                            Compras#}
-{#                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>#}
-{#                        </a>#}
-{#                        <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingOne"#}
-{#                             data-parent="#sidenavAccordionPages">#}
-{#                            <nav class="sb-sidenav-menu-nested nav">#}
-{#                                <a class="nav-link" href="{% url 'compra:report_total' %}"><i class="fas fa-funnel-dollar"></i> &nbsp;Totales</a>#}
-{#                                <a class="nav-link" href="{% url 'compra:report_by_product' %}"><i class="fab fa-amazon"></i>&nbsp; Por Producto</a>#}
-{#                            </nav>#}
-{#                        </div>#}
-{#                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pagesCollapseError"#}
-{#                           aria-expanded="false" aria-controls="pagesCollapseError"> <i class="fas fa-piggy-bank"></i>  &nbsp;#}
-{#                            Ventas#}
-{#                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>#}
-{#                        </a>#}
-{#                        <div class="collapse" id="pagesCollapseError" aria-labelledby="headingOne"#}
-{#                             data-parent="#sidenavAccordionPages">#}
-{#                            <nav class="sb-sidenav-menu-nested nav">#}
-{#                                <a class="nav-link" href="{% url 'venta:report_total' %}"><i class="fas fa-funnel-dollar"></i>&nbsp; Totales</a>#}
-{#                                <a class="nav-link" href="{% url 'venta:report_by_product' %}"><i class="fab fa-amazon"></i>&nbsp; Producto/Servicio</a>#}
-{#                            </nav>#}
-{#                        </div>#}
-{#                        <a class="nav-link" href="{% url 'inventario:lista' %}"><i class="fas fa-warehouse"></i> &nbsp;Inventario</a>#}
-{#                        <a class="nav-link" href="{% url 'gasto:report_total' %}"><i class="fas fa-file-invoice-dollar"></i> &nbsp;Gastos</a>#}
-{#                        <a class="nav-link" href="{% url 'devolucion:lista' %}"><i class="fas fa-exchange-alt"></i> &nbsp;Devoluciones</a>#}
-{#                    </nav>#}
-{#                </div>#}
-{#                <a class="nav-link" href="{% url 'database_backup:lista' %}">#}
-{#                    <div class="sb-nav-link-icon"><i class="fas fa-database"></i></div>#}
-{#                    Respaldos de Base de datos#}
-{#                </a>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="sb-sidenav-footer">#}
-{#            <div class="small">Bienvenido:</div>#}
-{#            {{ request.user.get_full_name }} <a href="#"><i class="far fa-play-circle text-success"></i> En Linea</a>#}
-{#        </div>#}
-{#    </nav>#}
-{#</div>#}
-
 <aside class="main-sidebar sidebar-dark-red2 elevation-4">
     <!-- Brand Logo -->
     <a href="{% url 'menu' %}" class="brand-link">
@@ -255,9 +147,21 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{% url 'color:lista' %}" class="nav-link">
+                                <i class="fa fa-palette"></i>
+                                <p>Colores</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{% url 'material:lista' %}" class="nav-link">
                                 <i class="fas fa-hat-cowboy-side"></i>
                                 <p>Material</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'tipo_mat:lista' %}" class="nav-link">
+                                <i class="fas fa-boxes"></i>
+                                <p>Tipo de material</p>
                             </a>
                         </li>
                         <li class="nav-item">

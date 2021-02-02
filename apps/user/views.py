@@ -91,7 +91,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 f = UserForm(request.POST, request.FILES)
@@ -99,14 +98,29 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     f.save(commit=False)
                     if verificar(f.data['cedula']):
                         f.save()
-                        return HttpResponseRedirect('/empleado/lista')
+                        return HttpResponseRedirect('/user/lista')
                     else:
                         f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
                         data['form'] = f
+                        data['icono'] = opc_icono
+                        data['entidad'] = opc_entidad
+                        data['boton'] = 'Nuevo Usuario'
+                        data['titulo'] = 'Registro de Usuarios'
+                        data['nuevo'] = '/usuario/nuevo'
+                        data['action'] = 'add'
+                        data['empresa'] = empresa
                 else:
                     data['form'] = f
+                    data['icono'] = opc_icono
+                    data['entidad'] = opc_entidad
+                    data['boton'] = 'Nuevo Usuario'
+                    data['titulo'] = 'Registro de Usuarios'
+                    data['nuevo'] = '/usuario/nuevo'
+                    data['action'] = 'add'
+                    data['empresa'] = empresa
                 return render(request, 'front-end/empleado/empleado_form.html', data)
             elif action == 'delete':
+               pk = request.POST['id']
                cli = User.objects.get(pk=pk)
                cli.delete()
                data['resp'] = True
@@ -124,6 +138,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['titulo'] = 'Registro de Usuarios'
         data['nuevo'] = '/usuario/nuevo'
         data['form'] = UserForm
+        data['action'] = 'add'
         data['empresa'] = empresa
         return data
 

@@ -133,8 +133,8 @@ function datatbles() {
         columns: [
             {data: "producto_base.nombre"},
             {data: "producto_base.categoria.nombre"},
-            {data: "producto_base.presentacion.nombre"},
-            {data: "producto_base.stock"},
+            {data: "presentacion.nombre"},
+            {data: "stock"},
             {data: "imagen"}
         ],
         columnDefs: [
@@ -175,7 +175,6 @@ function datatbles() {
         columns: [
             {data: 'compra.fecha_compra'},
             {data: "material.producto_base.nombre"},
-            {data: "material.producto_base.presentacion.nombre"},
             {data: "cantidad"},
             {data: "compra.total"}
         ],
@@ -216,7 +215,15 @@ $(function () {
      $('#alquiler_client').on('click', function () {
             window.location.href = '/alquiler/lista'
 
-        })
+        });
+        $('#rep_cliente').on('click', function () {
+            window.location.href = '/reparacion/lista'
+
+        });
+        $('#conf_cliente').on('click', function () {
+            window.location.href = '/confeccion/lista'
+
+        });
 
     }
 

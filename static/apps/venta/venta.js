@@ -139,6 +139,7 @@ $(function () {
             'Esta seguro que desea eliminar todos los productos seleccionados? <br>' +
             '<strong>CONTINUAR?</strong>', function () {
                 ventas.items.productos = [];
+                localStorage.clear();
                 ventas.list();
             });
     });

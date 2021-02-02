@@ -1,7 +1,7 @@
 import json
 
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Subquery, Sum
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -349,17 +349,26 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'report':
                 if start_date == '' and end_date == '':
-                    query = Produccion.objects.values('fecha_ingreso', 'asignacion__lote', 'novedades', 'estado') \
-                        .filter(estado=0)
+                    query = Inventario_producto.objects.values('produccion__produccion__fecha_ingreso',
+                                                               'produccion__produccion__novedades',
+                                                               'produccion__produccion__asignacion__lote').filter(
+                        produccion__produccion__estado=0) \
+                        .order_by().annotate(Count('produccion__produccion__asignacion__lote'))
+
                 else:
-                    query = Produccion.objects.values('fecha_ingreso', 'asignacion__lote', 'novedades',
-                                                      'estado').filter(
-                        fecha_ingreso__range=[start_date, end_date], estado=0)
+                    query = Inventario_producto.objects.values('produccion__produccion__fecha_ingreso',
+                                                               'produccion__produccion__novedades',
+                                                               'produccion__produccion__asignacion__lote') \
+                        .filter(produccion__produccion__fecha_ingreso__range=[start_date, end_date],
+                                produccion__produccion__estado=0).order_by().annotate(
+                        Count('produccion__produccion__asignacion__lote'))
+
                 for p in query:
                     data.append([
-                        p['fecha_ingreso'].strftime("%d/%m/%Y"),
-                        p['asignacion__lote'],
-                        p['novedades']
+                        p['produccion__produccion__fecha_ingreso'].strftime("%d/%m/%Y"),
+                        p['produccion__produccion__asignacion__lote'],
+                        p['produccion__produccion__novedades'],
+                        int(p['produccion__produccion__asignacion__lote__count'])
                     ])
         except Exception as e:
             data['error'] = 'No ha seleccionado una opcion'
@@ -399,24 +408,24 @@ class report(ValidatePermissionRequiredMixin, ListView):
                 if start_date == '' and end_date == '':
                     query = Inventario_producto.objects.values('produccion__produccion__fecha_ingreso',
                                                                'produccion__produccion__asignacion__lote',
-                                                               'produccion__producto__producto_base_id').filter(
-                        produccion__estado=0) \
+                                                               'produccion__producto_id').filter(
+                        produccion__produccion__estado=0) \
                         .order_by().annotate(Count('id'))
                 else:
                     query = Inventario_producto.objects.values('produccion__produccion__fecha_ingreso',
                                                                'produccion__produccion__asignacion__lote',
-                                                               'produccion__producto__producto_base_id') \
-                        .filter(produccion__fecha_ingreso__range=[start_date, end_date],
-                                produccion__estado=0).order_by().annotate(
+                                                               'produccion__producto_id') \
+                        .filter(produccion__produccion__fecha_ingreso__range=[start_date, end_date],
+                                produccion__produccion__estado=0).order_by().annotate(
                         Count('id'))
                 for p in query:
-                    pr = Producto_base.objects.get(id=int(p['producto__producto_base_id']))
+                    pr = Producto.objects.get(id=int(p['produccion__producto_id']))
                     data.append([
                         p['produccion__produccion__fecha_ingreso'].strftime("%d/%m/%Y"),
-                        pr.nombre,
-                        pr.categoria.nombre,
+                        pr.producto_base.nombre,
+                        pr.producto_base.categoria.nombre,
                         pr.presentacion.nombre,
-                        p['produccion__asignacion__lote'],
+                        p['produccion__produccion__asignacion__lote'],
                         int(p['id__count']),
                     ])
         except Exception as e:
@@ -605,3 +614,5 @@ def finalizar(request, id):
         productos.append(pro)
     data['productos'] = productos
     return render(request, 'front-end/produccion/produccion_form.html', data)
+
+

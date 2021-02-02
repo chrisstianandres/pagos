@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -107,10 +107,10 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             if action == 'add':
                 datos = json.loads(request.POST['compras'])
                 if datos:
-                    pr = []
                     with transaction.atomic():
                         c = Compra()
                         c.fecha_compra = datos['fecha_compra']
+                        c.comprobante = int(datos['comprobante'])
                         c.proveedor_id = datos['proveedor']
                         c.user_id = request.user.id
                         c.subtotal = float(datos['subtotal'])
@@ -125,14 +125,14 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dv.subtotal = float(i['subtotal'])
                             x = Material.objects.get(pk=i['id'])
                             dv.p_compra_actual = float(x.p_compra)
-                            x.stock = Inventario_material.objects.filter(material_id=x.id).count()
-                            x.save()
-                            dv.save()
                             for p in range(0, i['cantidad']):
                                 inv = Inventario_material()
                                 inv.compra_id = c.id
                                 inv.material_id = x.id
                                 inv.save()
+                            x.stock = Inventario_material.objects.filter(material_id=x.id, estado=1).count()
+                            x.save()
+                            dv.save()
                         data['id'] = c.id
                         data['resp'] = True
                 else:

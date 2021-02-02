@@ -17,7 +17,8 @@ class CompraForm(forms.ModelForm):
             }
             self.fields['proveedor'].widget.attrs = {
                 'class': 'form-control select2',
-                'data-live-search': "true"
+                'data-live-search': "true",
+                'style': "width: 80%"
             }
             self.fields['subtotal'].widget.attrs = {
                 'value': '0.00',
