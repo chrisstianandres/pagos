@@ -214,7 +214,7 @@ $(function () {
                 minYear: 1901,
                 maxDate: new Date(),
                 locale: {
-                    format: 'YYYY-MM-DD',
+                    format: 'DD-MM-YYYY',
                     applyLabel: '<i class="fas fa-search"></i> Aplicar',
                     cancelLabel: '<i class="fas fa-times"></i> Cancelar',
                 },

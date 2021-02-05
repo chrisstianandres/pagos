@@ -20,7 +20,7 @@ class Gasto(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['empresa'] = self.empresa.toJSON()
-        item['fecha_pago'] = self.fecha_pago.strftime('%d/%m/%Y')
+        item['fecha_pago'] = self.fecha_pago.strftime('%Y/%m/%d')
         item['tipo_gasto'] = self.tipo_gasto.toJSON()
         item['valor'] = format(self.valor, '.2f')
         return item

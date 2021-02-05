@@ -168,6 +168,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = GastoForm
+    permission_required = 'gasto.view_gasto'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -240,6 +241,11 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 class report_total(ListView):
     model = Gasto
     template_name = 'front-end/gasto/gasto_report_total.html'
+    permission_required = 'gasto.view_gasto'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Gasto.objects.none()
@@ -248,33 +254,25 @@ class report_total(ListView):
         data = {}
         start_date = request.POST.get('start_date', '')
         end_date = request.POST.get('end_date', '')
-        action = request.POST['action']
         try:
             action = request.POST['action']
             if action == 'list':
                 data = []
                 if start_date == '' and end_date == '':
-                    query = Gasto.objects.values('id', 'fecha', 'tipo_gasto__nombre', 'detalle').annotate(Sum('valor'))
-                    for p in query:
-                        data.append([
-                            p['id'],
-                            p['fecha'].strftime("%d/%m/%Y"),
-                            p['tipo_gasto__nombre'],
-                            p['detalle'],
-                            format(p['valor__sum'], '.2f')
-                        ])
+                    query = Gasto.objects.values('id', 'fecha_pago', 'tipo_gasto__nombre', 'detalle').annotate(Sum('valor'))
                 else:
-                    query = Gasto.objects.values('id', 'fecha', 'tipo_gasto__nombre', 'detalle').annotate(
+                    query = Gasto.objects.values('id', 'fecha_pago', 'tipo_gasto__nombre', 'detalle').annotate(
                         Sum('valor')).filter(
                         fecha_venta__range=[start_date, end_date])
-                    for p in query:
-                        data.append([
-                            p['id'],
-                            p['fecha'].strftime("%d/%m/%Y"),
-                            p['tipo_gasto__nombre'],
-                            p['detalle'],
-                            format(p['valor__sum'], '.2f')
-                        ])
+                for p in query:
+                    print(p)
+                    data.append([
+                        p['id'],
+                        p['fecha_pago'].strftime("%d/%m/%Y"),
+                        p['tipo_gasto__nombre'],
+                        p['detalle'],
+                        format(p['valor__sum'], '.2f')
+                    ])
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
