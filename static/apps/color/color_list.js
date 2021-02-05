@@ -64,7 +64,7 @@ $(function () {
 
     $('#nuevo').on('click', function () {
         $('#exampleModalLabel').html('<i class="fas fa-plus"></i>&nbsp;Nuevo registro de un Color');
-        $('#Modal').modal('show');
+        $('#Modal_color').modal('show');
         action = 'add';
         pk = '';
     });
@@ -81,7 +81,7 @@ $(function () {
                 '/color/nuevo', 'Esta seguro que desea guardar este Color?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este Color!', 'far fa-smile-wink', function () {
-                        $('#Modal').modal('hide');
+                        $('#Modal_color').modal('hide');
                         reset();
                         datatable.ajax.reload(null, false);
                     });

@@ -9,6 +9,13 @@ var ventas = {
         total: 0.00,
         productos: []
     },
+    get_ids: function () {
+        var ids = [];
+        $.each(this.items.productos, function (key, value) {
+            ids.push(value.producto_base.id);
+        });
+        return ids;
+    },
     calculate: function () {
         var subtotal = 0.00;
         var iva_emp = 0.00;
@@ -44,7 +51,9 @@ var ventas = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
+                {data: "presentacion.nombre"},
+                {data: "producto_base.color.nombre"},
+                {data: "talla.talla"},
                 {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
@@ -68,6 +77,12 @@ var ventas = {
                     render: function (data, type, row) {
                         return '$' + parseFloat(data).toFixed(2);
                     }
+                },
+                {
+                    targets: [5],
+                    class: 'text-center',
+                    orderable: false,
+                    width: '8%',
                 },
                 {
                     targets: [-3],
@@ -99,25 +114,63 @@ $(function () {
     var action = '';
     var pk = '';
     //seleccionar producto del select producto
-    $('#id_producto').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $('#id_producto option:selected').val(),
-                'action': 'get_confec'
+    $('#id_producto')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
             },
-            dataType: 'json',
-            success: function (data) {
-                ventas.add(data);
-                $('#id_producto').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                alert(data);
-            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/producto/lista',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search_rep',
+                        'id': ''
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
 
+                },
+
+            },
+            placeholder: 'Busca un Producto',
+            minimumInputLength: 1,
         })
-    });
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/producto/lista',
+                data: {
+                    "id": $('#id_producto option:selected').val(),
+                    'action': 'get_confec'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    ventas.add(data);
+                    $('#id_producto').val(null).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        });
     //remover producto del detalle
     $('#tblproductos tbody')
         .on('click', 'a[rel="remove"]', function () {
@@ -134,7 +187,7 @@ $(function () {
             var tr = tblventa.cell($(this).closest('td, li')).index();
             ventas.items.productos[tr.row].cantidad = cantidad;
             ventas.calculate();
-            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
         });
     //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {
@@ -241,44 +294,6 @@ $(function () {
     $('#Modal').on('hidden.bs.modal', function (e) {
         reset();
         $('#form').trigger("reset");
-    });
-    //buscar produto del select producto
-    $('#id_producto').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
-            },
-            "noResults": function () {
-                return "Sin resultados";
-            },
-            "searching": function () {
-                return "Buscando...";
-            }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: '/producto/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search_rep',
-                    'id': ''
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
-
-            },
-
-        },
-        placeholder: 'Busca un Producto',
-        minimumInputLength: 1,
     });
 });
 

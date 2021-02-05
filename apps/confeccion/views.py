@@ -65,7 +65,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         data.append({
                             'producto': p.producto.producto_base.nombre,
                             'categoria': p.producto.producto_base.categoria.nombre,
-                            'presentacion': p.producto.producto_base.presentacion.nombre,
+                            'presentacion': p.producto.presentacion.nombre,
+                            'color': p.producto.producto_base.color.nombre,
+                            'talla': '{} / {}'.format(p.producto.talla.talla, p.producto.talla.eqv_letra),
                             'cantidad': p.cantidad,
                             'pvp': p.pvp_by_confec,
                             'subtotal': p.subtotal

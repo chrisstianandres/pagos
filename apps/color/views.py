@@ -77,6 +77,20 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 cat = Color.objects.get(pk=pk)
                 cat.delete()
                 data['resp'] = True
+            elif action == 'search':
+                data = []
+                term = request.POST['term']
+                query = Color.objects.filter(nombre__icontains=term)
+                for a in query[0:10]:
+                    result = {'id': int(a.id), 'text': str(a.nombre)}
+                    data.append(result)
+            elif action == 'get':
+                data = []
+                pk = request.POST['id']
+                query = Color.objects.get(id=pk)
+                item = query.toJSON()
+                # item['presentacion'] = query.toJSON()
+                data.append(item)
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:

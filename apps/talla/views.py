@@ -1,5 +1,6 @@
 import json
 
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -63,6 +64,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
+        print(action)
         try:
             if action == 'add':
                 f = TallaForm(request.POST)
@@ -77,6 +79,20 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 cat = Talla.objects.get(pk=pk)
                 cat.delete()
                 data['resp'] = True
+            elif action == 'search':
+                data = []
+                term = request.POST['term']
+                query = Talla.objects.filter(talla__range=[0, int(term)])[0:10]
+                for a in query[0:10]:
+                    result = {'id': int(a.id), 'text': '{} / {}'.format(a.talla, a.eqv_letra)}
+                    data.append(result)
+            elif action == 'get':
+                data = []
+                pk = request.POST['id']
+                query = Talla.objects.get(id=pk)
+                item = query.toJSON()
+                item['talla_full'] = '{} / {}'.format(query.talla, query.eqv_letra)
+                data.append(item)
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:

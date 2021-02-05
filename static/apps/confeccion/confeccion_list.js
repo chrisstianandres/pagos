@@ -302,6 +302,8 @@ $(function () {
                     {data: 'producto'},
                     {data: 'categoria'},
                     {data: 'presentacion'},
+                    {data: 'color'},
+                    {data: 'talla'},
                     {data: 'cantidad'},
                     {data: 'pvp'},
                     {data: 'subtotal'}

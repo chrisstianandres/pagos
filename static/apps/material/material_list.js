@@ -7,7 +7,7 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.readAsDataURL(blob)
     }));
 
-toDataURL('/media/imagen.PNG').then(dataUrl => {
+toDataURL('/media/imagen.png').then(dataUrl => {
     logotipo = dataUrl;
 });
 $(function () {

@@ -11,12 +11,14 @@ from django.views.generic import *
 from apps.asignar_recursos.models import Detalle_asig_recurso, Asig_recurso
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
+from apps.color.forms import ColorForm
 from apps.inventario_material.models import Inventario_material
 from apps.material.forms import MaterialForm, Producto_baseForm
 from apps.material.models import Material
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.presentacion.forms import PresentacionForm
 from apps.producto_base.models import Producto_base
+from apps.tipo_material.forms import Tipo_materialForm
 
 opc_icono = 'fas fa-hat-cowboy-side'
 opc_entidad = 'Material'
@@ -123,7 +125,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
+            print(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -207,8 +210,12 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         data = {}
         if f.is_valid() and f2.is_valid():
             base = f2.save(commit=False)
-            base.producto_base = f.save()
+            b = f.save()
+            base.producto_base = b
             base.save()
+            mat = Producto_base.objects.get(pk=b.id)
+            mat.tipo = 1
+            mat.save()
             data['resp'] = True
         else:
             data['error'] = f.errors
@@ -229,6 +236,8 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         data['crud'] = crud
         data['form_cat'] = CategoriaForm
         data['form_pres'] = PresentacionForm
+        data['form_tipo'] = Tipo_materialForm
+        data['form_color'] = ColorForm
         data['empresa'] = empresa
         return data
 

@@ -51,6 +51,12 @@ $(document).ready(function () {
             presentacion: {
                 required: true
             },
+            ud_medida: {
+                required: true,
+                lettersonly: true,
+                minlength: 1,
+                maxlength: 10
+            },
         },
         messages: {
             nombre: {
@@ -70,6 +76,11 @@ $(document).ready(function () {
             presentacion: {
                 required: "Debe escoger una presentacion de producto",
 
+            },
+            ud_medida: {
+                 required: "Porfavor ingresa una unidad de medida",
+                minlength: "Debe ingresar al menos 3 letras",
+                lettersonly: "Debe ingresar unicamente letras y espacios"
             },
         },
     });
@@ -91,6 +102,11 @@ $(document).ready(function () {
     });
     $('#id_new_presentacion').on('click', function () {
         $('#Modal2').modal('show');
+        action = 'add';
+        pk = '';
+    });
+    $('#id_new_tipo_material').on('click', function () {
+        $('#Modal_tipo').modal('show');
         action = 'add';
         pk = '';
     });
@@ -130,6 +146,52 @@ $(document).ready(function () {
                     });
                 });
         }
+    });
+    $('#form_tipo').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', action);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/tipo_mat/nuevo', 'Esta seguro que desea guardar este tipo de material?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar este tipo de material!', 'far fa-smile-wink', function () {
+                        $('#Modal_tipo').modal('hide');
+                        var newOption = new Option(response.tipo_material['nombre'], response.tipo_material['id'], false, true);
+                        $('#id_tipo_material').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
+    $('#form_color').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', 'add');
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/color/nuevo', 'Esta seguro que desea guardar este color?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar este color!', 'far fa-smile-wink', function () {
+                        $('#Modal_color').modal('hide');
+                        var newOption = new Option(response.color['nombre'], response.color['id'], false, true);
+                        $('#id_color').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
+
+    $('#id_new_color').on('click', function () {
+        $('#Modal_color').modal('show');
+        action = 'add';
+        pk = '';
+    });
+
+    $('#id_medida').TouchSpin({
+        min: 1,
+        max: 1000000,
+        step: 1
     });
 
 });

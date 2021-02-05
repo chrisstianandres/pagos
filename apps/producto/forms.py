@@ -23,9 +23,9 @@ class Producto_baseForm(forms.ModelForm):
                 attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control form-rounded'})
             self.fields['categoria'].widget.attrs = {
                 'class': 'form-control select2',
-                'id': 'id_despcripcion_producto'}
+                'id': 'id_despcripcion_producto', 'style': 'width: 95%'}
             self.fields['color'].widget.attrs = {
-                'class': 'form-control select2'}
+                'class': 'form-control select2', 'style': 'width: 95%'}
 
     class Meta:
         model = Producto_base

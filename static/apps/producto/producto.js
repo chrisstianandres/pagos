@@ -108,54 +108,23 @@ $(document).ready(function () {
             ajax: {
                 url: '/producto/lista',
                 type: 'POST',
-                data: {'action': 'list'},
+                data: {'action': 'list_add'},
                 dataSrc: ""
             },
             columns: [
-                {"data": "producto_base.nombre"},
-                {"data": "producto_base.categoria.nombre"},
-                {"data": "presentacion.nombre"},
-                {"data": "stock"},
-                {"data": "producto_base.descripcion"},
-                {"data": "pvp"},
-                {"data": "pvp_alq"},
-                {"data": "pvp_confec"},
-                {"data": "imagen"},
-                {"data": "producto_base.id"}
+                {"data": "nombre"},
+                {"data": "categoria.nombre"},
+                {"data": "descripcion"},
+                {"data": "color.nombre"},
+                {"data": "id"}
             ],
             columnDefs: [
-                {
-                    targets: [-7],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<span>' + data + '</span>';
-                    }
-                },
-                {
-                    targets: [-3, -4, -5],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<span>$ ' + parseFloat(data).toFixed(2) + '</span>';
-                    }
-                },
                 {
                     targets: '__all',
                     class: 'text-center'
                 },
                 {
-                    targets: [-2],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
-                    }
-                },
-                {
                     targets: [-1],
-                    class: 'text-center',
-                    width: '10%',
                     orderable: false,
                     render: function (data, type, row) {
                         var select = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="select" ' +
@@ -164,17 +133,7 @@ $(document).ready(function () {
 
                     }
                 },
-            ],
-            createdRow: function (row, data, dataIndex) {
-                if (data.stock >= 51) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
-                } else if (data.stock >= 10) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
-                } else if (data.stock <= 9) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
-                }
-
-            }
+            ]
         })
     });
 
@@ -182,7 +141,7 @@ $(document).ready(function () {
         .on('click', 'a[rel="select"]', function () {
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var parametros = {'id': data.producto_base.id, 'action': 'get'};
+            var parametros = {'id': data.id, 'action': 'get'};
             $.ajax({
                 dataType: 'JSON',
                 type: 'POST',
@@ -271,6 +230,232 @@ $(document).ready(function () {
                 },
 
             })
+        })
+        .on("change", function () {
+            if ($(this).val() === "") {
+                $('#id_des').val("");
+                $('#id_cat').val("");
+                $('#id_col').val("");
+            }
+        });
+
+    $('#id_despcripcion_producto')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/categoria/nuevo',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data,
+                    };
+                },
+            },
+            placeholder: 'Busca una Categoria',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/categoria/nuevo',
+                data: {
+                    "id": $('#id_despcripcion_producto option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    var newOption = new Option(data[0]['nombre'], data[0]['id'], false, true);
+                    $('#id_despcripcion_producto').append(newOption).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        });
+    $('#id_color')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/color/nuevo',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data,
+                    };
+                },
+            },
+            placeholder: 'Busca un color',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/color/nuevo',
+                data: {
+                    "id": $('#id_color option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    var newOption = new Option(data[0]['nombre'], data[0]['id'], false, true);
+                    $('#id_color').append(newOption).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        });
+
+    $('#id_presentacion_producto')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/presentacion/nuevo',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data,
+                    };
+                },
+            },
+            placeholder: 'Busca una presentacion',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/presentacion/nuevo',
+                data: {
+                    "id": $('#id_presentacion_producto option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    var newOption = new Option(data[0]['nombre'], data[0]['id'], false, true);
+                    $('#id_presentacion_producto').append(newOption).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        });
+
+    $('#id_talla')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/talla/nuevo',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data,
+                    };
+                },
+            },
+            placeholder: 'Busca una talla',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/talla/nuevo',
+                data: {
+                    "id": $('#id_talla option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    var newOption = new Option(data[0]['talla_full'], data[0]['id'], false, true);
+                    $('#id_talla').append(newOption).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
         });
 
     $('#form_prod').on('submit', function (e) {
@@ -287,7 +472,6 @@ $(document).ready(function () {
                         $('#Modal_prod').modal('hide');
                         var newOption = new Option(response.producto_base['nombre'], response.producto_base['id'], false, true);
                         $('#id_producto_base').append(newOption).trigger('change');
-                        console.log(response);
                         $('#id_des').val(response.producto_base.descripcion);
                         $('#id_cat').val(response.producto_base.categoria.nombre);
                         $('#id_col').val(response.producto_base.color.nombre);
@@ -308,7 +492,7 @@ $(document).ready(function () {
                     menssaje_ok('Exito!', 'Exito al guardar esta categoria!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
                         var newOption = new Option(response.categoria['nombre'], response.categoria['id'], false, true);
-                        $('#id_categoria').append(newOption).trigger('change');
+                        $('#id_despcripcion_producto').append(newOption).trigger('change');
                     });
                 });
         }
@@ -326,7 +510,7 @@ $(document).ready(function () {
                     menssaje_ok('Exito!', 'Exito al guardar esta presentacion!', 'far fa-smile-wink', function () {
                         $('#Modal2').modal('hide');
                         var newOption = new Option(response.presentacion['full'], response.presentacion['id'], false, true);
-                        $('#id_presentacion').append(newOption).trigger('change');
+                        $('#id_presentacion_producto').append(newOption).trigger('change');
                     });
                 });
         }
@@ -365,6 +549,12 @@ $(document).ready(function () {
                 });
         }
     });
+
+
+    $('#Modal_prod').on('hidden.bs.modal', function () {
+        $('#id_despcripcion_producto').val("").trigger('change');
+        $('#id_color').val("").trigger('change');
+    })
 
 });
 

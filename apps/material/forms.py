@@ -20,7 +20,7 @@ class MaterialForm(forms.ModelForm):
             self.fields['tipo_material'].widget.attrs = {
                 'class': 'form-control select2'}
             self.fields['medida'].widget.attrs = {
-                'class': 'form-control'}
+                'class': 'form-control input-sm', 'value': 1}
             self.fields['ud_medida'].widget.attrs = {
                 'class': 'form-control'}
 
@@ -28,7 +28,7 @@ class MaterialForm(forms.ModelForm):
         model = Material
         fields = ['p_compra', 'calidad', 'tipo_material', 'ud_medida', 'medida']
         labels = {'p_compra': 'P. Compra','calidad': 'Calidad', 'tipo_material': 'Tipo de Material',
-                  'ud_medida': 'Unidad de medida', 'medida': 'Medida',}
+                  'ud_medida': 'Unidad de medida', 'medida': 'Medida'}
         widgets = {'p_compra': forms.TextInput(), 'ud_medida': forms.TextInput(), 'medida': forms.TextInput(),
                    }
 

@@ -99,20 +99,20 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-def save_data(self, f):
-    data = {}
-    if f.is_valid():
-        f.save(commit=False)
-        if verificar(f.data['cedula']):
-            cli = f.save()
-            data['resp'] = True
-            data['cliente'] = cli.toJSON()
+    def save_data(self, f):
+        data = {}
+        if f.is_valid():
+            f.save(commit=False)
+            if verificar(f.data['cedula']):
+                cli = f.save()
+                data['resp'] = True
+                data['cliente'] = cli.toJSON()
+            else:
+                f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
+                data['error'] = f.errors
         else:
-            f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
             data['error'] = f.errors
-    else:
-        data['error'] = f.errors
-    return data
+        return data
 
 
 class report(ValidatePermissionRequiredMixin, ListView):

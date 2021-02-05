@@ -47,6 +47,24 @@ $(document).ready(function () {
             },
         },
     });
+    $("#form_color").validate({
+        rules: {
+            nombre: {
+                required: true,
+                minlength: 3,
+                maxlength: 50,
+                lettersonly: true,
+            },
+        },
+        messages: {
+            nombre: {
+                required: "Porfavor ingresa el nombre del color",
+                minlength: "Debe ingresar al menos 3 letras",
+                lettersonly: "Debe ingresar unicamente letras y espacios",
+                maxlength: "La descripcion debe tener maximo 25 caracteres",
+            },
+        },
+    });
     $("#form_cat").validate({
         rules: {
             nombre: {

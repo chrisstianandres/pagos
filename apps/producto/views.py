@@ -45,6 +45,10 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for c in Producto.objects.all():
                     data.append(c.toJSON())
+            elif action == 'list_add':
+                data = []
+                for c in Producto_base.objects.filter(tipo=0):
+                    data.append(c.toJSON())
             elif action == 'list_venta':
                 data = []
                 vent = Producto.objects.filter(stock__gte=1)
@@ -301,7 +305,6 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        print(action)
         try:
             if action == 'add':
                 f = self.form_class(request.POST or None, request.FILES or None)
