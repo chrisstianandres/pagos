@@ -208,14 +208,13 @@ $(function () {
             $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            console.log(data);
             $('input[name="fecha_pago"]').val(data.fecha_pago).attr('readonly', false).daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
                 minYear: 1901,
                 maxDate: new Date(),
                 locale: {
-                    format: 'DD-MM-YYYY',
+                    format: 'YYYY-MM-DD',
                     applyLabel: '<i class="fas fa-search"></i> Aplicar',
                     cancelLabel: '<i class="fas fa-times"></i> Cancelar',
                 },
