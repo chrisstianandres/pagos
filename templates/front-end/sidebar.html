@@ -2,7 +2,7 @@
 <aside class="main-sidebar sidebar-dark-red2 elevation-4">
     <!-- Brand Logo -->
     <a href="{% url 'menu' %}" class="brand-link">
-        <img src="/media/imagen.PNG" alt="Logo" class="img" width="200" height="80"
+        <img src="/media/imagen.png" alt="Logo" class="img" width="200" height="80"
              style="opacity: .8">
         <br>
         <span class="brand-text font-weight-light">{{ empresa.nombre }}</span>
@@ -36,322 +36,329 @@
                     </a>
                 </li>
                 {% if request.user.tipo == 0 %}
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-lock"></i>
-                        <p>
-                            Transaciones
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{% url 'venta:lista' %}" class="nav-link">
-                                <i class="fas fa-piggy-bank"></i>
-                                <p>Compras</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'alquiler:lista' %}" class="nav-link">
-                                <i class="fas fa-donate"></i>
-                                <p>Alquileres</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'reparacion:lista' %}" class="nav-link">
-                                <i class="fa fa fa-tools"></i>
-                                <p>Reparaciones</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'confeccion:lista' %}" class="nav-link">
-                                <i class="fab fa-shirtsinbulk"></i>
-                                <p>Confecciones</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                     <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="far fa-newspaper"></i>
-                        <p>
-                            Sitio Web
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="/" class="nav-link">
-                                <i class="far fa-eye"></i>
-                                <p>Ver Sitio web</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-lock"></i>
+                            <p>
+                                Transaciones
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'venta:lista' %}" class="nav-link">
+                                    <i class="fas fa-piggy-bank"></i>
+                                    <p>Compras</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'alquiler:lista' %}" class="nav-link">
+                                    <i class="fas fa-donate"></i>
+                                    <p>Alquileres</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'reparacion:lista' %}" class="nav-link">
+                                    <i class="fa fa fa-tools"></i>
+                                    <p>Reparaciones</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'confeccion:lista' %}" class="nav-link">
+                                    <i class="fab fa-shirtsinbulk"></i>
+                                    <p>Confecciones</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="far fa-newspaper"></i>
+                            <p>
+                                Sitio Web
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/" class="nav-link">
+                                    <i class="far fa-eye"></i>
+                                    <p>Ver Sitio web</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 {% endif %}
-             {% if request.user.tipo == 1 %}
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-lock"></i>
-                        <p>
-                            Seguridad
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{% url 'user:lista' %}" class="nav-link">
-                                <i class="fas fa-user-shield"></i>
-                                <p>Usuarios</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'user:groups' %}" class="nav-link">
-                                <i class="fas fa-user-lock"></i>
-                                <p>Grupos</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'database_backup:lista' %}" class="nav-link">
-                                <i class="fas fa-database"></i>
-                                <p>Respado de datos</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-bezier-curve"></i>
-                        <p>
-                            Gestion
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{% url 'cliente:lista' %}" class="nav-link">
-                                <i class="fas fa-users"></i>
-                                <p>Clientes</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'proveedor:lista' %}" class="nav-link">
-                                <i class="fas fa-user-astronaut"></i>
-                                <p>Proveedor</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'producto:lista' %}" class="nav-link">
-                                <i class="fas fa-tshirt"></i>
-                                <p>Productos</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'color:lista' %}" class="nav-link">
-                                <i class="fa fa-palette"></i>
-                                <p>Colores</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'material:lista' %}" class="nav-link">
-                                <i class="fas fa-hat-cowboy-side"></i>
-                                <p>Material</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'tipo_mat:lista' %}" class="nav-link">
-                                <i class="fas fa-boxes"></i>
-                                <p>Tipo de material</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'categoria:lista' %}" class="nav-link">
-                                <i class="fab fa-buffer"></i>
-                                <p>Categoria</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'presentacion:lista' %}" class="nav-link">
-                                <i class="fas fa-mitten"></i>
-                                <p>Presentacion</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'maquina:lista' %}" class="nav-link">
-                                <i class="fas fa-subway"></i>
-                                <p>Maquina</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'gasto:lista' %}" class="nav-link">
-                                <i class="fas fa-hand-holding-usd"></i>
-                                <p>Gastos</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'asignacion:lista' %}" class="nav-link">
-                                <i class="fas fa-hand-holding-usd"></i>
-                                <p>Asignacion de Recursos</p>
-                            </a>
-                        </li>
+                {% if request.user.tipo == 1 %}
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-lock"></i>
+                            <p>
+                                Seguridad
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'user:lista' %}" class="nav-link">
+                                    <i class="fas fa-user-shield"></i>
+                                    <p>Usuarios</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'user:groups' %}" class="nav-link">
+                                    <i class="fas fa-user-lock"></i>
+                                    <p>Grupos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'database_backup:lista' %}" class="nav-link">
+                                    <i class="fas fa-database"></i>
+                                    <p>Respado de datos</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-bezier-curve"></i>
+                            <p>
+                                Gestion
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'cliente:lista' %}" class="nav-link">
+                                    <i class="fas fa-users"></i>
+                                    <p>Clientes</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'proveedor:lista' %}" class="nav-link">
+                                    <i class="fas fa-user-astronaut"></i>
+                                    <p>Proveedor</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'producto:lista' %}" class="nav-link">
+                                    <i class="fas fa-tshirt"></i>
+                                    <p>Productos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'color:lista' %}" class="nav-link">
+                                    <i class="fa fa-palette"></i>
+                                    <p>Colores</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'material:lista' %}" class="nav-link">
+                                    <i class="fas fa-hat-cowboy-side"></i>
+                                    <p>Material</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'tipo_mat:lista' %}" class="nav-link">
+                                    <i class="fas fa-boxes"></i>
+                                    <p>Tipo de material</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'categoria:lista' %}" class="nav-link">
+                                    <i class="fab fa-buffer"></i>
+                                    <p>Categoria</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'presentacion:lista' %}" class="nav-link">
+                                    <i class="fas fa-mitten"></i>
+                                    <p>Presentacion</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'maquina:lista' %}" class="nav-link">
+                                    <i class="fas fa-subway"></i>
+                                    <p>Maquina</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'gasto:lista' %}" class="nav-link">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                    <p>Gastos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'asignacion:lista' %}" class="nav-link">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                    <p>Asignacion de Recursos</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-code-branch"></i>
-                        <p>
-                            Produccion
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{% url 'compra:lista' %}" class="nav-link">
-                                <i class="far fa-money-bill-alt"></i>
-                                <p>Compras</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'venta:lista' %}" class="nav-link">
-                                <i class="fas fa-piggy-bank"></i>
-                                <p>Ventas</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'confeccion:lista' %}" class="nav-link">
-                                <i class="fab fa-shirtsinbulk"></i>
-                                <p>Confeccion</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'reparacion:lista' %}" class="nav-link">
-                                <i class="fa fa fa-tools"></i>
-                                <p>Reparacion</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'alquiler:lista' %}" class="nav-link">
-                                <i class="fas fa-donate"></i>
-                                <p>Alquiler</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'produccion:lista' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Produccion</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-file-alt"></i>
-                        <p>
-                            Reportes
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{% url 'compra:report_total' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Compras</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'cliente:report' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Clientes</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'producto:report' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Stock de productos</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'proveedor:report' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Proveedores</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'material:report' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Materiales</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'venta:report_total' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Ventas y Pedidos</p>
-                            </a>
-                        </li>
-                         <li class="nav-item">
-                            <a href="{% url 'alquiler:report_total' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Alquileres</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'confeccion:report_total' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Confecciones</p>
-                            </a>
-                        </li>
-                         <li class="nav-item">
-                            <a href="{% url 'reparacion:report_total' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Reparaciones</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'produccion:report_total' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Produccion</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'produccion:report_by_product_perd' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Perdidas</p>
-                            </a>
-                        </li>
-                          <li class="nav-item">
-                            <a href="{% url 'devolucion:lista' %}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Devoluciones en ventas</p>
-                            </a>
-                        </li>
-                        <br><br><br>
-                    </ul>
-                </li>
-                <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="far fa-newspaper"></i>
-                        <p>
-                            Sitio Web
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{% url 'sitio:configurar' %}" class="nav-link">
-                                <i class="fas fa-cogs"></i>
-                                <p>Configurar Sitio</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/" class="nav-link">
-                                <i class="far fa-eye"></i>
-                                <p>Ver Sitio web</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            {% endif %}
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-code-branch"></i>
+                            <p>
+                                Produccion
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'compra:lista' %}" class="nav-link">
+                                    <i class="far fa-money-bill-alt"></i>
+                                    <p>Compras</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'venta:lista' %}" class="nav-link">
+                                    <i class="fas fa-piggy-bank"></i>
+                                    <p>Ventas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'confeccion:lista' %}" class="nav-link">
+                                    <i class="fab fa-shirtsinbulk"></i>
+                                    <p>Confeccion</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'reparacion:lista' %}" class="nav-link">
+                                    <i class="fa fa fa-tools"></i>
+                                    <p>Reparacion</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'alquiler:lista' %}" class="nav-link">
+                                    <i class="fas fa-donate"></i>
+                                    <p>Alquiler</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'produccion:lista' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Produccion</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            <p>
+                                Reportes
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'compra:report_total' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Compras</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'cliente:report' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Clientes</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'producto:report' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Stock de productos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'proveedor:report' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Proveedores</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'material:report' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Materiales</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'venta:report_total' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Ventas y Pedidos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'alquiler:report_total' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Alquileres</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'confeccion:report_total' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Confecciones</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'reparacion:report_total' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Reparaciones</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'produccion:report_total' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Produccion</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'produccion:report_by_product_perd' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Perdidas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'devolucion:lista' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Devoluciones en ventas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'gasto:report_total' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Gatsos</p>
+                                </a>
+                            </li>
+                            <br><br><br>
+                            <br><br><br>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="far fa-newspaper"></i>
+                            <p>
+                                Sitio Web
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'sitio:configurar' %}" class="nav-link">
+                                    <i class="fas fa-cogs"></i>
+                                    <p>Configurar Sitio</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/" class="nav-link">
+                                    <i class="far fa-eye"></i>
+                                    <p>Ver Sitio web</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

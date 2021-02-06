@@ -265,7 +265,8 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
         data['form'] = TransaccionForm()
         data['form2'] = Detalle_confeccionform()
         data['detalle'] = []
-        data['formc'] = ClienteForm()
+        user = Cliente.objects.get(cedula=self.request.user.cedula)
+        data['formc'] = ClienteForm(instance=user)
         return data
 
 

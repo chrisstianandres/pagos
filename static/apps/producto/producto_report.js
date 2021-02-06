@@ -7,7 +7,7 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.readAsDataURL(blob)
     }));
 
-toDataURL('/media/imagen.PNG').then(dataUrl => {
+toDataURL('/media/imagen.png').then(dataUrl => {
     logotipo = dataUrl;
 });
 $(function () {
@@ -171,11 +171,12 @@ $(function () {
             },
         ],
         createdRow: function (row, data, dataIndex) {
-            if (data.producto_base.stock >= 51) {
+            console.log(data);
+            if (data.stock >= 51) {
                 $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
-            } else if (data.producto_base.stock >= 10) {
+            } else if (data.stock >= 10) {
                 $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
-            } else if (data.producto_base.stock <= 9) {
+            } else if (data.stock <= 9) {
                 $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
 

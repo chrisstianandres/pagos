@@ -434,10 +434,8 @@ def index(request):
     data = {}
     try:
         data = []
-        for p in Producto.objects.filter(stock__range=[1,10]):
-
+        for p in Producto.objects.filter(stock__range=[1, 10]):
             data.append(p.toJSON())
-        print(data)
     except Exception as e:
         data['error'] = str(e)
     return JsonResponse(data, safe=False)

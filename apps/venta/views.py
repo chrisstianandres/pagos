@@ -509,7 +509,7 @@ def data_tarjets():
     compras = Compra.objects.filter(fecha_compra__year=year, estado=1).aggregate(r=Coalesce(Count('id'), 0)).get('r')
     inventario = Inventario_producto.objects.filter(produccion__produccion__fecha_ingreso__year=year, estado=1).aggregate(
         r=Coalesce(Count('id'), 0)).get('r')
-    agotados = Producto.objects.filter(stock__lte=0).count()
+    agotados = Producto.objects.filter(stock=0).count()
     data = {
         'ventas': int(ventas),
         'compras': int(compras),
