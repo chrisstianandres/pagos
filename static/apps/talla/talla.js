@@ -1,8 +1,8 @@
 $(document).ready(function () {
     $('input[name="talla"]').TouchSpin({
-        min: 1,
-        max: 100,
-        step: 1,
+        min: 32,
+        max: 56,
+        step: 2,
     });
     $.validator.setDefaults({
         errorClass: 'invalid-feedback',
@@ -35,12 +35,12 @@ $(document).ready(function () {
         },
         messages: {
             talla: {
-                required: "Porfavor ingresa una talla",
+                required: "Por favor ingresa una talla",
                 minlength: "Debe ingresar al menos un numero",
                 digits: "Debe ingresar unicamente numeros"
             },
             eqv_letra: {
-                required: "Porfavor ingresa la talla equivalente en letras",
+                required: "Por favor ingresa la talla equivalente en letras",
                 minlength: "Debe ingresar al menos 1 letra",
                 maxlength: "Debe ingresar maximo 4 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"

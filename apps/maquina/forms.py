@@ -43,7 +43,8 @@ class MaquinaForm(forms.ModelForm):
             })
 
             self.fields['tipo'].widget.attrs = {
-                'class': 'form-control select2'
+                'class': 'form-control select2',
+                'style': "width: 90%"
 
             }
             self.fields['serie'].widget.attrs = {

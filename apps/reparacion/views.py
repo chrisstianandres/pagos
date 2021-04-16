@@ -65,16 +65,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    result = Detalle_reparacion.objects.filter(reparacion_id=id)
-                    for p in result:
-                        data.append({
-                            'producto': p.producto.producto_base.nombre,
-                            'categoria': p.producto.producto_base.categoria.nombre,
-                            'presentacion': p.producto.producto_base.presentacion.nombre,
-                            'cantidad': p.cantidad,
-                            'pvp': p.pvp_rep_by_prod,
-                            'subtotal': p.subtotal
-                        })
+                    result = self.model.objects.get(id=id)
+                    for p in result.detalle_reparacion_set.all():
+                        data.append(p.toJSON())
             elif action == 'anular':
                 id = request.POST['id']
                 result = Reparacion.objects.get(id=id)
@@ -98,14 +91,14 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nueva Reparacion'
+        data['boton'] = 'Nueva Reparacion de Prendas'
         data['titulo'] = 'Listado de Reparaciones'
         data['nuevo'] = '/reparacion/nuevo'
         data['empresa'] = empresa
@@ -148,7 +141,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                 dv = Detalle_reparacion()
                                 dv.reparacion_id = v.id
                                 dv.producto_id = int(i['id'])
-                                dv.cantidad = int(i['cantidad'])
+                                dv.cantidad = int(i['cantidad_venta'])
                                 dv.pvp_rep_by_prod = float(i['pvp'])
                                 dv.subtotal = float(i['subtotal'])
                                 dv.save()
@@ -282,6 +275,7 @@ class printpdf(View):
         Convert HTML URIs to absolute system paths so xhtml2pdf can access those
         resources
         """
+        global sUrl, mUrl
         result = finders.find(uri)
         if result:
             if not isinstance(result, (list, tuple)):
@@ -308,26 +302,11 @@ class printpdf(View):
             )
         return path
 
-    def pvp_cal(self, *args, **kwargs):
-        data = []
-        try:
-            for i in Detalle_reparacion.objects.filter(reparacion_id=self.kwargs['pk']):
-                item = i.reparacion.toJSON()
-                item['producto'] = {'producto': i.producto.toJSON()}
-                item['pvp'] = format(i.pvp_rep_by_prod, '.2f')
-                item['cantidad'] = i.cantidad
-                item['subtotal'] = i.subtotal
-                data.append(item)
-        except:
-            pass
-        return data
-
     def get(self, request, *args, **kwargs):
         try:
             template = get_template('front-end/report/pdf.html')
             context = {'title': 'Comprobante de Reparacion',
                        'sale': Reparacion.objects.get(pk=self.kwargs['pk']),
-                       'det_sale': self.pvp_cal(),
                        'empresa': Empresa.objects.first(),
                        'icon': 'media/imagen.PNG',
                        }
@@ -336,8 +315,8 @@ class printpdf(View):
             response['Content-Disposition'] = 'attachment; filename="report.pdf"'
             pisa_status = pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
             return response
-        except:
-            pass
+        except Exception as e:
+            print(e)
         return HttpResponseRedirect(reverse_lazy('reparacion:lista'))
 
 

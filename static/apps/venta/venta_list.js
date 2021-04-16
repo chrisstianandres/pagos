@@ -84,7 +84,7 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6, 7],
+                        columns: [0, 1, 2, 3, 4, 5, 6],
                         search: 'applied',
                         order: 'applied'
                     },
@@ -153,7 +153,7 @@ $(function () {
                             return 4;
                         };
                         doc.content[0].layout = objLayout;
-                        doc.content[1].table.widths = [65, '*', "*", 85, 75, 85, '*', '*'];
+                        doc.content[1].table.widths = [65, '*', 85, 75, 85, '*', '*'];
                         doc.styles.tableBodyEven.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center';
                     }
@@ -163,7 +163,6 @@ $(function () {
         columns: [
             {data: 'transaccion.fecha_trans'},
             {data: "transaccion.cliente.full_name_list"},
-            {data: "transaccion.user.full_name"},
             {data: "transaccion.subtotal"},
             {data: "transaccion.iva"},
             {data: "transaccion.total"},
@@ -224,28 +223,28 @@ $(function () {
         createdRow: function (row, data, dataIndex) {
             if (data.estado === 'FINALIZADA') {
                 if (user_tipo === '0') {
-                    $('td', row).eq(6).find('span').addClass('badge bg-success').attr("style", "color: white");
-                    $('td', row).eq(7).find('a[rel="devolver"]').hide();
+                    $('td', row).eq(5).find('span').addClass('badge bg-success').attr("style", "color: white");
+                    $('td', row).eq(6).find('a[rel="devolver"]').hide();
                 }
-                $('td', row).eq(7).find('span').addClass('badge bg-success').attr("style", "color: white");
-                $('td', row).eq(8).find('a[rel="devolver"]').hide();
+                $('td', row).eq(6).find('span').addClass('badge bg-success').attr("style", "color: white");
+                $('td', row).eq(7).find('a[rel="devolver"]').hide();
             } else if (data.estado === 'DEVUELTA') {
                 if (user_tipo === '0') {
-                    $('td', row).eq(6).find('span').addClass('badge bg-danger').attr("style", "color: white");
-                    $('td', row).eq(7).find('a[rel="devolver"]').hide();
-                    $('td', row).eq(7).find('a[rel="detalle"]').hide();
-                    $('td', row).eq(7).find('a[rel="pdf"]').hide();
+                    $('td', row).eq(5).find('span').addClass('badge bg-danger').attr("style", "color: white");
+                    $('td', row).eq(6).find('a[rel="devolver"]').hide();
+                    $('td', row).eq(6).find('a[rel="detalle"]').hide();
+                    $('td', row).eq(6).find('a[rel="pdf"]').hide();
                 }
-                $('td', row).eq(7).find('span').addClass('badge bg-danger').attr("style", "color: white");
-                $('td', row).eq(8).find('a[rel="devolver"]').hide();
-                $('td', row).eq(8).find('a[rel="detalle"]').hide();
-                $('td', row).eq(8).find('a[rel="pdf"]').hide();
+                $('td', row).eq(6).find('span').addClass('badge bg-danger').attr("style", "color: white");
+                $('td', row).eq(7).find('a[rel="devolver"]').hide();
+                $('td', row).eq(7).find('a[rel="detalle"]').hide();
+                $('td', row).eq(7).find('a[rel="pdf"]').hide();
             } else if (data.estado === 'RESERVADA') {
                 if (user_tipo === '0') {
-                    $('td', row).eq(7).find('a[rel="pagar"]').hide();
-                    $('td', row).eq(6).find('span').addClass('badge bg-warning').attr("style", "color: white");
+                    $('td', row).eq(6).find('a[rel="pagar"]').hide();
+                    $('td', row).eq(5).find('span').addClass('badge bg-warning').attr("style", "color: white");
                 }
-                $('td', row).eq(7).find('span').addClass('badge bg-warning').attr("style", "color: white");
+                $('td', row).eq(6).find('span').addClass('badge bg-warning').attr("style", "color: white");
             }
         },
     });
@@ -312,11 +311,13 @@ $(function () {
                     dataSrc: ""
                 },
                 columns: [
-                    {data: 'producto'},
-                    {data: 'categoria'},
-                    {data: 'presentacion'},
+                    {data: 'producto.producto_base.nombre'},
+                    {data: 'producto.producto_base.categoria.nombre'},
+                    {data: 'producto.color.nombre'},
+                    {data: 'producto.talla.talla_full'},
+                    {data: 'producto.producto_base.descripcion'},
                     {data: 'cantidad'},
-                    {data: 'pvp'},
+                    {data: 'pvp_actual'},
                     {data: 'subtotal'}
                 ],
                 columnDefs: [
@@ -324,7 +325,14 @@ $(function () {
                         targets: '_all',
                         class: 'text-center'
                     },
-
+                    {
+                        targets: [-3],
+                        class: 'text-center',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return parseInt(data);
+                        }
+                    },
                     {
                         targets: [-1, -2],
                         class: 'text-center',

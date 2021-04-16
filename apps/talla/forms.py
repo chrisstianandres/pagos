@@ -13,7 +13,7 @@ class TallaForm(forms.ModelForm):
                 'class': 'form-control'
             })
             self.fields['talla'].widget = TextInput(
-                attrs={'class': 'form-control', 'value': 1, 'id': 'id_talla_num'})
+                attrs={'class': 'form-control', 'value': 30, 'id': 'id_talla_num'})
             self.fields['eqv_letra'].widget = TextInput(
                 attrs={'class': 'form-control'})
         # habilitar, desabilitar, y mas

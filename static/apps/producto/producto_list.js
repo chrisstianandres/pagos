@@ -26,12 +26,12 @@ $(function () {
         columns: [
             {"data": "producto_base.nombre"},
             {"data": "producto_base.categoria.nombre"},
-            {"data": "presentacion.nombre"},
+            {"data": "producto_base.categoria.nombre"},
+            {"data": "talla.talla_full"},
             {"data": "stock"},
             {"data": "producto_base.descripcion"},
             {"data": "pvp"},
             {"data": "pvp_alq"},
-            {"data": "pvp_confec"},
             {"data": "imagen"},
             {"data": "id"}
         ],
@@ -55,7 +55,7 @@ $(function () {
                 pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                 download: 'open',
                 exportOptions: {
-                    columns: [1, 2, 3, 4, 5, 6],
+                    columns: [1, 2, 3, 4, 5],
                     search: 'applied',
                     order: 'applied'
                 },
@@ -143,7 +143,7 @@ $(function () {
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         columnDefs: [
             {
-                targets: [-7],
+                targets: [-6],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -151,7 +151,7 @@ $(function () {
                 }
             },
             {
-                targets: [-3, -4, -5],
+                targets: [-3, -4],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -187,11 +187,11 @@ $(function () {
         ],
         createdRow: function (row, data, dataIndex) {
             if (data.stock >= 51) {
-                $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
+                $('td', row).eq(4).find('span').addClass('badge badge-success').attr("style", "color: white");
             } else if (data.stock >= 10) {
-                $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
+                $('td', row).eq(4).find('span').addClass('badge badge-warning').attr("style", "color: white");
             } else if (data.stock <= 9) {
-                $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
+                $('td', row).eq(4).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
 
         }

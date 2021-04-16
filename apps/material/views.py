@@ -1,6 +1,7 @@
 import json
 
 from django.db.models import Q, Sum, Count
+from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import JsonResponse
 from django.urls import reverse_lazy
@@ -12,11 +13,11 @@ from apps.asignar_recursos.models import Detalle_asig_recurso, Asig_recurso
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
 from apps.color.forms import ColorForm
-from apps.inventario_material.models import Inventario_material
+from apps.compra.models import Detalle_compra
+
 from apps.material.forms import MaterialForm, Producto_baseForm
 from apps.material.models import Material
 from apps.mixins import ValidatePermissionRequiredMixin
-from apps.presentacion.forms import PresentacionForm
 from apps.producto_base.models import Producto_base
 from apps.tipo_material.forms import Tipo_materialForm
 
@@ -90,24 +91,29 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 #     data.append(item)
             elif action == 'search_asig':
                 data = []
+                ids = json.loads(request.POST['ids'])
                 term = request.POST['term']
-                query = Material.objects.filter(Q(producto_base__nombre__icontains=term) |
-                                                Q(producto_base__color__nombre__icontains=term), stock__gte=1)[0:10]
-                for a in query:
-                    result = {'id': int(a.id), 'text': str(str(a.producto_base.nombre) + ' / ' + str(a.producto_base.color) )}
+                que = self.model.objects.filter(Q(producto_base__nombre__icontains=term) |
+                                                Q(color__nombre__icontains=term), stock_actual__gte=5)
+                for a in que.exclude(id__in=ids)[0:10]:
+                    result = {'id': a.id, 'text': str(str(a.producto_base.nombre) + ' / ' + str(a.color))}
                     data.append(result)
             elif action == 'get_asig':
                 id = request.POST['id']
-                material = Material.objects.filter(pk=id)
+                material = Material.objects.get(pk=id)
                 data = []
-                for i in material:
-                    item = i.toJSON()
-                    item['cantidad'] = 1
-                    item['subtotal'] = 0.00
-                    item['iva_emp'] = 12
-                    cal = format(float((i.p_compra*100)/112), '.2f')
-                    item['p_compra'] = cal
-                    data.append(item)
+                item = material.toJSON()
+                item['cantidad'] = 5
+                item['iva_emp'] = empresa.iva
+                data.append(item)
+            elif action == 'search_asig_table':
+                data = []
+                ids = json.loads(request.POST['ids'])
+                que = self.model.objects.filter(stock_actual__gte=5)
+                for a in que.exclude(id__in=ids):
+                    result = a.toJSON()
+                    result['cantidad'] = 5
+                    data.append(result)
             elif action == 'get_perd':
                 id = request.POST['id']
                 max = Detalle_asig_recurso.objects.filter(inventario_material__material_id=id).count()
@@ -155,8 +161,9 @@ class report(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'report':
                 data = []
-                for c in Material.objects.all():
-                    data.append(c.toJSON())
+                for c in self.model.objects.all():
+                    item = c.toJSON()
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -166,7 +173,7 @@ class report(ValidatePermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
-        data['entidad'] = opc_entidad
+        data['entidad'] = 'Reporte de Stock de Materiales'
         data['titulo'] = 'Reporte de Materiales'
         data['empresa'] = empresa
         return data
@@ -235,7 +242,6 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         data['action'] = 'add'
         data['crud'] = crud
         data['form_cat'] = CategoriaForm
-        data['form_pres'] = PresentacionForm
         data['form_tipo'] = Tipo_materialForm
         data['form_color'] = ColorForm
         data['empresa'] = empresa
@@ -297,97 +303,6 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
         data['action'] = 'edit'
         data['crud'] = '/material/editar/' + str(self.kwargs['pk'])
         data['form_cat'] = CategoriaForm
-        data['form_pres'] = PresentacionForm
         data['empresa'] = empresa
         return data
 
-# class lista(ListView):
-#     model = Producto
-#     template_name = 'front-end/material/material_list.html'
-#
-#     def get_context_data(self, **kwargs):
-#         data = super().get_context_data(**kwargs)
-#         data['icono'] = opc_icono
-#         data['entidad'] = opc_entidad
-#         data['boton'] = 'Nuevo Material'
-#         data['titulo'] = 'Listado de Materiales'
-#         data['nuevo'] = '/material/nuevo'
-#         data['empresa'] = empresa
-#         return data
-#
-#
-# def nuevo(request):
-#     data = {
-#         'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa': empresa,
-#         'boton': 'Guardar Producto', 'action': 'add', 'titulo': 'Nuevo Registro de un Producto',
-#     }
-#     if request.method == 'GET':
-#         data['form'] = ProductoForm()
-#     return render(request, 'front-end/producto/producto_form.html', data)
-#
-#
-# def crear(request):
-#     f = ProductoForm(request.POST)
-#     data = {
-#         'icono': opc_icono, 'entidad': opc_entidad, 'crud': crud, 'empresa': empresa,
-#         'boton': 'Guardar Producto', 'action': 'add', 'titulo': 'Nuevo Registro de un Producto'
-#     }
-#     action = request.POST['action']
-#     data['action'] = action
-#     if request.method == 'POST':
-#         f = ProductoForm(request.POST)
-#         if f.is_valid():
-#             f.save()
-#         else:
-#             data['form'] = f
-#             return render(request, 'front-end/producto/producto_form.html', data)
-#         return HttpResponseRedirect('/producto/lista')
-#
-#
-# def editar(request, id):
-#     producto = Producto.objects.get(id=id)
-#     crud = '/producto/editar/' + str(id)
-#     data = {
-#         'icono': opc_icono, 'crud': crud, 'entidad': opc_entidad, 'empresa': empresa,
-#         'boton': 'Guardar Edicion', 'titulo': 'Editar Registro de un Producto',
-#     }
-#     if request.method == 'GET':
-#         form = ProductoForm(instance=producto)
-#         data['form'] = form
-#     else:
-#         form = ProductoForm(request.POST, instance=producto)
-#         if form.is_valid():
-#             form.save()
-#         else:
-#             data['form'] = form
-#         return redirect('/producto/lista')
-#     return render(request, 'front-end/producto/producto_form.html', data)
-#
-#
-# @csrf_exempt
-# def eliminar(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             ps = Producto.objects.get(pk=id)
-#             ps.delete()
-#             data['resp'] = True
-#         else:
-#             data['error'] = 'Ha ocurrido un error'
-#     except Exception as e:
-#         data['error'] = "!No se puede eliminar este producto porque esta referenciado en otros procesos!!"
-#         data['content'] = "Intenta con otro producto"
-#     return JsonResponse(data)
-
-#
-# @csrf_exempt
-# def index(request):
-#     data = {}
-#     try:
-#         data = []
-#         for p in Producto.objects.filter(stock__lt=10):
-#             data.append(p.toJSON())
-#     except Exception as e:
-#         data['error'] = str(e)
-#     return JsonResponse(data, safe=False)

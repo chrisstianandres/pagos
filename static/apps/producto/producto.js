@@ -3,8 +3,8 @@ $(document).ready(function () {
     edit_cat();
     var action = '';
     var pk = '';
-    $('input[name="pvp"], input[name="pvp_alq"], input[name="pvp_confec"]').TouchSpin({
-        min: 0.05,
+    $('input[name="pvp"]').TouchSpin({
+        min: 1.00,
         max: 1000000,
         step: 0.01,
         decimals: 2,
@@ -12,7 +12,30 @@ $(document).ready(function () {
         boostat: 5,
         maxboostedstep: 10,
         prefix: '$'
+    }).on('change keyup', function () {
+        $('input[name="pvp_alq"]').trigger('touchspin.destroy');
+        precio();
+    }).keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 46 || e.which > 57 || e.which === 47)) {
+            return false;
+        }
     });
+    precio();
+
+    function precio() {
+        var max = $('input[name="pvp"]').val();
+        $('input[name="pvp_alq"]').val(1.00).TouchSpin({
+            min: 1.00,
+            max: parseFloat(max).toFixed(2),
+            step: 0.01,
+            decimals: 2,
+            forcestepdivisibility: 'none',
+            boostat: 5,
+            maxboostedstep: 10,
+            prefix: '$'
+        }).prop('readonly', true);
+    }
+
     $.validator.setDefaults({
         errorClass: 'invalid-feedback',
 
@@ -34,6 +57,9 @@ $(document).ready(function () {
                 minlength: 3,
                 maxlength: 50
             },
+            producto_base: {
+                required: true
+            },
             descripcion: {
                 required: true,
                 minlength: 3,
@@ -42,7 +68,7 @@ $(document).ready(function () {
             categoria: {
                 required: true
             },
-            presentacion: {
+            color: {
                 required: true
             },
         },
@@ -51,6 +77,9 @@ $(document).ready(function () {
                 required: "Porfavor ingresa el nombre del producto",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
+            },
+            producto_base: {
+                required: "Elige un producto producto"
             },
             descripcion: {
                 required: "Porfavor ingresa una descripcion del producto",
@@ -61,8 +90,8 @@ $(document).ready(function () {
                 required: "Debe escoger una categoria de producto",
 
             },
-            presentacion: {
-                required: "Debe escoger una presentacion de producto",
+            color: {
+                required: "Debe escoger un color",
 
             },
         },
@@ -115,7 +144,6 @@ $(document).ready(function () {
                 {"data": "nombre"},
                 {"data": "categoria.nombre"},
                 {"data": "descripcion"},
-                {"data": "color.nombre"},
                 {"data": "id"}
             ],
             columnDefs: [
@@ -127,9 +155,8 @@ $(document).ready(function () {
                     targets: [-1],
                     orderable: false,
                     render: function (data, type, row) {
-                        var select = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="select" ' +
+                        return '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="select" ' +
                             'data-toggle="tooltip" title="Selcionar producto"><i class="fa fa-check"></i></a>' + ' ';
-                        return select;
 
                     }
                 },
@@ -157,7 +184,6 @@ $(document).ready(function () {
                     $('#id_producto_base').append(newOption).trigger('change');
                     $('#id_des').val(data[0].descripcion);
                     $('#id_cat').val(data[0]['categoria'].nombre);
-                    $('#id_col').val(data[0]['color'].nombre);
                     $('#Modal_prod_table').modal('hide');
                     return false;
                 }
@@ -196,11 +222,10 @@ $(document).ready(function () {
                 type: 'POST',
                 url: '/producto/nuevo',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search'
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -259,11 +284,10 @@ $(document).ready(function () {
                 type: 'POST',
                 url: '/categoria/nuevo',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search'
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -313,11 +337,10 @@ $(document).ready(function () {
                 type: 'POST',
                 url: '/color/nuevo',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search'
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -348,61 +371,6 @@ $(document).ready(function () {
             })
         });
 
-    $('#id_presentacion_producto')
-        .select2({
-            theme: "classic",
-            language: {
-                inputTooShort: function () {
-                    return "Ingresa al menos un caracter...";
-                },
-                "noResults": function () {
-                    return "Sin resultados";
-                },
-                "searching": function () {
-                    return "Buscando...";
-                }
-            },
-            allowClear: true,
-            ajax: {
-                delay: 250,
-                type: 'POST',
-                url: '/presentacion/nuevo',
-                data: function (params) {
-                    var queryParameters = {
-                        term: params.term,
-                        'action': 'search'
-                    };
-                    return queryParameters;
-                },
-                processResults: function (data) {
-                    return {
-                        results: data,
-                    };
-                },
-            },
-            placeholder: 'Busca una presentacion',
-            minimumInputLength: 1,
-        })
-        .on('select2:select', function (e) {
-            $.ajax({
-                type: "POST",
-                url: '/presentacion/nuevo',
-                data: {
-                    "id": $('#id_presentacion_producto option:selected').val(),
-                    'action': 'get'
-                },
-                dataType: 'json',
-                success: function (data) {
-                    var newOption = new Option(data[0]['nombre'], data[0]['id'], false, true);
-                    $('#id_presentacion_producto').append(newOption).trigger('change');
-                },
-                error: function (xhr, status, data) {
-                    alert(data);
-                },
-
-            })
-        });
-
     $('#id_talla')
         .select2({
             theme: "classic",
@@ -417,45 +385,7 @@ $(document).ready(function () {
                     return "Buscando...";
                 }
             },
-            allowClear: true,
-            ajax: {
-                delay: 250,
-                type: 'POST',
-                url: '/talla/nuevo',
-                data: function (params) {
-                    var queryParameters = {
-                        term: params.term,
-                        'action': 'search'
-                    };
-                    return queryParameters;
-                },
-                processResults: function (data) {
-                    return {
-                        results: data,
-                    };
-                },
-            },
             placeholder: 'Busca una talla',
-            minimumInputLength: 1,
-        })
-        .on('select2:select', function (e) {
-            $.ajax({
-                type: "POST",
-                url: '/talla/nuevo',
-                data: {
-                    "id": $('#id_talla option:selected').val(),
-                    'action': 'get'
-                },
-                dataType: 'json',
-                success: function (data) {
-                    var newOption = new Option(data[0]['talla_full'], data[0]['id'], false, true);
-                    $('#id_talla').append(newOption).trigger('change');
-                },
-                error: function (xhr, status, data) {
-                    alert(data);
-                },
-
-            })
         });
 
     $('#form_prod').on('submit', function (e) {
@@ -497,24 +427,6 @@ $(document).ready(function () {
                 });
         }
     });
-    $('#form_pre').on('submit', function (e) {
-        e.preventDefault();
-        var parametros = new FormData(this);
-        parametros.append('action', action);
-        parametros.append('id', pk);
-        var isvalid = $(this).valid();
-        if (isvalid) {
-            save_with_ajax2('Alerta',
-                '/presentacion/nuevo', 'Esta seguro que desea guardar esta presentacion?', parametros,
-                function (response) {
-                    menssaje_ok('Exito!', 'Exito al guardar esta presentacion!', 'far fa-smile-wink', function () {
-                        $('#Modal2').modal('hide');
-                        var newOption = new Option(response.presentacion['full'], response.presentacion['id'], false, true);
-                        $('#id_presentacion_producto').append(newOption).trigger('change');
-                    });
-                });
-        }
-    });
     $('#form_talla').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
@@ -526,12 +438,13 @@ $(document).ready(function () {
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar esta talla!', 'far fa-smile-wink', function () {
                         $('#Modal_talla').modal('hide');
-                        var newOption = new Option(response.talla['talla'], response.talla['id'], false, true);
+                        var newOption = new Option(response.talla['talla']+'/'+response.talla['eqv_letra'], response.talla['id'], false, true);
                         $('#id_talla').append(newOption).trigger('change');
                     });
                 });
         }
     });
+
     $('#form_color').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
@@ -554,7 +467,23 @@ $(document).ready(function () {
     $('#Modal_prod').on('hidden.bs.modal', function () {
         $('#id_despcripcion_producto').val("").trigger('change');
         $('#id_color').val("").trigger('change');
-    })
+    });
+
+     $('#form').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', 'add');
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                window.location.pathname, 'Esta seguro que desea guardar esta prenda?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar esta prenda!', 'far fa-smile-wink', function () {
+                       window.location.replace('/producto/lista')
+                    });
+                });
+        }
+    });
 
 });
 
@@ -570,10 +499,8 @@ function edit_cat() {
             },
             dataType: 'json',
             success: function (data) {
-                console.log(data[0]);
                 $('#id_des').val(data[0].descripcion);
                 $('#id_cat').val(data[0]['categoria'].nombre);
-                $('#id_col').val(data[0]['color'].nombre);
             },
             error: function (xhr, status, data) {
                 alert(data);

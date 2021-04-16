@@ -10,11 +10,18 @@ var ventas = {
         total: 0.00,
         productos: []
     },
+    get_ids: function () {
+        var ids = [];
+        $.each(this.items.productos, function (key, value) {
+            ids.push(value.id);
+        });
+        return ids;
+    },
     calculate: function () {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
-            dict.subtotal = dict.cantidad * parseFloat(dict.pvp_alq);
+            dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp_alq);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp/100);
         });
@@ -45,9 +52,10 @@ var ventas = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
-                {data: "producto_base.stock"},
-                {data: "cantidad"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
+                {data: "stock"},
+                {data: "cantidad_venta"},
                 {data: "pvp_alq"},
                 {data: "subtotal"}
             ],
@@ -80,10 +88,11 @@ var ventas = {
 
                     }
                 }
-            ],  rowCallback: function (row, data) {
+            ],
+            rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: data.producto_base.stock,
+                    max: data.stock,
                     step: 1
                 });
             }
@@ -98,10 +107,49 @@ var ventas = {
     }
 };
 $(function () {
+    $('.sidebar-mini').addClass('sidebar-collapse');
     var action = '';
     var pk = '';
     //seleccionar producto del select producto
-    $('#id_inventario').on('select2:select', function (e) {
+    $('#id_inventario')
+        .select2({
+        theme: "classic",
+        language: {
+            inputTooShort: function () {
+                return "Ingresa al menos un caracter...";
+            },
+            "noResults": function () {
+                return "Sin resultados";
+            },
+            "searching": function () {
+                return "Buscando...";
+            }
+        },
+        allowClear: true,
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: '/producto/lista',
+            data: function (params) {
+                return {
+                    term: params.term,
+                    'action': 'search',
+                    'id': '',
+                    'ids': JSON.stringify(ventas.get_ids())
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+
+            },
+
+        },
+        placeholder: 'Busca un Producto',
+        minimumInputLength: 1,
+    })
+        .on('select2:select', function (e) {
         $.ajax({
             type: "POST",
             url: '/producto/lista',
@@ -120,6 +168,108 @@ $(function () {
 
         })
     });
+
+     //modal buscar
+    $('#id_search_producto').on('click', function () {
+        $('#Modal_lista').modal('show');
+        tbl_prod = $("#tbl_prod").DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+            },
+            ajax: {
+                url: '/producto/lista',
+                type: 'POST',
+                data: {'action': 'list_venta', 'ids': JSON.stringify(ventas.get_ids())},
+                dataSrc: ""
+            },
+            columns: [
+                {"data": "producto_base.nombre"},
+                {"data": "producto_base.categoria.nombre"},
+                {"data": "stock"},
+                {"data": "producto_base.descripcion"},
+                {"data": "pvp_alq"},
+                {"data": "imagen"},
+                {"data": "id"}
+            ],
+
+            columnDefs: [
+                {
+                    targets: [2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>' + data + '</span>';
+                    }
+                },
+                {
+                    targets: [-3],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>$ ' + parseFloat(data).toFixed(2) + '</span>';
+                    }
+                },
+                {
+                    targets: '__all',
+                    class: 'text-center'
+                },
+                {
+                    targets: [-2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
+                    }
+                },
+                {
+                    targets: [-1],
+                    class: 'text-center',
+                    width: '10%',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
+                            'data-toggle="tooltip" title="Seleccionar prenda"><i class="fas fa-arrow-circle-right"></i></a>' + ' '
+
+                    }
+                },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.stock >= 51) {
+                    $('td', row).eq(2).find('span').addClass('badge badge-success').attr("style", "color: white");
+                } else if (data.stock >= 10) {
+                    $('td', row).eq(2).find('span').addClass('badge badge-warning').attr("style", "color: white");
+                } else if (data.stock <= 9) {
+                    $('td', row).eq(2).find('span').addClass('badge badge-danger').attr("style", "color: white");
+                }
+
+            }
+
+        });
+    });
+    //select producto de table
+    $('#tbl_prod tbody').on('click', 'a[rel="check"]', function () {
+        var tr = tbl_prod.cell($(this).closest('td, li')).index();
+        var data = tbl_prod.row(tr.row).data();
+        var parametros = {'id': data.id, 'action': 'get'};
+        $.ajax({
+            dataType: 'JSON',
+            type: 'POST',
+            url: '/producto/lista',
+            data: parametros,
+        }).done(function (data) {
+            if (!data.hasOwnProperty('error')) {
+                ventas.add(data);
+                $('#Modal_lista').modal('hide');
+                return false;
+            }
+            menssaje_error(data.error, data.content, 'fa fa-times-circle');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown);
+        });
+    });
     //remover producto del detalle
     $('#tblproductos tbody')
         .on('click', 'a[rel="remove"]', function () {
@@ -134,9 +284,9 @@ $(function () {
         .on('change keyup', 'input[name="cantidad"]', function () {
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
-            ventas.items.productos[tr.row].cantidad = cantidad;
+            ventas.items.productos[tr.row].cantidad_venta = cantidad;
             ventas.calculate();
-            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
         });
     //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {
@@ -223,11 +373,10 @@ $(function () {
             type: 'POST',
             url: '/cliente/lista',
             data: function (params) {
-                var queryParameters = {
+                return {
                     term: params.term,
                     'action': 'search'
                 };
-                return queryParameters;
             },
             processResults: function (data) {
                 return {
@@ -245,44 +394,7 @@ $(function () {
         reset();
         $('#form').trigger("reset");
     });
-    //buscar produto del select producto
-    $('#id_inventario').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
-            },
-            "noResults": function () {
-                return "Sin resultados";
-            },
-            "searching": function () {
-                return "Buscando...";
-            }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: '/producto/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search',
-                    'id': ''
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
 
-            },
-
-        },
-        placeholder: 'Busca un Producto',
-        minimumInputLength: 1,
-    });
 
     $('input[name="fecha_salida"]').daterangepicker({
         locale: {

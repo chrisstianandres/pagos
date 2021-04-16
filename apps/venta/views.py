@@ -4,7 +4,6 @@ from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.compra.models import Compra
 from apps.delvoluciones_venta.models import Devolucion
-from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
 from datetime import datetime
@@ -19,17 +18,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
-# from apps.compra.models import Compra
-# from apps.delvoluciones_venta.models import Devolucion
-# from apps.inventario.models import Inventario
-# from apps.servicio.models import Servicio
-# from apps.venta.forms import VentaForm, Detalle_VentaForm
-from apps.producto_base.models import Producto_base
-from apps.proveedor.forms import ProveedorForm
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
 from apps.user.forms import UserForm
-from apps.user.models import User
 from apps.venta.forms import Detalle_VentaForm
 from apps.venta.models import Venta, Detalle_venta
 from apps.empresa.models import Empresa
@@ -82,20 +73,10 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 if id:
                     # inventario__produccion__producto__producto_base_id
                     data = []
-                    result = Detalle_venta.objects.filter(venta_id=id).values('inventario__produccion__producto_id',
-                                                                              'cantidad', 'pvp_actual', 'subtotal'). \
-                        annotate(Count('inventario__produccion__producto_id'))
-                    for p in result:
-                        # pr = Producto_base.objects.get(id=int(p['inventario__produccion__producto__producto_base_id']))
-                        pb = Producto.objects.get(id=p['inventario__produccion__producto_id'])
-                        data.append({
-                            'producto': pb.producto_base.nombre,
-                            'categoria': pb.producto_base.categoria.nombre,
-                            'presentacion': pb.presentacion.nombre,
-                            'cantidad': p['cantidad'],
-                            'pvp': p['pvp_actual'],
-                            'subtotal': p['subtotal']
-                        })
+                    result = self.model.objects.get(id=id)
+                    for p in result.detalle_venta_set.all():
+                        item=p.toJSON()
+                        data.append(item)
             elif action == 'estado':
                 id = request.POST['id']
                 if id:
@@ -175,21 +156,15 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1)[
-                                             :i['cantidad']]:
-                                    dv = Detalle_venta()
-                                    dv.venta_id = v.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.produccion.producto.pvp)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 0
-                                    in_pr.save()
-                                    dv.save()
-
+                                dv = Detalle_venta()
+                                dv.venta_id = v.id
+                                dv.inventario_id = i['id']
+                                dv.cantidad = int(i['cantidad_venta'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(
-                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1).count())
+                                stock.stock -= int(int(i['cantidad_venta']))
                                 stock.save()
                         data['id'] = v.id
                         data['resp'] = True
@@ -287,20 +262,21 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1)[
-                                             :i['cantidad']]:
+                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'],
+                                                                                estado=1)[:i['cantidad']]:
                                     dv = Detalle_venta()
                                     dv.venta_id = v.id
                                     dv.inventario_id = in_pr.id
                                     dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.producto.pvp)
+                                    dv.pvp_actual = float(in_pr.produccion.producto.pvp)
                                     dv.subtotal = float(i['subtotal'])
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
                                 stock = Producto.objects.get(id=i['id'])
                                 stock.stock = int(
-                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1).count())
+                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'],
+                                                                       estado=1).count())
                                 stock.save()
                     data['id'] = v.id
                     data['resp'] = True
@@ -332,7 +308,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                                     dv.venta_id = v.id
                                     dv.inventario_id = in_pr.id
                                     dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.producto.pvp)
+                                    dv.pvp_actual = float(in_pr.produccion.producto.pvp)
                                     dv.subtotal = float(i['subtotal'])
                                     in_pr.estado = 0
                                     in_pr.save()
@@ -396,6 +372,7 @@ class printpdf(View):
         Convert HTML URIs to absolute system paths so xhtml2pdf can access those
         resources
         """
+        global sUrl, mUrl
         result = finders.find(uri)
         if result:
             if not isinstance(result, (list, tuple)):
@@ -422,39 +399,21 @@ class printpdf(View):
             )
         return path
 
-    def pvp_cal(self, *args, **kwargs):
-        data = []
-        try:
-            result = Detalle_venta.objects.filter(venta_id=self.kwargs['pk']).values(
-                'inventario__produccion__producto_id',
-                'cantidad', 'pvp_actual', 'subtotal'). \
-                annotate(Count('inventario__produccion__producto_id'))
-            for i in result:
-                pb = Producto.objects.get(id=int(i['inventario__produccion__producto_id']))
-                item = {'producto': {'producto': pb.toJSON()}}
-                item['pvp'] = format(i['pvp_actual'], '.2f')
-                item['cantidad'] = i['cantidad']
-                item['subtotal'] = i['subtotal']
-                data.append(item)
-        except:
-            pass
-        return data
-
     def get(self, request, *args, **kwargs):
         try:
             template = get_template('front-end/report/pdf.html')
             context = {'title': 'Comprobante de Venta',
                        'sale': Venta.objects.get(pk=self.kwargs['pk']),
                        'empresa': Empresa.objects.first(),
-                       'det_sale': self.pvp_cal(),
-                       'icon': 'media/imagen.PNG',
+                       'icon': 'media/logo_don_chuta.png'
                        }
             html = template.render(context)
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename="report.pdf"'
             pisa_status = pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
             return response
-        except:
+        except Exception as e:
+            print(e)
             pass
         return HttpResponseRedirect(reverse_lazy('venta:lista'))
 

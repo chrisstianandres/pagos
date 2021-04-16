@@ -1,8 +1,8 @@
 from django.db import models
 from django.forms import model_to_dict
 
+from apps.asignar_recursos.models import Detalle_produccion
 from apps.cliente.models import Cliente
-from apps.inventario_productos.models import Inventario_producto
 from apps.transaccion.models import Transaccion
 from apps.producto.models import Producto
 from apps.empresa.models import Empresa
@@ -36,7 +36,7 @@ class Venta(models.Model):
 
 class Detalle_venta(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.PROTECT)
-    inventario = models.ForeignKey(Inventario_producto, on_delete=models.PROTECT)
+    inventario = models.ForeignKey(Producto, on_delete=models.PROTECT)
     pvp_actual = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     cantidad = models.IntegerField(default=0)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)

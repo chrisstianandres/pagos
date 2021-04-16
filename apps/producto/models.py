@@ -1,7 +1,7 @@
 from django.db import models
 from django.forms import model_to_dict
 
-from apps.presentacion.models import Presentacion
+from apps.color.models import Color
 from apps.producto_base.models import Producto_base
 from apps.talla.models import Talla
 from pagos.settings import STATIC_URL, MEDIA_URL
@@ -9,9 +9,9 @@ from pagos.settings import STATIC_URL, MEDIA_URL
 
 class Producto(models.Model):
     producto_base = models.ForeignKey(Producto_base, on_delete=models.PROTECT)
+    color = models.ForeignKey(Color, on_delete=models.PROTECT, null=True, blank=True)
     talla = models.ForeignKey(Talla, on_delete=models.PROTECT, null=True, blank=True)
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
-    presentacion = models.ForeignKey(Presentacion, on_delete=models.PROTECT, null=True, blank=True)
     pvp_alq = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     pvp_confec = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     imagen = models.ImageField(upload_to='producto/imagen', blank=True, null=True)
@@ -23,12 +23,12 @@ class Producto(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['producto_base'] = self.producto_base.toJSON()
-        item['presentacion'] = self.presentacion.toJSON()
         item['pvp'] = format(self.pvp, '.2f')
         item['pvp_alq'] = format(self.pvp_alq, '.2f')
         item['pvp_confec'] = format(self.pvp_confec, '.2f')
         item['imagen'] = self.get_image()
         item['talla'] = self.talla.toJSON()
+        item['color'] = self.color.toJSON()
         return item
 
     def get_image(self):

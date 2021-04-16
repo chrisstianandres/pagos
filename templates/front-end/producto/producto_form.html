@@ -55,20 +55,11 @@
                                 </div>
                             </div>
                             <div class="form-group col-lg-12">
-                                <label style="font-size: 13px;"
-                                       class="col-lg-3 control-label"><strong>Color</strong></label>
+                                <label for="id_color">{{ form.color.label_tag }}</label>
                                 <div class="input-group form-group-lg col-lg-10">
-                                    <input type="text" name="pres" readonly
-                                           class="form-control form-control-sm input-sm" id="id_col"
-                                           aria-invalid="false">
-                                </div>
-                            </div>
-                            <div class="form-group col-lg-12">
-                                <label for="id_presentacion">{{ form.presentacion.label_tag }}</label>
-                                <div class="input-group form-group-lg col-lg-10">
-                                    {{ form.presentacion }}
+                                    {{ form.color }}
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary btn-xs" id="id_new_presentacion" type="button"><i
+                                        <button class="btn btn-primary btn-xs" id="id_new_color" type="button"><i
                                                 class="fas fa-plus"></i></button>
                                     </div>
                                 </div>
@@ -103,14 +94,6 @@
                                        class="col-lg-3 control-label"><strong>{{ form.pvp_alq.label_tag }}</strong></label>
                                 <div class="col-lg-10">
                                     {{ form.pvp_alq }}
-                                </div>
-                            </div>
-
-                            <div class="form-group col-lg-12">
-                                <label style="font-size: 13px;"
-                                       class="col-lg-3 control-label"><strong>{{ form.pvp_confec.label_tag }}</strong></label>
-                                <div class="col-lg-10">
-                                    {{ form.pvp_confec }}
                                 </div>
                             </div>
 
@@ -153,7 +136,6 @@
                             <th style="width: 18%">Nombre</th>
                             <th style="width: 10%">Categoria</th>
                             <th style="width: 13%">Descripcion</th>
-                            <th style="width: 13%">Color</th>
                             <th style="width: 5%" class="text-center"><em class="fa fa-cog"></em></th>
                         </tr>
                         </thead>
@@ -208,17 +190,6 @@
                                                 class="fas fa-plus"></i></button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="id_color">{{ form_prod.color.label_tag }}</label>
-                                <div class="input-group form-group-lg col-lg-12">
-                                    {{ form_prod.color }}
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-xs" id="id_new_color" type="button"><i
-                                                class="fas fa-plus"></i></button>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>

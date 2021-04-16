@@ -1,7 +1,7 @@
 from django import forms
 
 from .models import Detalle_venta
-from apps.inventario_productos.models import Inventario_producto
+from ..asignar_recursos.models import Detalle_produccion
 
 
 class Detalle_VentaForm(forms.ModelForm):
@@ -16,7 +16,7 @@ class Detalle_VentaForm(forms.ModelForm):
                 'class': 'form-control select2',
                 'data-live-search': "true"
             }
-            self.fields["inventario"].queryset = Inventario_producto.objects.none()
+            self.fields["inventario"].queryset = Detalle_produccion.objects.none()
         # habilitar, desabilitar, y mas
 
     class Meta:

@@ -137,7 +137,8 @@ $(function () {
                     var queryParameters = {
                         term: params.term,
                         'action': 'search_rep',
-                        'id': ''
+                        'id': '',
+                        'ids': JSON.stringify(ventas.get_ids())
                     };
                     return queryParameters;
                 },

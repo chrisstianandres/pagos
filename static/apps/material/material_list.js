@@ -30,7 +30,6 @@ $(function () {
             {"data": "calidad"},
             {"data": "medida_full"},
             {"data": "tipo_material.nombre"},
-            {"data": "stock"},
             {"data": "producto_base.descripcion"},
             {"data": "p_compra"},
             {"data": "id"}
@@ -55,7 +54,7 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                        columns: [1, 2, 3, 4, 5, 6, 7],
                         search: 'applied',
                         order: 'applied'
                     },

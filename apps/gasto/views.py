@@ -17,6 +17,7 @@ opc_entidad = 'Gasto'
 crud = '/gasto/crear'
 empresa = nombre_empresa()
 
+
 class lista(ValidatePermissionRequiredMixin, ListView):
     model = Gasto
     template_name = 'front-end/gasto/gasto_list.html'
@@ -38,7 +39,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 gasto = Gasto.objects.filter(fecha_pago__range=[start_date, end_date])
             for c in gasto:
                 data.append(c.toJSON())
-            print(data)
         except Exception as e:
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
@@ -70,6 +70,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         try:
             if action == 'add':
                 f = GastoForm(request.POST)
+                print(f)
                 data = self.save_data(f)
             elif action == 'edit':
                 tpg = Gasto.objects.get(pk=int(pk))

@@ -143,7 +143,7 @@
                             <li class="nav-item">
                                 <a href="{% url 'producto:lista' %}" class="nav-link">
                                     <i class="fas fa-tshirt"></i>
-                                    <p>Productos</p>
+                                    <p>Prendas de Vestir</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -171,12 +171,6 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{% url 'presentacion:lista' %}" class="nav-link">
-                                    <i class="fas fa-mitten"></i>
-                                    <p>Presentacion</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
                                 <a href="{% url 'maquina:lista' %}" class="nav-link">
                                     <i class="fas fa-subway"></i>
                                     <p>Maquina</p>
@@ -190,8 +184,15 @@
                             </li>
                             <li class="nav-item">
                                 <a href="{% url 'asignacion:lista' %}" class="nav-link">
-                                    <i class="fas fa-hand-holding-usd"></i>
-                                    <p>Asignacion de Recursos</p>
+                                    <i class="fas fa-calendar-check"></i>
+                                    <p>Confeccion de Prendas</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{% url 'asignacion:lista' %}" class="nav-link">
+                                    <i class="fas fa-business-time"></i>
+                                    <p>Control de Produccion</p>
                                 </a>
                             </li>
 
@@ -236,12 +237,7 @@
                                     <p>Alquiler</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{% url 'produccion:lista' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Produccion</p>
-                                </a>
-                            </li>
+
                         </ul>
                     </li>
                     <li class="nav-item has-treeview">
@@ -265,12 +261,7 @@
                                     <p>Clientes</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{% url 'producto:report' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Stock de productos</p>
-                                </a>
-                            </li>
+
                             <li class="nav-item">
                                 <a href="{% url 'proveedor:report' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
@@ -308,15 +299,9 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{% url 'produccion:report_total' %}" class="nav-link">
+                                <a href="{% url 'maquina:lista_mantenimiento' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Produccion</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{% url 'produccion:report_by_product_perd' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Perdidas</p>
+                                    <p>Mantenimiento de Maquinas</p>
                                 </a>
                             </li>
                             <li class="nav-item">

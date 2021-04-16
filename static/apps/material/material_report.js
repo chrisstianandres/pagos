@@ -30,7 +30,7 @@ $(function () {
             {"data": "calidad"},
             {"data": "medida_full"},
             {"data": "tipo_material.nombre"},
-            {"data": "stock"},
+            {"data": "stock_actual"},
             {"data": "producto_base.descripcion"},
             {"data": "p_compra"},
         ],
@@ -54,7 +54,7 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6],
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
                         search: 'applied',
                         order: 'applied'
                     },
@@ -123,7 +123,7 @@ $(function () {
                             return 4;
                         };
                         doc.content[0].layout = objLayout;
-                        doc.content[1].table.widths = [150, '*', 90, 70, 180, 70];
+                        doc.content[1].table.widths = ['*','*','*','*','*','*','*','*','*'];
                         doc.styles.tableBodyEven.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center';
                     }
@@ -153,7 +153,7 @@ $(function () {
                 targets: [-1],
                 class: 'text-center',
                 orderable: false,
-                render: function (data, type, row) {
+                render: function (data) {
                     return '<span>$ ' + parseFloat(data).toFixed(2) + '</span>';
                 }
             },
@@ -162,13 +162,13 @@ $(function () {
                 class: 'text-center'
             },
         ],
-        createdRow: function (row, data, dataIndex) {
-            if (data.producto_base.stock >= 51) {
-                $('td', row).eq(4).find('span').addClass('badge badge-success').attr("style", "color: white");
-            } else if (data.producto_base.stock >= 10) {
-                $('td', row).eq(4).find('span').addClass('badge badge-warning').attr("style", "color: white");
-            } else if (data.producto_base.stock <= 9) {
-                $('td', row).eq(4).find('span').addClass('badge badge-danger').attr("style", "color: white");
+        createdRow: function (row, data) {
+            if (data.stock_actual >= 51) {
+                $('td', row).eq(6).find('span').addClass('badge badge-success').attr("style", "color: white");
+            } else if (data.stock_actual >= 10) {
+                $('td', row).eq(6).find('span').addClass('badge badge-warning').attr("style", "color: white");
+            } else if (data.stock_actual <= 9) {
+                $('td', row).eq(6).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
 
         }

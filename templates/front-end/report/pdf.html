@@ -7,6 +7,9 @@
         width: 400px;
         text-align: center;
         margin: 0 auto;
+        background-color: #ffffff;
+        color: white;
+        opacity: 1;
     }
 
     .head {
@@ -47,27 +50,26 @@
 
     table th {
         color: #fff;
-        background-color: #1d4061;
+        background-color: rgba(255, 124, 148, 0.41);
     }
 </style>
 <body>
-<img src="{{ icon }}" class="img-invoice" alt="logo">
 <p class="head">
-    <b>{{ empresa.nombre|upper }}</b><br>
+    <b style="font-size: 50px">{{ empresa.nombre|upper }}</b><br>
     <b>RUC: {{ empresa.ruc }}</b><br>
     <b>TELF: {{ empresa.telefono }}</b>&nbsp;&nbsp;<b>EMAIL: {{ empresa.correo }}</b><br>
     <b>{{ empresa.direccion|upper }} / ECUADOR</b>
 </p>
 <h1 class="head">
-    {{ title|upper }}</h1>
+    {{ title|upper }} {% if sale.estado == 2 %} (RESERVADA) {% endif %}</h1>
 <p class="fact">
     <b>FACTURA N°:</b><br>
     <b class="n">{{ sale.transaccion.id|stringformat:"010d" }}</b>
 </p>
 <p>
-    <b>FECHA DE VENTA:</b> {{ sale.transaccion.fecha_trans }}<br>
-    {% if sale.transaccion.fecha_ingreso != None %}<b>FECHA DE RECEPCION:</b> {{ sale.fecha_ingreso }}<br>{% endif %}
-    {% if sale.transaccion.fecha_entrega != None %}<b>FECHA DE ENTREGA:</b> {{ sale.transaccion.fecha_entrega }}
+    <b>FECHA:</b> {{ sale.transaccion.fecha_trans }}<br>
+    {% if sale.fecha_ingreso != None %}<b>FECHA DE RECEPCION:</b> {{ sale.fecha_ingreso }}<br>{% endif %}
+    {% if sale.fecha_entrega != None %}<b>FECHA DE ENTREGA:</b> {{ sale.fecha_entrega }}
         <br>{% endif %}
     <b>CLIENTE:</b> {{ sale.transaccion.cliente.nombres|upper }}&nbsp;{{ sale.transaccion.cliente.apellidos|upper }}<br>
     <b>CEDULA:</b> {{ sale.transaccion.cliente.cedula }}<br>
@@ -76,58 +78,72 @@
 <table id="invoice">
     <thead>
     <tr>
-        <th style="width: 40%;"> PRODUCTO</th>
+        <th style="width: 30%;"> PRODUCTO</th>
         <th style="width: 20%;"> CATEGORIA</th>
-        <th style="width: 20%;"> PRESENTACION</th>
-        {% if sale.transaccion.tipo == 0 %}
-            <th style="width: 15%;"> P.VENTA</th>
-            <th style="width: 15%;"> COLOR</th>
-            <th style="width: 15%;"> TALLA</th>
-        {% endif %}
-        {% if sale.transaccion.tipo == 1 %}
-            <th style="width: 15%;"> PRECIO</th>{% endif %}
-        {% if sale.transaccion.tipo == 2 %}
-            <th style="width: 15%;"> PRECIO</th>
-            <th style="width: 15%;"> COLOR</th>
-            <th style="width: 15%;"> TALLA</th>{% endif %}
-        {% if sale.transaccion.tipo == 3 %}
-            <th style="width: 15%;"> PRECIO</th>
-            <th style="width: 15%;"> COLOR</th>
-            <th style="width: 15%;"> TALLA</th>{% endif %}
-        <th style="width: 10%;" class="text-center">&nbsp;CANT</th>
-        <th style="width: 15%;"> SUBTOTAL</th>
-
+        <th style="width: 15%;"> PRECIO</th>
+        <th style="width: 15%;"> COLOR</th>
+        <th style="width: 15%;"> TALLA</th>
+        <th style="width: 10%;">CANTIDAD</th>
+        <th style="width: 15%; text-align: center;">&nbsp; SUBTOTAL</th>
     </tr>
     </thead>
     <tbody>
-    {% for d in det_sale %}
-        <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
-            <td>{{ d.producto.producto.producto_base.nombre }}</td>
-            <td>{{ d.producto.producto.producto_base.categoria.nombre }}</td>
-            <td>{{ d.producto.producto.presentacion.nombre }}</td>
-        <td class="text-center">${{ d.pvp }}</td>
-            {% if sale.transaccion.tipo == 0 or sale.transaccion.tipo == 2  or sale.transaccion.tipo == 3 %}
-                <td>{{ d.producto.producto.producto_base.color.nombre }}</td>
-                <td>{{ d.producto.producto.talla.talla }}</td>
-            {% endif %}
-            <td class="text-center">{{ d.cantidad }}</td>
-            <td style="text-align: right;">${{ d.subtotal }}</td>
-        </tr>
-        <tr></tr>
-        <tr style="border-top: 1px solid black; padding-top: 4px;"></tr>
-    {% endfor %}
+    {% if sale.transaccion.tipo == 0 %}
+        {% for d in sale.detalle_venta_set.all %}
+            <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
+                <td>{{ d.inventario.producto_base.nombre }}</td>
+                <td>{{ d.inventario.producto_base.categoria.nombre }}</td>
+                <td class="text-center">${{ d.pvp_actual }}</td>
+                <td>{{ d.inventario.color.nombre }}</td>
+                <td>{{ d.inventario.talla.talla }}&nbsp;{{ d.inventario.talla.eqv_letra }}</td>
+                <td class="text-center">{{ d.cantidad }}</td>
+                <td style="text-align: center;">${{ d.subtotal }}</td>
+            </tr>
+            <tr></tr>
+            <tr style="border-top: 1px solid black; padding-top: 4px;"></tr>
+        {% endfor %}
+    {% elif sale.transaccion.tipo == 1 %}
+        {% for d in sale.detalle_reparacion_set.all %}
+            <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
+                <td>{{ d.producto.producto_base.nombre }}</td>
+                <td>{{ d.producto.producto_base.categoria.nombre }}</td>
+                <td class="text-center">${{ d.pvp_rep_by_prod }}</td>
+                <td>{{ d.producto.color.nombre }}</td>
+                <td>{{ d.producto.talla.talla }}&nbsp;{{ d.producto.talla.eqv_letra }}</td>
+                <td class="text-center">{{ d.cantidad }}</td>
+                <td style="text-align: center;">${{ d.subtotal }}</td>
+            </tr>
+            <tr></tr>
+            <tr style="border-top: 1px solid black; padding-top: 4px;"></tr>
+        {% endfor %}
+    {% else %}
+        {% for d in sale.detalle_alquiler_set.all %}
+            <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
+                <td>{{ d.inventario.producto_base.nombre }}</td>
+                <td>{{ d.inventario.producto_base.categoria.nombre }}</td>
+                <td class="text-center">${{ d.pvp_actual }}</td>
+                <td>{{ d.inventario.color.nombre }}</td>
+                <td>{{ d.inventario.talla.talla }}&nbsp;{{ d.inventario.talla.eqv_letra }}</td>
+                <td>{{ d.cantidad }}</td>
+                <td>${{ d.subtotal }}</td>
+            </tr>
+            <tr></tr>
+            <tr style="border-top: 1px solid black; padding-top: 4px;"></tr>
+        {% endfor %}
+    {% endif %}
+
     <tr></tr>
     <tr></tr>
     <tr style="padding-top: 0px;">
-        <td colspan="7" style="text-align: right"><b>SUBTOTAL</b></td>
+        <td colspan="6" style="text-align: right"><b>SUBTOTAL</b></td>
         <td style="text-align: right">${{ sale.transaccion.subtotal }}</td>
     </tr>
     <tr style="padding-top: 0px;">
-        <td colspan="7" style="text-align: right"><b>IVA {{ empresa.iva }}%</b></td>
+        <td colspan="6" style="text-align: right"><b>IVA {{ empresa.iva }}%</b></td>
         <td style="text-align: right">${{ sale.transaccion.iva }}</td>
     </tr>
     <tr style="padding-top: 0px;">
-        <td colspan="7" style="text-align: right"><b>TOTAL A PAGAR</b></td>
+        <td colspan="6" style="text-align: right"><b>TOTAL A PAGAR</b></td>
         <td style="text-align: right">${{ sale.transaccion.total }}</td>
     </tr>
     </tbody>

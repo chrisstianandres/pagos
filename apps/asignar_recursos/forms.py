@@ -1,6 +1,6 @@
 from django import forms
 from datetime import *
-from .models import Asig_recurso, Detalle_asig_recurso, Detalle_asig_maquina
+from .models import Asig_recurso, Detalle_asig_recurso, Detalle_asig_maquina, Novedades
 from tempus_dominus.widgets import DatePicker
 
 from apps.producto.models import Producto
@@ -35,7 +35,7 @@ class Asig_recursoForm(forms.ModelForm):
 
         ]
         labels = {
-            'fecha_asig': 'Fecha inicio de Produccion',
+            'fecha_asig': 'Duracion de Produccion',
             'lote': 'Lote',
         }
         widgets = {
@@ -79,7 +79,7 @@ class Detalle_Asig_maquinaForm(forms.ModelForm):
             self.fields['maquina'].widget.attrs = {
                 'class': 'form-control select2',
                 'data-live-search': "true",
-                'style': 'width: 100%'
+                'style': 'width: 90%'
             }
             self.fields["maquina"].queryset = Maquina.objects.none()
         # habilitar, desabilitar, y mas
@@ -89,3 +89,36 @@ class Detalle_Asig_maquinaForm(forms.ModelForm):
         fields = [
             'maquina'
         ]
+
+
+class NovedadesForm(forms.ModelForm):
+    # constructor
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+            self.fields['novedad'].widget.attrs = {
+                'class': 'form-control',
+                'placeholder': 'Ingrese una novedad con maximo 200 caracteres'
+            }
+        # habilitar, desabilitar, y mas
+
+    class Meta:
+        model = Novedades
+        fields = [
+            'fecha',
+            'novedad'
+        ]
+        labels = {
+            'novedad': 'Novedad',
+            'fecha': 'Fecha',
+        }
+        widgets = {
+            'fecha': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={'value': datetime.now().strftime('%Y-%m-%d')},
+            ),
+            'novedad': forms.Textarea()
+        }

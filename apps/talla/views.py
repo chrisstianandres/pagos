@@ -64,7 +64,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        print(action)
         try:
             if action == 'add':
                 f = TallaForm(request.POST)
@@ -82,8 +81,8 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             elif action == 'search':
                 data = []
                 term = request.POST['term']
-                query = Talla.objects.filter(talla__range=[0, int(term)])[0:10]
-                for a in query[0:10]:
+                query = Talla.objects.all()
+                for a in query:
                     result = {'id': int(a.id), 'text': '{} / {}'.format(a.talla, a.eqv_letra)}
                     data.append(result)
             elif action == 'get':

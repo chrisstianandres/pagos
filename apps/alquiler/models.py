@@ -2,7 +2,7 @@ from datetime import datetime
 from django.db import models
 from django.forms import model_to_dict
 
-from apps.inventario_productos.models import Inventario_producto
+from apps.asignar_recursos.models import Detalle_produccion
 from apps.transaccion.models import Transaccion
 from apps.producto.models import Producto
 
@@ -27,6 +27,7 @@ class Alquiler(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['transaccion'] = self.transaccion.toJSON()
+        item['estado_text'] = self.get_estado_display()
         if self.fecha_entrega is None:
             item['fecha_entrega'] = self.fecha_entrega
         else:
@@ -46,7 +47,7 @@ class Alquiler(models.Model):
 
 class Detalle_alquiler(models.Model):
     alquiler = models.ForeignKey(Alquiler, on_delete=models.PROTECT)
-    inventario = models.ForeignKey(Inventario_producto, on_delete=models.PROTECT, null=True, blank=True, default=None)
+    inventario = models.ForeignKey(Producto, on_delete=models.PROTECT, null=True, blank=True, default=None)
     pvp_by_alquiler = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, blank=True, null=True)
     cantidad = models.IntegerField(default=0)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
@@ -57,7 +58,7 @@ class Detalle_alquiler(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['alquiler'] = self.alquiler.toJSON()
-        item['producto'] = self.producto.toJSON()
+        item['producto'] = self.inventario.toJSON()
         item['pvp'] = format(self.pvp_by_alquiler, '.2f') #format(self.iva, '.2f')
         item['subtotal'] = format(self.subtotal, '.2f') #format(self.iva, '.2f')
         return item

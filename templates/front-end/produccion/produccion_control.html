@@ -1,0 +1,506 @@
+{% extends 'front-end/base.html' %}
+{% load static %}
+{% block head %}
+    {% block form_head %}
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+        <link rel="stylesheet" href="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.css' %}"/>
+    {% endblock %}
+{% endblock %}
+{% block content %}
+    <style>
+        .nav-tabs .navbar-nav .nav-link {
+            color: black;
+        }
+    </style>
+    <input type="hidden" id="action" name="action" value="{{ action }}">
+    <input type="hidden" name="crud" value="{{ crud }}">
+    <input type="hidden" name="key" value="{{ key }}">
+    <div class="card card-default">
+        <div class="card-header">
+            <h4> &nbsp;<i class="{{ icono }}"></i> {{ titulo }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="container col-lg-12">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="card card-danger">
+                            <div class="card-header">
+                                <h4>&nbsp;<i class="fa fa-book-open"></i> Datos de la Produccion</h4>
+                            </div>
+                            <div class="card-body">
+                                <input type="hidden" value="{{ inicio }}" id="inicio">
+                                <input type="hidden" value="{{ fin }}" id="fin">
+                                <div class="row">
+                                    <div class="form-group col-lg-5">
+                                        <label for="id_fecha_ingreso">Tiempo de Produccion:</label>
+                                        <br>
+                                        <div id="id_fecha_ingreso"
+                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                                            <i class="fa fa-calendar"></i>&nbsp;
+                                            <span></span> <i class="fa fa-caret-down"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-lg-5">
+                                        <label for="id_lote">{{ form.lote.label_tag }}</label>
+                                        <div class="input-group">
+                                            {{ form.lote }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12">
+                        <div class="card card-success" id="ingreso_materiales">
+                            <div class="card-header">
+                                <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="mat-tab" data-toggle="tab" href="#materiales">
+                                            <i class="fas fa-hat-cowboy-side"></i>
+                                            &nbsp;<strong>Materiales</strong></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="maq-tab" data-toggle="tab" href="#maquinas"
+                                           role="tab" aria-controls="machines" aria-selected="false">
+                                            <i class="fas fa-subway"></i>&nbsp;Maquinas</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="prod-tab" data-toggle="tab" href="#productos">
+                                           <i class="fas fa-tshirt"></i>
+                                            &nbsp;<strong>Prendas</strong></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="est-tab" data-toggle="tab" href="#novedades">
+                                            <i class="far fa-comment-dots"></i>
+                                            &nbsp;<strong>Novedades</strong></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="perd-tab" data-toggle="tab" href="#perdidas">
+                                            <i class="fas fa-clipboard-list"></i>
+                                            &nbsp;<strong>Perdidas</strong></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content" id="myTabContent" role="tablist">
+                                    <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="mat-tab"
+                                         id="materiales">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5><i class="fas fa-hat-cowboy-side"></i> Detalle de Materiales</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label> Buscar Materiales:</label>
+                                                    <div class="input-group">
+                                                        {{ form_materiales.inventario_material }}
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-primary btn-sm"
+                                                                    id="buscar_material_tabla"><i
+                                                                    class="fa fa-search"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <br><br>
+                                                    <div class="table-responsive">
+                                                        <table class="table" id="tblinsumos">
+                                                            <thead>
+                                                            <tr>
+                                                                <th><em class="fas fa-trash-alt"></em></th>
+                                                                <th>Material</th>
+                                                                <th>Catg</th>
+                                                                <th>Calidad</th>
+                                                                <th>Color</th>
+                                                                <th>Tipo</th>
+                                                                <th>Medida</th>
+                                                                <th>Stock</th>
+                                                                <th>Cantidad</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" role="tabpanel" aria-labelledby="maq-tab"
+                                         id="maquinas">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5><i class="fas fa-subway"></i> Detalle de Maquinas</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label> Buscar Maquinas:</label>
+                                                    <br>
+                                                    <div class="input-group">
+                                                        {{ form_maquinas.maquina }}
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-primary btn-sm"
+                                                                    id="buscar_maquina_tabla"><i
+                                                                    class="fa fa-search"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <br><br>
+                                                    <div class="table-responsive">
+                                                        <table class="table" id="tblmaquinas">
+                                                            <thead>
+                                                            <tr>
+                                                                <th><em class="fas fa-trash-alt"></em></th>
+                                                                <th>Maquina</th>
+                                                                <th>Descripcion</th>
+                                                                <th>Serie</th>
+                                                                <th>Estado</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" role="tabpanel" aria-labelledby="prod-tab"
+                                         id="productos">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5><i class="fas fa-tshirt"></i> Prendas a Confeccionar</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="id_producto_estimado"> Buscar Prendas:</label>
+                                                    <div class="input-group">
+                                                        <select class="form-control" id="id_producto_estimado"
+                                                                style="width: 90%">
+                                                        </select>
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-primary btn-sm"
+                                                                    id="buscar_producto_tabla"><i
+                                                                    class="fa fa-search"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <br><br>
+                                                    <div class="table-responsive">
+                                                        <table class="table" id="tblproductos">
+                                                            <thead>
+                                                            <tr>
+                                                                <th><em class="fas fa-trash-alt"></em></th>
+                                                                <th>Prenda</th>
+                                                                <th>Categoria</th>
+                                                                <th>Color</th>
+                                                                <th>Talla</th>
+                                                                <th>Cantidad</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" role="tabpanel" aria-labelledby="est-tab"
+                                         id="novedades">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5><i class="far fa-comment-dots"></i> Novedades</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                 <button type="button"
+                                                        class="btn btn-danger btn-sm btn-flat"
+                                                        id="btnRemoveall_novedades">
+                                                    <i class="far fa-trash-alt"></i> Quitar todo
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-primary btn-sm btn-flat"
+                                                        id="btn_new_novedad">
+                                                    <i class="fas fa-plus-circle"></i> Agregar Novedad
+                                                </button>
+                                                <br><br>
+                                                <div class="table-responsive">
+                                                    <table class="table" id="tblnovedades">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Fecha</th>
+                                                            <th>Novedad</th>
+                                                            <th><i class="fa fa-cog"></i></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" role="tabpanel" aria-labelledby="perd-tab"
+                                         id="perdidas">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5><i class="fas fa-clipboard-list"></i> Perdidas</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <button type="button"
+                                                        class="btn btn-danger btn-sm btn-flat"
+                                                        id="btnRemoveall_perdidas">
+                                                    <i class="far fa-trash-alt"></i> Quitar todo
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-primary btn-sm btn-flat"
+                                                        id="btnadd_perdida">
+                                                    <i class="fas fa-plus-circle"></i> Agregar perdida
+                                                </button>
+                                                <br><br>
+                                                <div class="table-responsive">
+                                                    <table class="table" id="tblperdidas_materiales">
+                                                        <thead>
+                                                        <tr>
+                                                            <th><em class="fas fa-trash-alt"></em></th>
+                                                            <th>Material</th>
+                                                            <th>Catg</th>
+                                                            <th>Calidad</th>
+                                                            <th>Color</th>
+                                                            <th>Tipo</th>
+                                                            <th>Medida</th>
+                                                            <th>Cantidad</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <button type="submit" class="btn btn-primary btn-sm btn-flat" id="save">
+                    <i class="far fa-save"></i> {{ boton }}
+                    <span class="ripple ripple-animate"
+                          style="height: 115px; width: 115px; animation-duration: 0.7s; animation-timing-function: linear; background: rgb(255, 255, 255); opacity: 0.4; top: -47.875px; left: -23.5px;"></span>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm btn-flat"
+                        onclick="window.history.back();">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+            <br>
+        </div>
+    </div>
+    </div>
+
+    <div class="modal fade" id="Modal_lista_material" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-search"></i>&nbsp;Buscar Materiales
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <table id="tbl_mat_search" class="table table-bordered table-hover" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>Categoria</th>
+                                <th>Calidad</th>
+                                <th>Color</th>
+                                <th>Tipo</th>
+                                <th>Medida</th>
+                                <th>Stock</th>
+                                <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="Modal_lista_maquina" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-search"></i>&nbsp;Buscar Maquinas
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <table id="tbl_maq_search" class="table table-bordered table-hover" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th>Maquina</th>
+                                <th>Descripcion</th>
+                                <th>Serie</th>
+                                <th>Estado</th>
+                                <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="Modal_lista_producto" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-search"></i>&nbsp;Buscar Prendas
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <table id="tbl_prod_search" class="table table-bordered table-hover" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th>Prenda</th>
+                                <th>Categoria</th>
+                                <th>Color</th>
+                                <th>Talla</th>
+                                <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="Modal_novedades" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus-circle"></i>&nbsp;Agregar
+                        Novedades
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="form_novedades" method="POST">
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            {{ form_novedades.as_p }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-sm btn-flat" id="save">
+                            <i class="far fa-save"></i> Guardar
+                            <span class="ripple ripple-animate"
+                                  style="height: 115px; width: 115px; animation-duration: 0.7s; animation-timing-function: linear; background: rgb(255, 255, 255); opacity: 0.4; top: -47.875px; left: -23.5px;"></span>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm btn-flat" data-dismiss="modal"
+                                aria-label="Close" id="close_nov">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="Modal_perdida_material" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-search"></i>&nbsp;Materiales
+                        ingresados
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <table id="tbl_buscar_mat" class="table table-bordered table-hover" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>Categoria</th>
+                                <th>Calidad</th>
+                                <th>Color</th>
+                                <th>Tipo</th>
+                                <th>Medida</th>
+                                <th>Cantidad</th>
+                                <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <!-- Latest compiled and minified JavaScript -->
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="{% static 'apps/produccion/control.js' %}"></script>
+    <script src="{% static 'apps/funtions.js' %}"></script>
+    <script>
+        produccion.items.materiales = {{ materiales|safe }};
+        produccion.items.maquinas = {{ maquinas|safe }};
+        produccion.items.perdidas = {{ perdidas|safe }};
+        produccion.items.productos = {{ productos|safe }};
+        produccion.list_estimado();
+        produccion.list_material();
+        produccion.list_machine();
+        produccion.list_novedades();
+        produccion.list_perdidas_materiales();
+        {##}
+        {#        {% if action == 'finalizar' %}#}
+        {#            produccion.items.productos = {{ productos|safe }};#}
+        {#            produccion.items.perdidas_productos = {{ productos|safe }};#}
+        {#            produccion.list_perdidas_productos();#}
+        {#            #}
+        {#            produccion.list_productos();#}
+        {#        {% endif %}#}
+    </script>
+{% endblock %}

@@ -15,7 +15,6 @@
     <tr>
         <th>Fecha</th>
         <th>Lote</th>
-        <th>Usuario</th>
         <th>Estado</th>
         <th class="text-center" scope="col" style="width: 10%"><em class="fa fa-cog"></em></th>
     </tr>
@@ -40,7 +39,7 @@
                 <div class="modal-body">
                     <div class="card">
                         <div class="card-header">
-                            <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                            <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                                 <li class="nav-item">
                                     <a class="nav-link active" id="prod-tab" data-toggle="tab" href="#prod"
                                        style="color: black">
@@ -53,6 +52,24 @@
                                        style="color: black"> <i
                                             class="fas fa-concierge-bell"></i>&nbsp;Maquinas</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="prend-tab" data-toggle="tab" href="#prendas"
+                                       role="tab" aria-controls="prendas" aria-selected="false"
+                                       style="color: black"> <i
+                                            class="fa fa-tshirt"></i>&nbsp;Prendas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="nov-tab" data-toggle="tab" href="#novedades"
+                                       role="tab" aria-controls="novedades" aria-selected="false"
+                                       style="color: black"> <i
+                                            class="fa fa-comment-dots"></i>&nbsp;Novedades</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="perd-tab" data-toggle="tab" href="#perdidas"
+                                       role="tab" aria-controls="perdidas" aria-selected="false"
+                                       style="color: black"> <i
+                                            class="fa fa-clipboard-list"></i>&nbsp;Perdidas</a>
+                                </li>
                             </ul>
                         </div>
                         <div class="card-body">
@@ -63,8 +80,11 @@
                                         <thead>
                                         <tr>
                                             <th>Material</th>
-                                            <th>Categoria</th>
-                                            <th>Presentacion</th>
+                                            <th>Catg</th>
+                                            <th>Calidad</th>
+                                            <th>Color</th>
+                                            <th>Tipo</th>
+                                            <th>Medida</th>
                                             <th>Cantidad</th>
                                         </tr>
                                         </thead>
@@ -85,14 +105,60 @@
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
 
+
+                                <div class="tab-pane fade" role="tabpanel" aria-labelledby="prend-tab"
+                                     id="prendas">
+                                    <table class="table" id="tbldetalle_prendas">
+                                        <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Categoria</th>
+                                            <th>Color</th>
+                                            <th>Talla</th>
+                                            <th>Cantidad</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane fade" role="tabpanel" aria-labelledby="nov-tab"
+                                     id="novedades">
+                                    <table class="table" id="tbldetalle_novedades">
+                                        <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Novedad</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane fade" role="tabpanel" aria-labelledby="perd-tab"
+                                     id="perdidas">
+                                    <table class="table" id="tbldetalle_perdidas">
+                                        <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Catg</th>
+                                            <th>Calidad</th>
+                                            <th>Color</th>
+                                            <th>Tipo</th>
+                                            <th>Medida</th>
+                                            <th>Cantidad</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                         <div>
-
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

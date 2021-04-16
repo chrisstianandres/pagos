@@ -13,17 +13,15 @@ from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
 from apps.color.forms import ColorForm
 from apps.empresa.models import Empresa
-from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
-from apps.presentacion.forms import PresentacionForm
 from apps.producto.forms import ProductoForm, Producto_baseForm
 from apps.producto.models import Producto
 from apps.producto_base.models import Producto_base
 from apps.talla.forms import TallaForm
 from apps.venta.models import Detalle_venta
 
-opc_icono = 'fab fa-amazon'
-opc_entidad = 'Productos'
+opc_icono = 'fa fa-tshirt'
+opc_entidad = 'Prendas de Vestir'
 crud = '/producto/nuevo'
 empresa = nombre_empresa()
 
@@ -53,25 +51,40 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 vent = Producto.objects.filter(stock__gte=1)
                 ids = json.loads(request.POST['ids'])
-                for c in vent.exclude(producto_base_id__in=ids):
+                for c in vent.exclude(id__in=ids):
                     data.append(c.toJSON())
             elif action == 'search':
                 data = []
                 term = request.POST['term']
                 ids = json.loads(request.POST['ids'])
                 query = Producto.objects.filter(producto_base__nombre__icontains=term, stock__gte=1)
-                for a in query.exclude(producto_base_id__in=ids)[0:10]:
-                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
+                for a in query.exclude(id__in=ids)[0:10]:
+                    result = {'id': int(a.id), 'text': str(str(a.producto_base.nombre) + ' / ' + str(a.color.nombre) + ' / ' + str(
+                                  a.talla.talla_full()))}
                     data.append(result)
             elif action == 'search_rep':
                 data = []
+                ids = json.loads(request.POST['ids'])
                 term = request.POST['term']
                 query = Producto.objects.filter(
-                    Q(producto_base__nombre__icontains=term) | Q(producto_base__color__nombre__icontains=term))[0:10]
-                for a in query:
+                    Q(producto_base__nombre__icontains=term) | Q(color__nombre__icontains=term))
+                for a in query.exclude(id__in=ids)[0:10]:
                     result = {'id': int(a.id),
-                              'text': str(str(a.producto_base.nombre) + ' / ' + str(a.producto_base.color.nombre))}
+                              'text': str(str(a.producto_base.nombre) + ' / ' + str(a.color.nombre) + ' / ' + str(
+                                  a.talla.talla_full()))}
                     data.append(result)
+            elif action == 'lista_reparacion':
+                data = []
+                vent = Producto.objects.all()
+                ids = json.loads(request.POST['ids'])
+                for c in vent.exclude(id__in=ids):
+                    data.append(c.toJSON())
+            elif action == 'search_asig_table':
+                data = []
+                ids = json.loads(request.POST['ids'])
+                query = Producto.objects.all()
+                for a in query.exclude(id__in=ids):
+                    data.append(a.toJSON())
             elif action == 'get':
                 data = []
                 id = request.POST['id']
@@ -79,7 +92,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 empresa = Empresa.objects.first()
                 for i in producto:
                     item = i.toJSON()
-                    item['cantidad'] = 1
+                    item['cantidad'] = 5
+                    item['cantidad_venta'] = 1
                     item['subtotal'] = 0.00
                     item['iva_emp'] = empresa.iva
                     data.append(item)
@@ -133,7 +147,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -196,7 +210,8 @@ class sitio(ListView):
                 mas = []
                 pop = []
                 h = datetime.today()
-                query = Detalle_venta.objects.filter(venta__estado=1).values('inventario__produccion__producto_id').annotate(
+                query = Detalle_venta.objects.filter(venta__estado=1).values(
+                    'inventario__produccion__producto_id').annotate(
                     total=Sum('cantidad')).order_by('-total')[0:6]
                 for i in query:
                     pr = Producto.objects.get(id=int(i['inventario__produccion__producto_id']))
@@ -309,12 +324,14 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
             if action == 'add':
                 f = self.form_class(request.POST or None, request.FILES or None)
                 if f.is_valid():
-                    var = f.save()
-                    data['producto_base'] = var.toJSON()
-                    data['resp'] = True
-                    return HttpResponseRedirect('/producto/lista')
+                    if Producto.objects.filter(producto_base_id=f.data['producto_base'], color_id=f.data['color'],
+                                               talla_id=f.data['talla']):
+                        f.add_error("producto_base", "Prenda de vestir repetida")
+                        data['error'] = f.errors
+                    else:
+                        f.save()
+                        data['resp'] = True
                 else:
-                    print(5)
                     data['error'] = f.errors
                     data['form'] = f
             elif action == 'delete':
@@ -325,7 +342,6 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                 data = []
                 term = request.POST['term']
                 query = Producto_base.objects.filter(nombre__icontains=term)[0:10]
-
                 for a in query:
                     result = {'id': int(a.id),
                               'text': 'Nombre: ' + str(a.nombre) + ' / ' + 'Descripcion: ' + str(a.descripcion)}
@@ -368,7 +384,6 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         data['action'] = 'add'
         data['crud'] = crud
         data['form_cat'] = CategoriaForm
-        data['form_pres'] = PresentacionForm
         data['form_prod'] = Producto_baseForm
         data['form_talla'] = TallaForm
         data['form_color'] = ColorForm
@@ -389,24 +404,22 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         data = {}
-        action = request.POST['action']
         try:
             pk = self.kwargs.get('pk', 0)
             producto = self.model.objects.get(id=pk)
-            if action == 'edit':
-                f = self.form_class(request.POST or None, request.FILES or None, instance=producto)
-                if f.is_valid():
-                    print(2)
+            f = self.form_class(request.POST or None, request.FILES or None, instance=producto)
+            if f.is_valid():
+                if Producto.objects.filter(producto_base_id=f.data['producto_base'], color_id=f.data['color'],
+                                           talla_id=f.data['talla']).exclude(id=pk):
+                    f.add_error("producto_base", "Prenda de vestir repetida")
+                    data['error'] = f.errors
+                else:
                     var = f.save()
                     data['producto_base'] = var.toJSON()
                     data['resp'] = True
-                    return HttpResponseRedirect('/producto/lista')
-                else:
-                    print(25)
-                    data['error'] = f.errors
-                    data['form'] = f
             else:
-                data['error'] = 'No ha seleccionado ninguna opción'
+                data['error'] = f.errors
+                data['form'] = f
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
@@ -423,9 +436,11 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
         data['titulo'] = 'Edicion del Registro de un Producto'
         data['action'] = 'edit'
         data['crud'] = '/producto/editar/' + str(self.kwargs['pk'])
-        data['form_cat'] = CategoriaForm
-        data['form_pres'] = PresentacionForm
         data['empresa'] = empresa
+        data['form_cat'] = CategoriaForm
+        data['form_prod'] = Producto_baseForm
+        data['form_talla'] = TallaForm
+        data['form_color'] = ColorForm
         return data
 
 

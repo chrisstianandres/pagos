@@ -21,6 +21,7 @@ from apps.confeccion.forms import ConfeccionForm, Detalle_confeccionform
 from apps.confeccion.models import Confeccion, Detalle_confeccion
 from apps.empresa.models import Empresa
 from apps.mixins import ValidatePermissionRequiredMixin
+from apps.producto.models import Producto
 from apps.producto_base.models import Producto_base
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
@@ -84,6 +85,18 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 result.estado = 1
                 result.fecha_entrega = datetime.now()
                 result.save()
+                det = Detalle_confeccion.objects.filter(confeccion_id=id)
+                for p in det:
+                    a = Inventario_producto.objects.filter(produccion__producto_id=p.producto.id, estado=1).count()
+                    if a >= p.cantidad:
+                        for inv in Inventario_producto.objects.filter(produccion__producto_id=p.producto.id, estado=1)[0:p.cantidad]:
+                            inv.estado = 0
+                            inv.save()
+                            pp = Producto.objects.get(p.producto.id)
+                            pp.stock = a
+                            pp.save()
+                    else:
+                        data['error'] = 'Inventario insuficiente, por favor revisa el inventario y vuelve a intentarlo'
                 data['resp'] = True
             elif action == 'estado':
                 id = request.POST['id']

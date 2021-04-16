@@ -1,6 +1,4 @@
 $(function () {
-
-
     var action = '';
     var pk = '';
     var datatable = $("#datatable").DataTable({
@@ -20,10 +18,9 @@ $(function () {
             {"data": "estado"},
             {"data": "id"}
         ],
-        language:
-            {
-                url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
-            },
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+        },
         columnDefs: [
             {
                 targets: [-1],
@@ -35,11 +32,15 @@ $(function () {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" type="button" class="btn btn-warning btn-sm" rel="edit" ' +
-                        'data-toggle="tooltip" href="/maquina/editar/' + data + '" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
-                    var del = '<a type="button" class="btn btn-danger btn-sm"  style="color: white" rel="del" ' +
-                        'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
-                    return edit + del
+                    var edit = row.estado === 0 ? '<a style="color: white" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
+                        'data-toggle="tooltip" href="/maquina/editar/' + data + '" title="Editar Datos"><i class="fa fa-edit"></i></a>' + ' ' : ' ';
+                    var mant = row.estado === 0 ? '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="mant" ' +
+                        'data-toggle="tooltip" title="Ingresar a mantenimiento"><i class="fa fa-tools"></i></a>' + ' ' : ' ';
+                    var close_mant = row.estado === 2 ? '<a style="color: white" type="button" class="btn btn-primary btn-xs" rel="colse_mant" ' +
+                        'data-toggle="tooltip" title="Terminar mantenimiento"><i class="fas fa-calendar-check"></i></a>' + ' ' : ' ';
+                    var del = row.estado === 0 ? '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
+                        'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ' : ' ';
+                    return edit + mant + close_mant + del
 
                 }
             },
@@ -49,6 +50,8 @@ $(function () {
                 $('td', row).eq(4).html('<span class = "badge badge-success" style="color: white "> DISPONIBLE </span>');
             } else if (data.estado === 1) {
                 $('td', row).eq(4).html('<span class = "badge badge-danger" style="color: white "> EN USO </span>');
+            } else {
+                $('td', row).eq(4).html('<span class = "badge badge-primary" style="color: white "> MANTENIMIENTO </span>');
             }
 
         }
@@ -67,11 +70,37 @@ $(function () {
                         datatable.ajax.reload(null, false)
                     })
                 })
+        })
+        .on('click', 'a[rel="mant"]', function () {
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id};
+            parametros['action'] = 'add_mant';
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea ingresar esta maquina a mantenimiento?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al agregar esta maquina!', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false)
+                    })
+                })
+        })
+        .on('click', 'a[rel="colse_mant"]', function () {
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id};
+            parametros['action'] = 'close_mant';
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea terminar el mantenimiento de esta maquina?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al finalizar!', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false)
+                    })
+                })
         });
 
 
     $('#nuevo').on('click', function () {
-        window.location.replace('/maquina/nuevo')
+        window.location.href = '/maquina/nuevo'
     });
 
     //enviar formulario de nuevo tipo de gasto

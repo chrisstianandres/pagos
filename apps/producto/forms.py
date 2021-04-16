@@ -24,21 +24,17 @@ class Producto_baseForm(forms.ModelForm):
             self.fields['categoria'].widget.attrs = {
                 'class': 'form-control select2',
                 'id': 'id_despcripcion_producto', 'style': 'width: 95%'}
-            self.fields['color'].widget.attrs = {
-                'class': 'form-control select2', 'style': 'width: 95%'}
 
     class Meta:
         model = Producto_base
         fields = ['nombre',
                   'descripcion',
-                  'categoria',
-                  'color'
+                  'categoria'
                   ]
         labels = {
             'nombre': 'Nombre',
             'descripcion': 'Decripcion',
-            'categoria': 'Categoria',
-            'color': 'Color'
+            'categoria': 'Categoria'
         }
         widgets = {
             'nombre': forms.TextInput(),
@@ -66,17 +62,16 @@ class ProductoForm(forms.ModelForm):
             self.fields['pvp_confec'].widget.attrs = {
                 'class': 'form-control form-control-sm input-sm',
                 'value': 1}
-            self.fields['presentacion'].widget.attrs = {
-                'class': 'form-control select2',
-                'id': 'id_presentacion_producto'}
             self.fields['talla'].widget.attrs = {
                 'class': 'form-control select2'}
+            self.fields['color'].widget.attrs = {
+                'class': 'form-control select2', 'style': 'width: 95%'}
 
     class Meta:
         model = Producto
-        fields = ['producto_base', 'pvp', 'pvp_alq', 'pvp_confec', 'imagen', 'presentacion', 'talla']
+        fields = ['producto_base', 'color', 'pvp', 'pvp_alq', 'pvp_confec', 'imagen', 'talla']
         labels = {'producto_base': 'Producto', 'pvp': 'P.V.P.', 'pvp_alq': 'Precio Alquiler.',  'talla': 'Talla',
-                  'pvp_confec': 'Precio Confeccion.', 'imagen': 'Imagen',  'presentacion': 'Presentacion'}
+                  'pvp_confec': 'Precio Confeccion.', 'imagen': 'Imagen', 'color': 'Color'}
         widgets = {'pvp': forms.TextInput(), 'pvp_alq': forms.TextInput(), 'pvp_confec': forms.TextInput()}
 
 

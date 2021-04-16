@@ -3,7 +3,6 @@ from django.utils.decorators import method_decorator
 from apps.alquiler.forms import Detalle_AlquilerForm, AlquilerForm
 from apps.alquiler.models import Alquiler, Detalle_alquiler
 from apps.cliente.models import Cliente
-from apps.inventario_productos.models import Inventario_producto
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
 from datetime import datetime
@@ -72,34 +71,32 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    result = Detalle_alquiler.objects.filter(alquiler_id=id)
-                    for p in result:
-                        data.append({
-                            'producto': p.inventario.producto.producto_base.nombre,
-                            'categoria': p.inventario.producto.producto_base.categoria.nombre,
-                            'presentacion': p.inventario.producto.producto_base.presentacion.nombre,
-                            'cantidad': p.cantidad,
-                            'pvp': p.pvp_by_alquiler,
-                            'subtotal': p.subtotal
-                        })
-            elif action == 'estado':
+                    result = self.model.objects.get(id=id)
+                    for p in result.detalle_alquiler_set.all():
+                        data.append(p.toJSON())
+            elif action == 'anular':
                 id = request.POST['id']
                 if id:
                     with transaction.atomic():
-                        es = Alquiler.objects.get(id=id)
-                        es.estado = 2
-                        for i in Detalle_alquiler.objects.filter(alquiler_id=id):
-                            for a in Inventario_producto.objects.filter(id=i.inventario.id):
-                                a.estado = 1
-                                a.save()
-                        es.save()
+                        estado = self.model.objects.get(id=id)
+                        if estado.estado == 0:
+                            for i in estado.detalle_alquiler_set.all():
+                                producto = Producto.objects.get(id=i.inventario.id)
+                                producto.stock += i.cantidad
+                                producto.save()
+                        estado.estado = 2
+                        estado.save()
                 else:
                     data['error'] = 'Ha ocurrido un error'
             elif action == 'recibir':
                 id = request.POST['id']
-                result = Alquiler.objects.get(id=id)
+                result = self.model.objects.get(id=id)
                 result.estado = 1
                 result.fecha_entrega = datetime.now()
+                for dt_a in result.detalle_alquiler_set.all():
+                    producto = Producto.objects.get(id=dt_a.inventario.id)
+                    producto.stock += dt_a.cantidad
+                    producto.save()
                 result.save()
                 data['resp'] = True
             elif action == 'dar':
@@ -112,7 +109,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            print(e)
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
@@ -130,6 +126,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Alquiler
     template_name = 'front-end/alquiler/alquiler_form.html'
+    permission_required = 'alquiler.add_alquiler'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -159,24 +156,22 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[:i['cantidad']]:
-                                    dv = Detalle_alquiler()
-                                    dv.alquiler_id = v.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_by_alquiler = float(in_pr.producto.pvp_alq)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 2
-                                    in_pr.save()
-                                    dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
-                                stock.stock = int(Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock = Producto.objects.get(id=i['id'])
+                                dv = Detalle_alquiler()
+                                dv.alquiler_id = v.id
+                                dv.inventario_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad_venta'])
+                                dv.pvp_by_alquiler = stock.pvp_alq
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                                stock.stock -= int(i['cantidad_venta'])
                                 stock.save()
-                        data['id'] = v.id
-                        data['resp'] = True
-                else:
-                    data['resp'] = False
-                    data['error'] = "Datos Incompletos"
+                    data['id'] = v.id
+                    data['resp'] = True
+            else:
+                data['resp'] = False
+                data['error'] = "Datos Incompletos"
+
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
@@ -200,7 +195,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Alquiler
     template_name = 'front-end/alquiler/alquiler_online.html'
-    permission_required = 'venta.add_venta'
+    permission_required = 'alquiler.add_alquiler'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -229,20 +224,21 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[
+                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'],
+                                                                                estado=1)[
                                              :i['cantidad']]:
                                     dv = Detalle_alquiler()
                                     dv.alquiler_id = v.id
                                     dv.inventario_id = in_pr.id
                                     dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_by_alquiler = float(in_pr.producto.pvp_alq)
+                                    dv.pvp_by_alquiler = float(in_pr.produccion.producto.pvp_alq)
                                     dv.subtotal = float(i['subtotal'])
                                     in_pr.estado = 2
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
-                                stock.stock = int(
-                                    Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock = Producto.objects.get(id=i['id'])
+                                stock.stock = int(Inventario_producto.objects.filter(produccion__producto_id=i['id'],
+                                                                                     estado=1).count())
                                 stock.save()
                         data['id'] = v.id
                         data['resp'] = True
@@ -269,21 +265,20 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(producto_id=i['id'], estado=1)[
-                                             :i['cantidad']]:
+                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'],
+                                                                                estado=1)[:i['cantidad']]:
                                     dv = Detalle_alquiler()
                                     dv.alquiler_id = v.id
                                     dv.inventario_id = in_pr.id
                                     dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_by_alquiler = float(in_pr.producto.pvp_alq)
+                                    dv.pvp_by_alquiler = float(in_pr.produccion.producto.pvp_alq)
                                     dv.subtotal = float(i['subtotal'])
                                     in_pr.estado = 2
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
-                                stock.stock = int(
-                                    Inventario_producto.objects.filter(producto_id=i['id'], estado=1).count())
-                                stock.save()
+                                stock = Producto.objects.get(id=i['id'])
+                                stock.stock = int(Inventario_producto.objects.filter(produccion__producto_id=i['id'],
+                                                                                     estado=1).count())
                         data['id'] = v.id
                         data['resp'] = True
                 else:
@@ -346,12 +341,15 @@ class printpdf(View):
     def pvp_cal(self, *args, **kwargs):
         data = []
         try:
-            for i in Detalle_alquiler.objects.filter(alquiler_id=self.kwargs['pk']):
-                item = i.alquiler.toJSON()
-                item['producto'] = i.inventario.toJSON()
-                item['pvp'] = format(i.pvp_by_alquiler, '.2f')
-                item['cantidad'] = i.cantidad
-                item['subtotal'] = i.subtotal
+            result = Detalle_alquiler.objects.filter(alquiler_id=self.kwargs['pk']).values(
+                'inventario__produccion__producto_id',
+                'cantidad', 'pvp_by_alquiler', 'subtotal').annotate(Count('inventario__produccion__producto_id'))
+            for i in result:
+                pb = Producto.objects.get(id=int(i['inventario__produccion__producto_id']))
+                item = {'producto': {'producto': pb.toJSON()}}
+                item['pvp'] = format(i['pvp_by_alquiler'], '.2f')
+                item['cantidad'] = i['cantidad']
+                item['subtotal'] = i['subtotal']
                 data.append(item)
         except:
             pass
@@ -366,7 +364,6 @@ class printpdf(View):
                        'empresa': Empresa.objects.first(),
                        'icon': 'media/imagen.PNG',
                        }
-            print(self.pvp_cal())
             html = template.render(context)
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename="report.pdf"'
@@ -401,22 +398,22 @@ class report(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 if start_date == '' and end_date == '':
                     query = Detalle_alquiler.objects.values('alquiler__transaccion__fecha_trans',
-                                                         'inventario__producto__producto_base_id',
-                                                         'pvp_by_alquiler').order_by().annotate(
+                                                            'inventario__produccion__producto_id',
+                                                            'pvp_by_alquiler').order_by().annotate(
                         Sum('cantidad')).filter(alquiler__estado=1)
                 else:
                     query = Detalle_alquiler.objects.values('alquiler__transaccion__fecha_trans',
-                                                         'inventario__producto__producto_base_id',
-                                                         'pvp_by_alquiler') \
+                                                            'inventario__produccion__producto_id',
+                                                            'pvp_by_alquiler') \
                         .filter(alquiler__transaccion__fecha_trans__range=[start_date, end_date],
                                 alquiler__estado=1).order_by().annotate(
                         Sum('cantidad'))
                 for p in query:
                     total = p['pvp_by_alquiler'] * p['cantidad__sum']
-                    pr = Producto_base.objects.get(id=int(p['inventario__producto__producto_base_id']))
+                    pr = Producto.objects.get(id=int(p['inventario__produccion__producto_id']))
                     data.append([
                         p['alquiler__transaccion__fecha_trans'].strftime("%d/%m/%Y"),
-                        pr.nombre,
+                        pr.producto_base.nombre,
                         int(p['cantidad__sum']),
                         format(p['pvp_by_alquiler'], '.2f'),
                         format(total, '.2f'),
@@ -458,13 +455,13 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 if start_date == '' and end_date == '':
                     query = Alquiler.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                                                    'transaccion__cliente__apellidos', 'transaccion__user__username') \
                         .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=1)
                 else:
                     query = Alquiler.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos',
-                                                 'transaccion__user__username').filter(
+                                                    'transaccion__cliente__apellidos',
+                                                    'transaccion__user__username').filter(
                         transaccion__fecha_trans__range=[start_date, end_date], estado=1). \
                         annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
@@ -512,13 +509,13 @@ class report_total_alquilada(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 if start_date == '' and end_date == '':
                     query = Alquiler.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                                                    'transaccion__cliente__apellidos', 'transaccion__user__username') \
                         .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=0)
                 else:
                     query = Alquiler.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos',
-                                                 'transaccion__user__username').filter(
+                                                    'transaccion__cliente__apellidos',
+                                                    'transaccion__user__username').filter(
                         transaccion__fecha_trans__range=[start_date, end_date], estado=0). \
                         annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
@@ -566,13 +563,13 @@ class report_total_reservada(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 if start_date == '' and end_date == '':
                     query = Alquiler.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                                                    'transaccion__cliente__apellidos', 'transaccion__user__username') \
                         .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=3)
                 else:
                     query = Alquiler.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos',
-                                                 'transaccion__user__username').filter(
+                                                    'transaccion__cliente__apellidos',
+                                                    'transaccion__user__username').filter(
                         transaccion__fecha_trans__range=[start_date, end_date], estado=3). \
                         annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
@@ -596,4 +593,3 @@ class report_total_reservada(ValidatePermissionRequiredMixin, ListView):
         data['titulo'] = 'Reporte de Alquiler de prendas'
         data['empresa'] = empresa
         return data
-

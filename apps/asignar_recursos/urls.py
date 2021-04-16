@@ -8,6 +8,7 @@ app_name = 'Asig_recurso'
 urlpatterns = [
     path('lista', login_required(lista.as_view()), name='lista'),
     path('nuevo', login_required(CrudView.as_view()), name='nuevo'),
+    path('control/<int:pk>', login_required(Control.as_view()), name='control'),
     # path('nuevo', login_required(views.nuevo), name='nuevo'),
     # path('get_insumo', login_required(views.get_insumo), name='get_insumo'),
     # path('crear', login_required(views.crear), name='crear'),

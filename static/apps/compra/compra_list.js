@@ -56,7 +56,7 @@ $(function () {
             {"data": "proveedor.nombre"},
             {"data": "user"},
             {"data": "total"},
-            {"data": "id"},
+            {"data": "comprobante"},
             {"data": "estado"},
             {"data": "id"}
         ],
@@ -249,20 +249,18 @@ $(function () {
                     {data: 'material.calidad'},
                     {data: 'material.tipo_material.nombre'},
                     {data: 'material.producto_base.descripcion'},
+                    {data: 'material.medida_full'},
                     {data: 'cantidad'},
                     {data: 'p_compra'},
                     {data: 'subtotal'}
                 ],
                 columnDefs: [
                     {
-                        targets: [3],
-                        class: 'text-center'
-                    },
-                    {
                         targets: [-1, -2],
                         class: 'text-center',
                         orderable: false,
                         render: function (data, type, row) {
+                            console.log(row);
                             return '$' + parseFloat(data).toFixed(2);
                         }
                     },
@@ -272,7 +270,7 @@ $(function () {
         });
 
 $('#nuevo').on('click', function () {
-        window.location.replace('/compra/nuevo')
+        window.location.href='/compra/nuevo'
 
     })
 });

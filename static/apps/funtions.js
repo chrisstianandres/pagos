@@ -293,6 +293,14 @@ function reset() {
     $('.is-invalid').removeClass('is-invalid');
 }
 
+
+function reset_form(form) {
+    $(form)[0].reset();
+    var validator = $(form).validate();
+    validator.resetForm();
+    $('.is-valid').removeClass('is-valid');
+    $('.is-invalid').removeClass('is-invalid');
+}
 function menssaje_error_form(title, content, icon, callback) {
     var html = '<ul>';
     $.each(content, function (key, value) {

@@ -217,7 +217,7 @@ $(function () {
         createdRow: function (row, data, dataIndex) {
             if (data.estado === 1) {
                 $('td', row).eq(7).html('<span class="badge badge-success" style="color: white"> ENTREGADA');
-                $('td', row).eq(7).find('a[rel="entregar"]').hide();
+                $('td', row).eq(8).find('a[rel="entregar"]').hide();
                 if (user_tipo === '0') {
                     $('td', row).eq(8).find('a[rel="devolver"]').hide();
                 }

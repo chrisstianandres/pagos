@@ -54,14 +54,13 @@ $(function () {
         columns: [
             {"data": "fecha_asig"},
             {"data": "lote"},
-            {"data": "user.full_name"},
             {"data": "estado_label"},
             {"data": "id"}
         ],
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
         },
-        order: [[4, "desc"]],
+        order: [[0, "desc"]],
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
             "<'row'<'col-sm-12 col-md-12'f>>" +
@@ -91,7 +90,7 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5],
+                        columns: [0, 1, 2],
                         search: 'applied',
                         order: 'applied'
                     },
@@ -188,23 +187,23 @@ $(function () {
                     var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Asignacion" ><i class="fa fa-search"></i></a>' + ' ';
                     var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ';
                     var finaizar = '<a type="button" rel="finalizar" class="btn btn-warning btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Finalizar"><i class="fas fa-hourglass-end"></i></a>' + ' ';
-                    return detalle + finaizar + devolver;
+                    var controlar = row.estado === 1 ? '<a type="button" rel="controlar" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Controlar Confeccion"><i class="fa fa-cog"></i></a>' + ' ' : ' ';
+                    return detalle + controlar + finaizar + devolver;
                 }
             },
         ],
         createdRow: function (row, data, dataIndex) {
             if (data.estado === 1) {
-                $('td', row).eq(3).find('span').addClass('badge bg-warning').attr("style", "color: white");
+                $('td', row).eq(2).find('span').addClass('badge bg-warning').attr("style", "color: white");
             } else if (data.estado === 2) {
-                $('td', row).eq(3).find('span').addClass('badge bg-success').attr("style", "color: white");
-                $('td', row).eq(4).find('a[rel="devolver"]').hide();
-                $('td', row).eq(4).find('a[rel="finalizar"]').hide();
+                $('td', row).eq(2).find('span').addClass('badge bg-success').attr("style", "color: white");
+                $('td', row).eq(3).find('a[rel="devolver"]').hide();
+                $('td', row).eq(3).find('a[rel="finalizar"]').hide();
             } else if (data.estado === 0) {
-                $('td', row).eq(3).find('span').addClass('badge bg-danger').attr("style", "color: white");
-                $('td', row).eq(4).find('a[rel="devolver"]').hide();
-                $('td', row).eq(4).find('a[rel="finalizar"]').hide();
+                $('td', row).eq(2).find('span').addClass('badge bg-danger').attr("style", "color: white");
+                $('td', row).eq(3).find('a[rel="devolver"]').hide();
+                $('td', row).eq(3).find('a[rel="finalizar"]').hide();
             }
-
         }
     });
     $('#datatable tbody')
@@ -244,10 +243,13 @@ $(function () {
                     dataSrc: ""
                 },
                 columns: [
-                    {data: 'material'},
-                    {data: 'categoria'},
-                    {data: 'presentacion'},
-                    {data: 'cantidad'}
+                    {data: "producto_base.nombre"},
+                    {data: "producto_base.categoria.nombre"},
+                    {data: "calidad"},
+                    {data: "color.nombre"},
+                    {data: "tipo_material.nombre"},
+                    {data: "medida_full"},
+                    {data: "cant"}
                 ]
             });
             $("#tbldetalle_servicios").DataTable({
@@ -272,6 +274,79 @@ $(function () {
                 ]
             });
 
+
+            $("#tbldetalle_prendas").DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+                },
+                destroy: true,
+                ajax: {
+                    url: window.location.pathname,
+                    type: 'Post',
+                    data: {
+                        'action': 'detalle_prendas',
+                        'id': data.id
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {data: "producto_base.nombre"},
+                    {data: "producto_base.categoria.nombre"},
+                    {data: "color.nombre"},
+                    {data: "talla.talla_full"},
+                    {data: "cantidad"}
+                ]
+            });
+            $("#tbldetalle_novedades").DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+                },
+                destroy: true,
+                ajax: {
+                    url: window.location.pathname,
+                    type: 'Post',
+                    data: {
+                        'action': 'detalle_novedades',
+                        'id': data.id
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {data: "fecha"},
+                    {data: "novedad"},
+                ]
+            });
+            $("#tbldetalle_perdidas").DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+                },
+                destroy: true,
+                ajax: {
+                    url: window.location.pathname,
+                    type: 'Post',
+                    data: {
+                        'action': 'detalle_perdidas',
+                        'id': data.id
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {data: "producto_base.nombre"},
+                    {data: "producto_base.categoria.nombre"},
+                    {data: "calidad"},
+                    {data: "color.nombre"},
+                    {data: "tipo_material.nombre"},
+                    {data: "medida_full"},
+                    {data: "cantidad"}
+                ]
+            });
+
         })
         .on('click', 'a[rel="finalizar"]', function () {
             $('.tooltip').remove();
@@ -279,13 +354,19 @@ $(function () {
             var data = datatable.row(tr.row).data();
             var parametros = {'id': data.id, 'action': 'finalizar'};
             save_estado('Alerta',
-                window.location.pathname, 'Esta seguro que desea finalizar esta asignacion?', parametros,
+                window.location.pathname, 'Esta seguro que desea finalizar esta confeccion?', parametros,
                 function () {
-                    menssaje_ok('Exito!', 'Exito al finalizar esta asignacion', 'far fa-smile-wink', function () {
+                    menssaje_ok('Exito!', 'Exito al finalizar esta confeccion', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false);
                     })
                 });
 
+        })
+        .on('click', 'a[rel="controlar"]', function () {
+            $('.tooltip').remove();
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            window.location.replace('/asignacion/control/' + data.id);
         });
 
     $('#nuevo').on('click', function () {

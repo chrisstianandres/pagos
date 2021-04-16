@@ -15,18 +15,14 @@ from apps.backEnd import nombre_empresa
 from apps.compra.forms import CompraForm, Detalle_CompraForm
 from apps.compra.models import Compra, Detalle_compra
 from apps.empresa.models import Empresa
-from apps.inventario_material.models import Inventario_material
 from apps.material.models import Material
 from apps.mixins import ValidatePermissionRequiredMixin
-from apps.producto.models import Producto
-from datetime import date
 import os
 from django.conf import settings
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
 
-from apps.producto_base.models import Producto_base
 from apps.proveedor.forms import ProveedorForm
 
 opc_icono = 'fa fa-shopping-bag'
@@ -125,14 +121,10 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dv.subtotal = float(i['subtotal'])
                             x = Material.objects.get(pk=i['id'])
                             dv.p_compra_actual = float(x.p_compra)
-                            for p in range(0, i['cantidad']):
-                                inv = Inventario_material()
-                                inv.compra_id = c.id
-                                inv.material_id = x.id
-                                inv.save()
-                            x.stock = Inventario_material.objects.filter(material_id=x.id, estado=1).count()
-                            x.save()
                             dv.save()
+                            mat = Material.objects.get(id=i['id'])
+                            mat.stock_actual += int(i['cantidad'])
+                            mat.save()
                         data['id'] = c.id
                         data['resp'] = True
                 else:

@@ -1,4 +1,4 @@
-var tblproductos_estimado;
+var tblproductos_estimado, tbl_mat_list, tbl_prod_list;
 var tblproductos;
 var tblperdidas_productos;
 var tblperdidas_materiales;
@@ -6,8 +6,8 @@ var data_asig = '';
 var produccion = {
     items: {
         fecha_ingreso: '',
+        fecha_salida: '',
         asignacion: '',
-        novedades: '',
         productos_estimados: [],
         productos: [],
         materiales: [],
@@ -15,9 +15,29 @@ var produccion = {
         perdidas_productos: [],
         perdidas_materiales: [],
     },
+    get_ids_maquina: function () {
+        var ids = [];
+        $.each(this.items.maquinas, function (key, value) {
+            ids.push(value.id);
+        });
+        return ids;
+    },
+    get_ids_estimado: function () {
+        var ids = [];
+        $.each(this.items.productos_estimados, function (key, value) {
+            ids.push(value.id);
+        });
+        return ids;
+    },
+    get_ids_material: function () {
+        var ids = [];
+        $.each(this.items.materiales, function (key, value) {
+            ids.push(value.id)
+        });
+        return ids;
+    },
     add_estimado: function (data) {
         this.items.productos_estimados.push(data[0]);
-        this.items.productos_estimados = this.exclude_duplicados(this.items.productos_estimados);
         this.list_estimado();
 
     },
@@ -35,8 +55,8 @@ var produccion = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "presentacion.nombre"},
-                {data: "producto_base.color.nombre"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
                 {data: "cantidad"}
             ],
             columnDefs: [
@@ -64,10 +84,14 @@ var produccion = {
             ],
             rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
-                    min: 1,
-                    max: 10000000,
+                    min: 5,
+                    max: 200,
                     step: 1
-                });
+                }).keypress(function (e) {
+                    if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                        return false;
+                    }
+                });//Para solo numeros
             },
         });
     },
@@ -92,7 +116,7 @@ var produccion = {
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
                 {data: "presentacion.nombre"},
-                {data: "producto_base.color.nombre"},
+                {data: "color.nombre"},
                 {data: "cantidad"}
             ],
             columnDefs: [
@@ -251,76 +275,80 @@ var produccion = {
 
     add_material: function (data) {
         this.items.materiales.push(data);
-        this.items.materiales = this.exclude_duplicados_materiales(this.items.materiales);
+        console.log(this.items.materiales);
         this.list_material();
 
     },
     list_material: function () {
-        tblmateriales = $("#tblinsumos").DataTable({
-            destroy: true,
-            autoWidth: false,
-            dataSrc: "",
-            scrollX: true,
-            language: {
-                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
-            },
-            data: this.items.materiales,
-            columns: [
-                {data: 'id'},
-                {data: "producto_base.nombre"},
-                {data: "producto_base.categoria.nombre"},
-                {data: "calidad"},
-                {data: "producto_base.color.nombre"},
-                {data: "tipo_material.nombre"},
-                {data: "medida"},
-                {data: "ud_medida"},
-                {data: "producto_base.stock"},
-                {data: "cantidad"}
-            ],
-            columnDefs: [
-                {
-                    targets: [0],
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Insumo"><i class="fa fa-trash-alt"></i></a>';
-                        //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
-                    }
+        tblmateriales = $("#tblinsumos")
+            .DataTable({
+                destroy: true,
+                autoWidth: false,
+                dataSrc: "",
+                scrollX: true,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
                 },
-                {
-                    targets: [-1],
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
+                data: this.items.materiales,
+                columns: [
+                    {data: 'id'},
+                    {data: "producto_base.nombre"},
+                    {data: "producto_base.categoria.nombre"},
+                    {data: "calidad"},
+                    {data: "color.nombre"},
+                    {data: "tipo_material.nombre"},
+                    {data: "medida_full"},
+                    {data: "stock_actual"},
+                    {data: "cantidad"}
+                ],
+                columnDefs: [
+                    {
+                        targets: [0],
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '<a rel="remove" type="button" class="btn btn-danger btn-sm btn-flat" style="color: white" data-toggle="tooltip" title="Eliminar Insumo"><i class="fa fa-trash-alt"></i></a>';
+                            //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                        }
+                    },
+                    {
+                        targets: [-1],
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
 
+                        }
+                    },
+                    {
+                        targets: '_all',
+                        class: 'text-center'
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    $(row).find('input[name="cantidad"]').TouchSpin({
+                        min: 5,
+                        max: data.stock_actual,
+                        step: 1
+                    }).keypress(function (e) {
+                        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                            return false;
+                        }
+                    });//Para solo numeros
+
+                },
+                createdRow: function (row, data, dataIndex) {
+                    if (data.stock_actual <= 5) {
+                        $('td', row).eq(7).html('<span class = "badge badge-danger" style="color: white ">' + data.stock_actual + '</span>');
+                    } else if (data.stock_actual <= 10) {
+                        $('td', row).eq(7).html('<span class = "badge badge-warning" style="color: white ">' + data.stock_actual + '</span>');
+                    } else if (data.stock_actual > 10) {
+                        $('td', row).eq(7).html('<span class = "badge badge-success" style="color: white ">' + data.stock_actual + '</span>');
                     }
-                },
-                {
-                    targets: '_all',
-                    class: 'text-center'
-                },
-            ],
-            rowCallback: function (row, data) {
-                $(row).find('input[name="cantidad"]').TouchSpin({
-                    min: 1,
-                    max: data.producto_base.stock,
-                    step: 1
-                });
-            },
-            createdRow: function (row, data, dataIndex) {
-                if (data.producto_base.stock <= 5) {
-                    $('td', row).eq(8).html('<span class = "badge badge-danger" style="color: white ">' + data.producto_base.stock + '</span>');
-                } else if (data.producto_base.stock <= 10) {
-                    $('td', row).eq(8).html('<span class = "badge badge-warning" style="color: white ">' + data.producto_base.stock + '</span>');
-                } else if (data.producto_base.stock > 10) {
-                    $('td', row).eq(8).html('<span class = "badge badge-success" style="color: white ">' + data.producto_base.stock + '</span>');
                 }
-            }
-        });
+            });
     },
 
     add_machine: function (data) {
         this.items.maquinas.push(data);
-        this.items.maquinas = this.exclude_duplicados_machine(this.items.maquinas);
         this.list_machine();
 
     },
@@ -329,7 +357,7 @@ var produccion = {
             destroy: true,
             autoWidth: false,
             dataSrc: "",
-            scrollX: true,
+            responsive: true,
             language: {
                 "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
             },
@@ -388,32 +416,23 @@ var produccion = {
         return result;
     },
 
-    exclude_duplicados_materiales: function (array) {
-        this.items.productos = [];
-        let hash = {};
-        result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
-        return result;
-
-    },
-    exclude_duplicados_machine: function (array) {
-        this.items.maquinas = [];
-        let hash = {};
-        result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
-        return result;
-
-    }
-
 };
 var action;
 $(function () {
+
+
     action = $('#action').val();
 
     if (action === 'finalizar') {
+        var inicio = $('#inicio').val();
+        var fin = $('#fin').val();
+
 
         $('#ingreso_productos').show();
         $('#ingreso_materiales').hide();
         $('#id_lote').prop('readonly', true);
 
+        cb(moment(inicio), moment(fin));
         $('#id_productos_perdida').on('select2:select', function (e) {
             $.ajax({
                 type: "POST",
@@ -454,11 +473,11 @@ $(function () {
                     type: 'POST',
                     url: '/producto/lista',
                     data: function (params) {
-                        var queryParameters = {
+                        return {
                             term: params.term,
-                            'action': 'search_rep'
+                            'action': 'search_rep',
+                            'ids': []
                         };
-                        return queryParameters;
                     },
                     processResults: function (data) {
                         return {
@@ -622,11 +641,11 @@ $(function () {
                     type: 'POST',
                     url: '/producto/lista',
                     data: function (params) {
-                        var queryParameters = {
+                        return {
                             term: params.term,
-                            'action': 'search_rep'
+                            'action': 'search_rep',
+                            'ids': []
                         };
-                        return queryParameters;
                     },
                     processResults: function (data) {
                         return {
@@ -755,8 +774,10 @@ $(function () {
                 minimumInputLength: 1,
             });
 
-    } else if (action === 'agg_more') {
+    }
+    else if (action === 'agg_more') {
         $('#id_lote').prop('readonly', true);
+        $('#id_fecha_ingreso').prop('readonly', true);
         $('#save').on('click', function () {
             if (produccion.items.materiales.length === 0 && produccion.items.maquinas.length === 0 && produccion.items.productos_estimados.length === 0) {
                 menssaje_error('Error!', "Debe ingresar al menos un material, una maquina o un producto a producir", 'far fa-times-circle');
@@ -793,71 +814,107 @@ $(function () {
                 return false
             }
             var parametros;
-            produccion.items.fecha_ingreso = $('input[name="fecha_ingreso"]').val();
+            produccion.items.fecha_ingreso = $('#id_fecha_ingreso').data('daterangepicker').startDate.format('YYYY-MM-DD');
+            produccion.items.fecha_salida = $('#id_fecha_ingreso').data('daterangepicker').endDate.format('YYYY-MM-DD');
             produccion.items.lote = $('input[name="lote"]').val();
-            produccion.items.novedades = $('textarea[name="novedades"]').val();
             parametros = {'ingresos': JSON.stringify(produccion.items)};
             parametros['action'] = 'add';
             parametros['id'] = '';
             save_with_ajax('Alerta',
                 window.location.pathname, 'Esta seguro que desea guardar estos ingresos de produccion?', parametros, function (response) {
-                    window.location.replace('/produccion/lista')
+                    window.location.replace('/asignacion/lista')
                 });
         });
+        // $('#id_fecha_ingreso').daterangepicker({
+        //     locale: {
+        //         format: 'YYYY-MM-DD',
+        //         applyLabel: '<i class="fas fa-search"></i> Buscar',
+        //         cancelLabel: '<i class="fas fa-times"></i> Cancelar',
+        //     },
+        //     showDropdowns: true,
+        //     minYear: 1901,
+        //     maxYear: 2022
+        // })
+
+        var start = moment();
+        var end = moment();
+
+
+        $('#id_fecha_ingreso').daterangepicker({
+            startDate: start,
+            endDate: end,
+            locale: {
+                format: 'YYYY-MM-DD',
+                applyLabel: '<i class="fas fa-search"></i> Selccionar',
+                cancelLabel: '<i class="fas fa-times"></i> Cancelar',
+                customRangeLabel: "Fecha personalizada",
+            },
+            minDate: moment(),
+            ranges: {
+                'Hoy': [moment(), moment()],
+                '7 Dias': [moment(), moment().add(6, 'days')],
+                '30 Dias': [moment(), moment().add(30, 'days')],
+                '90 Dias': [moment(), moment().add(90, 'days')],
+                '180 Dias': [moment(), moment().add(180, 'days')]
+            }
+        }, cb);
+
+
+        cb(start, end);
 
     }
     //seleccionar producto del select producto
 
 
-    $('#id_asignacion').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
+    $('#id_asignacion')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
             },
-            "noResults": function () {
-                return "Sin resultados";
-            },
-            "searching": function () {
-                return "Buscando...";
-            }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: '/asignacion/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search'
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                data_asig = data[0];
-                return {
-                    results: data
-                };
-            },
-            add: function (data) {
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/asignacion/lista',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    data_asig = data[0];
+                    return {
+                        results: data
+                    };
+                },
+                add: function (data) {
+                    var newOption = new Option(data.id, data.text, false, true);
+                    $('#id_asignacion').append(newOption).trigger('change');
+                },
 
-                var newOption = new Option(data.id, data.text, false, true);
-                $('#id_asignacion').append(newOption).trigger('change');
             },
-
-        },
-        placeholder: 'Busca un numero de lote',
-        minimumInputLength: 1,
-    });
+            placeholder: 'Busca un numero de lote',
+            minimumInputLength: 1,
+        });
 
 
     $('.btnRemoveall').on('click', function () {
         if (compras.items.productos.length === 0) return false;
         borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar todos los productos seleccionados?', function () {
+            'Esta seguro que desea eliminar todas las prendas seleccionados?', function () {
                 compras.items.productos = [];
-                menssaje_ok('Confirmacion!', 'Productos eliminados', 'far fa-smile-wink', function () {
+                menssaje_ok('Confirmacion!', 'Prendas eliminadas', 'far fa-smile-wink', function () {
                     compras.list();
                 });
             });
@@ -884,11 +941,11 @@ $(function () {
                 type: 'POST',
                 url: '/material/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
-                        'action': 'search_asig'
+                        'action': 'search_asig',
+                        'ids': JSON.stringify(produccion.get_ids_material())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -942,11 +999,11 @@ $(function () {
                 type: 'POST',
                 url: '/maquina/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
-                        'action': 'search_asig'
+                        'action': 'search_asig',
+                        'ids': JSON.stringify(produccion.get_ids_maquina())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -1022,11 +1079,11 @@ $(function () {
                 type: 'POST',
                 url: '/producto/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
-                        'action': 'search_rep'
+                        'action': 'search_rep',
+                        'ids': JSON.stringify(produccion.get_ids_estimado())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -1036,8 +1093,69 @@ $(function () {
                 },
 
             },
-            placeholder: 'Busca un Producto',
+            placeholder: 'Busca una Prenda',
             minimumInputLength: 1,
+        });
+
+
+    $('#buscar_producto_tabla').on('click', function () {
+        $('#Modal_lista_producto').modal('show');
+        tbl_prod_list = $('#tbl_prod_search').DataTable({
+            destroy: true,
+            autoWidth: false,
+            dataSrc: "",
+            responsive: true,
+            language: {
+                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+            },
+            ajax: {
+                url: '/producto/lista',
+                type: 'POST',
+                data: {'action': 'search_asig_table', 'ids': JSON.stringify(produccion.get_ids_estimado())},
+                dataSrc: ""
+            },
+            columns: [
+                {data: "producto_base.nombre"},
+                {data: "producto_base.categoria.nombre"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
+                {data: "id"},
+            ],
+            columnDefs: [
+                {
+                    targets: [-1],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a type="button" rel="take" class="btn btn-success btn-xs" style="color: white"><i class="fas fa-arrow-circle-right"></i>';
+
+                    }
+                },
+                {
+                    targets: '_all',
+                    class: 'text-center'
+                },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.estado === 0) {
+                    $('td', row).eq(3).html('<span class = "badge badge-success" style="color: white ">' + data.estado_full + '</span>');
+                } else if (data.estado === 1) {
+                    $('td', row).eq(3).html('<span class = "badge badge-danger" style="color: white ">' + data.estado_full + '</span>');
+                } else if (data.estado === 2) {
+                    $('td', row).eq(3).html('<span class = "badge badge-primary" style="color: white ">' + data.estado_full + '</span>');
+                }
+            }
+        });
+    });
+
+    $('#tbl_prod_search tbody')
+        .on('click', 'a[rel="take"]', function () {
+            var tr = tbl_prod_list.cell($(this).closest('td, li')).index();
+            var data = tbl_prod_list.row(tr.row).data();
+            data['cantidad'] = 5;
+            var ex =[];
+            ex.push(data);
+            produccion.add_estimado(ex);
+            $('#Modal_lista_producto').modal('hide');
         });
 
     $('#tblinsumos tbody')
@@ -1076,5 +1194,138 @@ $(function () {
             produccion.items.productos_estimados[tr.row].cantidad = cantidad;
         });
 
+
+    $('#buscar_material_tabla').on('click', function () {
+        $('#Modal_lista_material').modal('show');
+        tbl_mat_list = $('#tbl_mat_search').DataTable({
+            destroy: true,
+            autoWidth: false,
+            dataSrc: "",
+            responsive: true,
+            language: {
+                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+            },
+            ajax: {
+                url: '/material/lista',
+                type: 'POST',
+                data: {'action': 'search_asig_table', 'ids': JSON.stringify(produccion.get_ids_material())},
+                dataSrc: ""
+            },
+            columns: [
+                {data: "producto_base.nombre"},
+                {data: "producto_base.categoria.nombre"},
+                {data: "calidad"},
+                {data: "color.nombre"},
+                {data: "tipo_material.nombre"},
+                {data: "medida_full"},
+                {data: "stock_actual"},
+                {data: "id"},
+            ],
+            columnDefs: [
+                {
+                    targets: [-1],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a type="button" rel="take" class="btn btn-success btn-xs" style="color: white"><i class="fas fa-arrow-circle-right"></i>';
+
+                    }
+                },
+                {
+                    targets: '_all',
+                    class: 'text-center'
+                },
+            ],
+            rowCallback: function (row, data) {
+                $(row).find('input[name="cantidad"]').TouchSpin({
+                    min: 1,
+                    max: data.stock_actual,
+                    step: 1
+                }).keypress(function (e) {
+                    if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                        return false;
+                    }
+                });//Para solo numeros
+
+            },
+            createdRow: function (row, data, dataIndex) {
+                if (data.stock_actual <= 5) {
+                    $('td', row).eq(6).html('<span class = "badge badge-danger" style="color: white ">' + data.stock_actual + '</span>');
+                } else if (data.stock_actual <= 10) {
+                    $('td', row).eq(6).html('<span class = "badge badge-warning" style="color: white ">' + data.stock_actual + '</span>');
+                } else if (data.stock_actual > 10) {
+                    $('td', row).eq(6).html('<span class = "badge badge-success" style="color: white ">' + data.stock_actual + '</span>');
+                }
+            }
+        });
+    });
+
+    $('#tbl_mat_search tbody')
+        .on('click', 'a[rel="take"]', function () {
+            var tr = tbl_mat_list.cell($(this).closest('td, li')).index();
+            var data = tbl_mat_list.row(tr.row).data();
+            data['cantidad'] = 5;
+            produccion.add_material(data);
+            $('#Modal_lista_material').modal('hide');
+        });
+
+    $('#buscar_maquina_tabla').on('click', function () {
+        $('#Modal_lista_maquina').modal('show');
+        tbl_maq_list = $('#tbl_maq_search').DataTable({
+            destroy: true,
+            autoWidth: false,
+            dataSrc: "",
+            responsive: true,
+            language: {
+                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+            },
+            ajax: {
+                url: '/maquina/lista',
+                type: 'POST',
+                data: {'action': 'search_asig_table', 'ids': JSON.stringify(produccion.get_ids_maquina())},
+                dataSrc: ""
+            },
+            columns: [
+                {data: "tipo.nombre"},
+                {data: "tipo.descripcion"},
+                {data: "serie"},
+                {data: "estado_full"},
+                {data: "id"},
+            ],
+            columnDefs: [
+                {
+                    targets: [-1],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a type="button" rel="take" class="btn btn-success btn-xs" style="color: white"><i class="fas fa-arrow-circle-right"></i>';
+
+                    }
+                },
+                {
+                    targets: '_all',
+                    class: 'text-center'
+                },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.estado === 0) {
+                    $('td', row).eq(3).html('<span class = "badge badge-success" style="color: white ">' + data.estado_full + '</span>');
+                } else if (data.estado === 1) {
+                    $('td', row).eq(3).html('<span class = "badge badge-danger" style="color: white ">' + data.estado_full + '</span>');
+                } else if (data.estado === 2) {
+                    $('td', row).eq(3).html('<span class = "badge badge-primary" style="color: white ">' + data.estado_full + '</span>');
+                }
+            }
+        });
+    });
+
+    $('#tbl_maq_search tbody')
+        .on('click', 'a[rel="take"]', function () {
+            var tr = tbl_maq_list.cell($(this).closest('td, li')).index();
+            var data = tbl_maq_list.row(tr.row).data();
+            produccion.add_machine(data);
+            $('#Modal_lista_maquina').modal('hide');
+        })
 });
 
+function cb(start, end) {
+    $('#id_fecha_ingreso span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+}

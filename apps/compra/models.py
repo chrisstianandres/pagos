@@ -5,7 +5,6 @@ from django.forms import model_to_dict
 from apps.material.models import Material
 from apps.user.models import User
 from apps.producto.models import Producto
-from apps.presentacion.models import Presentacion
 from apps.proveedor.models import Proveedor
 
 estado = (

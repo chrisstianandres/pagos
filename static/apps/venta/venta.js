@@ -13,7 +13,7 @@ var ventas = {
     get_ids: function () {
         var ids = [];
         $.each(this.items.productos, function (key, value) {
-            ids.push(value.producto_base.id);
+            ids.push(value.id);
         });
         return ids;
     },
@@ -21,7 +21,7 @@ var ventas = {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
-            dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
+            dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
         });
@@ -52,9 +52,8 @@ var ventas = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "presentacion.nombre"},
                 {data: "stock"},
-                {data: "cantidad"},
+                {data: "cantidad_venta"},
                 {data: "pvp"},
                 {data: "subtotal"}
             ],
@@ -101,7 +100,6 @@ var ventas = {
         let hash = {};
         result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
         return result;
-
     }
 };
 $(function () {
@@ -128,7 +126,7 @@ $(function () {
         .on('change keyup', 'input[name="cantidad"]', function () {
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
-            ventas.items.productos[tr.row].cantidad = cantidad;
+            ventas.items.productos[tr.row].cantidad_venta = cantidad;
             ventas.calculate();
             $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
         });
@@ -218,11 +216,10 @@ $(function () {
             type: 'POST',
             url: '/cliente/lista',
             data: function (params) {
-                var queryParameters = {
+                return {
                     term: params.term,
                     'action': 'search'
                 };
-                return queryParameters;
             },
             processResults: function (data) {
                 return {
@@ -261,12 +258,11 @@ $(function () {
                 type: 'POST',
                 url: '/producto/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search',
                         'ids': JSON.stringify(ventas.get_ids())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -317,7 +313,6 @@ $(function () {
             columns: [
                 {"data": "producto_base.nombre"},
                 {"data": "producto_base.categoria.nombre"},
-                {"data": "presentacion.nombre"},
                 {"data": "stock"},
                 {"data": "producto_base.descripcion"},
                 {"data": "pvp"},
@@ -362,20 +357,19 @@ $(function () {
                     width: '10%',
                     orderable: false,
                     render: function (data, type, row) {
-                        var check = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
-                            'data-toggle="tooltip" title="Seleccionar producto"><i class="fa fa-check-circle"></i></a>' + ' ';
-                        return check
+                        return '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
+                            'data-toggle="tooltip" title="Seleccionar prenda"><i class="fas fa-arrow-circle-right"></i>/a>' + ' '
 
                     }
                 },
             ],
             createdRow: function (row, data, dataIndex) {
                 if (data.stock >= 51) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
+                    $('td', row).eq(2).find('span').addClass('badge badge-success').attr("style", "color: white");
                 } else if (data.stock >= 10) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
+                    $('td', row).eq(2).find('span').addClass('badge badge-warning').attr("style", "color: white");
                 } else if (data.stock <= 9) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
+                    $('td', row).eq(2).find('span').addClass('badge badge-danger').attr("style", "color: white");
                 }
 
             }

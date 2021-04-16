@@ -39,7 +39,7 @@ var compras = {
 
     },
     list: function () {
-        console.log( this.items.productos);
+        console.log(this.items.productos);
         this.calculate();
         tblcompra = $("#tblinsumos").DataTable({
             destroy: true,
@@ -53,7 +53,7 @@ var compras = {
             columns: [
                 {data: 'id'},
                 {data: "producto_base.nombre"},
-                {data: "producto_base.categoria.nombre"},
+                {data: "color.nombre"},
                 {data: "calidad"},
                 {data: "medida_full"},
                 {data: "cantidad"},
@@ -91,7 +91,11 @@ var compras = {
                     min: 1,
                     max: 100000000,
                     step: 1
-                });
+                }).keypress(function (e) {
+                        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                            return false;
+                        }
+                    });//Para solo numeros
             }
         });
     },
@@ -143,8 +147,7 @@ $(function () {
         } else if (compras.items.productos.length === 0) {
             menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
             return false
-        }
-        else if ($('input[name="comprobante"]').val() === ""){
+        } else if ($('input[name="comprobante"]').val() === "") {
             menssaje_error('Error!', "Debe ingresar un numero de comprobante", 'far fa-times-circle');
             return false
         }
@@ -193,11 +196,11 @@ $(function () {
             },
             columns: [
                 {"data": "producto_base.nombre"},
-                {"data": "producto_base.categoria.nombre"},
+                {"data": "color.nombre"},
                 {"data": "calidad"},
                 {"data": "medida_full"},
                 {"data": "tipo_material.nombre"},
-                {"data": "stock"},
+                {"data": "stock_actual"},
                 {"data": "producto_base.descripcion"},
                 {"data": "p_compra"},
                 {"data": "id"}

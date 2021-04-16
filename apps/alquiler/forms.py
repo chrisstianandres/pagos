@@ -1,9 +1,7 @@
 from django import forms
 from datetime import *
 from .models import Alquiler, Detalle_alquiler
-
-from ..inventario_productos.models import Inventario_producto
-
+from ..asignar_recursos.models import Detalle_produccion
 
 
 class AlquilerForm(forms.ModelForm):
@@ -57,7 +55,7 @@ class Detalle_AlquilerForm(forms.ModelForm):
                 'class': 'form-control select2',
                 'data-live-search': "true"
             }
-            self.fields["inventario"].queryset = Inventario_producto.objects.none()
+            self.fields["inventario"].queryset = Detalle_produccion.objects.none()
         # habilitar, desabilitar, y mas
 
     class Meta:

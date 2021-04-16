@@ -1,4 +1,25 @@
 $(document).ready(function () {
+    jQuery.validator.addMethod("val_c", function (value, element) {
+        if (value.length === 10 || value.length === 13) {
+            $.ajax({
+                type: "POST",
+                url: '/verificar/',
+                data: {'data': value.toString()},
+                dataType: 'json',
+                success: function (data) {
+                    if (!data.hasOwnProperty('error')) {
+                        $(element).addClass("is-valid").removeClass("is-invalid");
+                        return false;
+                    }
+                    $(element).addClass("is-invalid").removeClass("is-valid");
+                    $('#id_cedula-error').html('Tu numero de documento no es valido para Ecuador').show();
+                },
+            })
+        }
+        return true;
+        // return this.optional(element) || /^[a-z," "]+$/i.test(value);
+    }, "");
+
     jQuery.validator.addMethod("lettersonly", function (value, element) {
         return this.optional(element) || /^[a-z," "]+$/i.test(value);
     }, "Letters and spaces only please");
@@ -16,6 +37,7 @@ $(document).ready(function () {
                 .removeClass("is-invalid");
         }
     });
+
     $("#form").validate({
         rules: {
             username: {
@@ -39,7 +61,8 @@ $(document).ready(function () {
                 required: true,
                 minlength: 10,
                 maxlength: 10,
-                digits: true
+                digits: true,
+                val_c: true
             },
             email: {
                 required: true,
@@ -61,7 +84,7 @@ $(document).ready(function () {
                 minlength: 5
             },
             password2: {
-                 required: true,
+                required: true,
                 equalTo: "#id_password"
             },
 
@@ -87,6 +110,7 @@ $(document).ready(function () {
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
                 maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+                val_c: "Tu numero de documento no es valido para Ecuador"
             },
             email: "Debe ingresar un correo valido",
             cargo: "Debe seleccionar un cargo",
@@ -94,9 +118,9 @@ $(document).ready(function () {
                 required: "Debe Ingresar una contraseña",
                 minlength: "Tu contraseña debe tener al menos 5 digitos"
             },
-             password2: {
+            password2: {
                 equalTo: "La contraseñas deben coincidir",
-                 required: "Debe verificar su contraseña",
+                required: "Debe verificar su contraseña",
             },
             telefono: {
                 required: "Por favor ingresa tu numero convencional",
@@ -126,5 +150,7 @@ $(document).ready(function () {
         $(this).val(changue);
     });
 
-    $('.errorlist').attr('style',  'color:red');
+    $('.errorlist').attr('style', 'color:red');
 });
+
+

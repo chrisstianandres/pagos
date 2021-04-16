@@ -214,7 +214,7 @@ $(function () {
                 minYear: 1901,
                 maxDate: new Date(),
                 locale: {
-                    format: 'DD-MM-YYYY',
+                    format: 'YYYY-MM-DD',
                     applyLabel: '<i class="fas fa-search"></i> Aplicar',
                     cancelLabel: '<i class="fas fa-times"></i> Cancelar',
                 },
@@ -253,6 +253,13 @@ $(function () {
                 });
         }
     });
+
+
+    $('#Modal').on('hidden.bs.modal', function (e) {
+        reset();
+        $('input[name="fecha_pago"]').attr('readonly', true)
+
+})
 });
 
 function daterange() {

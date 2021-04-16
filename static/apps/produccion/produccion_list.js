@@ -8,7 +8,7 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.readAsDataURL(blob)
     }));
 
-toDataURL('/media/imagen.PNG').then(dataUrl => {
+toDataURL('/media/imagen.png').then(dataUrl => {
     logotipo = dataUrl;
 });
 var datos = {
@@ -195,8 +195,6 @@ $(function () {
             },
         ],
         createdRow: function (row, data, dataIndex) {
-            console.log(data.estado_text);
-            console.log(data.estado);
             if (data.estado === 0) {
                 $('td', row).eq(3).find('span').addClass('badge bg-success').attr("style", "color: white");
                 $('td', row).eq(4).find('a[rel="anular"]').hide();

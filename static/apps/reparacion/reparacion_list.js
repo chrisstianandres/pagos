@@ -202,7 +202,7 @@ $(function () {
                 render: function (data, type, row) {
                     var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
                     var entregar = '<a type="button" rel="entregar" class="btn btn-warning btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Entregar" ><i class="fa fa-check"></i></a>' + ' ';
-                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ';
+                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ';
                     var pdf = '<a type="button" href= "/reparacion/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
                     var dar = row.estado === 3 ? '<a type="button" rel="dar" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Confirmar"><i class="fas fa-thumbs-up"></i></a>' : '';
                     return detalle + dar + entregar + devolver + pdf;
@@ -306,9 +306,10 @@ $(function () {
                     dataSrc: ""
                 },
                 columns: [
-                    {data: 'producto'},
-                    {data: 'categoria'},
-                    {data: 'presentacion'},
+                    {data: 'producto.producto_base.nombre'},
+                    {data: 'producto.producto_base.categoria.nombre'},
+                    {data: 'producto.color.nombre'},
+                    {data: 'producto.talla.talla_full'},
                     {data: 'cantidad'},
                     {data: 'pvp'},
                     {data: 'subtotal'}

@@ -1,3 +1,5 @@
 from django.contrib import admin
-
-# Register your models here.
+from .models import *
+admin.site.register(Maquina)
+admin.site.register(Maquina_mantenimiento)
+admin.site.register(Tipo_maquina)
