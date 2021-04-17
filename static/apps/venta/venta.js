@@ -358,7 +358,7 @@ $(function () {
                     orderable: false,
                     render: function (data, type, row) {
                         return '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
-                            'data-toggle="tooltip" title="Seleccionar prenda"><i class="fas fa-arrow-circle-right"></i>/a>' + ' '
+                            'data-toggle="tooltip" title="Seleccionar prenda"><i class="fas fa-arrow-circle-right"></i></a>' + ' '
 
                     }
                 },

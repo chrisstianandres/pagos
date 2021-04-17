@@ -448,6 +448,7 @@ def grap(request):
             data['error'] = 'Ha ocurrido un error'
     except Exception as e:
         data['error'] = str(e)
+        print(e)
     return JsonResponse(data, safe=False)
 
 
@@ -466,8 +467,7 @@ def data_tarjets():
     ventas = Venta.objects.filter(transaccion__fecha_trans__year=year, estado=1).aggregate(
         r=Coalesce(Count('id'), 0)).get('r')
     compras = Compra.objects.filter(fecha_compra__year=year, estado=1).aggregate(r=Coalesce(Count('id'), 0)).get('r')
-    inventario = Inventario_producto.objects.filter(produccion__produccion__fecha_ingreso__year=year, estado=1).aggregate(
-        r=Coalesce(Count('id'), 0)).get('r')
+    inventario = Producto.objects.filter(stock__gte=1).aggregate(r=Coalesce(Sum('stock'), 0)).get('r')
     agotados = Producto.objects.filter(stock=0).count()
     data = {
         'ventas': int(ventas),
@@ -486,10 +486,10 @@ def dataChart2():
     for p in producto:
         total = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__year=year,
                                              venta__transaccion__fecha_trans__month=month,
-                                             inventario__produccion__producto_id=p).aggregate(
+                                             inventario_id=p).aggregate(
             r=Coalesce(Sum('venta__transaccion__total'), 0)).get('r')
         data.append({
-            'name': p.producto_base.nombre,
+            'name': p.producto_base.nombre + '/'+p.talla.talla_full()+' /'+p.color.nombre,
             'y': float(total)
         })
 

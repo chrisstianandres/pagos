@@ -182,20 +182,6 @@
                                     <p>Gastos</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{% url 'asignacion:lista' %}" class="nav-link">
-                                    <i class="fas fa-calendar-check"></i>
-                                    <p>Confeccion de Prendas</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{% url 'asignacion:lista' %}" class="nav-link">
-                                    <i class="fas fa-business-time"></i>
-                                    <p>Control de Produccion</p>
-                                </a>
-                            </li>
-
                         </ul>
                     </li>
                     <li class="nav-item has-treeview">
@@ -207,6 +193,12 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                             <li class="nav-item">
+                                <a href="{% url 'asignacion:lista' %}" class="nav-link">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <p>Confeccion de Prendas</p>
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <a href="{% url 'compra:lista' %}" class="nav-link">
                                     <i class="far fa-money-bill-alt"></i>

@@ -82,7 +82,7 @@
             </div>
             <div class="col-xl-3 col-md-6">
                 <div class="card bg-success text-white mb-4">
-                    <div class="card-header"> Productos en Inventario</div>
+                    <div class="card-header"> Prendas en Inventario</div>
                     <div class="card-body"><div class="text-center"><h1 id="inv_tarjet"></h1></div></div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
                         <a class="small text-white stretched-link" href="{% url 'producto:lista' %}">Ver más</a>
@@ -92,7 +92,7 @@
             </div>
             <div class="col-xl-3 col-md-6">
                 <div class="card bg-danger text-white mb-4">
-                    <div class="card-header"> Productos Agotados</div>
+                    <div class="card-header"> Prendas Agotadas</div>
                     <div class="card-body"><div class="text-center"><h1 id="inv_tarjet_agot"></h1></div></div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
                         <a class="small text-white stretched-link" href="{% url 'producto:lista' %}">Ver más</a>
@@ -147,15 +147,16 @@
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header">
-                        <h5><i class="fas fa-exclamation-circle"></i>&nbsp;Prodcutos por agotarse</h5>
+                        <h5><i class="fas fa-exclamation-circle"></i>&nbsp;Prendas por agotarse</h5>
                     </div>
                     <div class="card-body">
                         <table class="table" id="datatable">
                             <thead>
                             <tr>
-                                <th>Producto</th>
+                                <th>Prenda</th>
                                 <th>Categoria</th>
-                                <th>Presentacion</th>
+                                <th>Color</th>
+                                <th>Talla</th>
                                 <th>Stock</th>
                                 <th>Imagen</th>
                             </tr>
@@ -178,7 +179,7 @@
                             <thead>
                             <tr>
                                 <th>Fecha</th>
-                                <th>Producto</th>
+                                <th>Prenda</th>
                                 <th>Cantidad</th>
                                 <th>Total</th>
                             </tr>

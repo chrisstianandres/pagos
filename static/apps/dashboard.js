@@ -133,7 +133,8 @@ function datatbles() {
         columns: [
             {data: "producto_base.nombre"},
             {data: "producto_base.categoria.nombre"},
-            {data: "presentacion.nombre"},
+            {data: "color.nombre"},
+            {data: "talla.talla_full"},
             {data: "stock"},
             {data: "imagen"}
         ],
