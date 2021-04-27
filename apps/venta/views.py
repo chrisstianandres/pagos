@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.utils.decorators import method_decorator
 
 from apps.cliente.forms import ClienteForm
@@ -21,6 +22,7 @@ from apps.backEnd import nombre_empresa
 from apps.transaccion.forms import TransaccionForm
 from apps.transaccion.models import Transaccion
 from apps.user.forms import UserForm
+from apps.user.models import User
 from apps.venta.forms import Detalle_VentaForm
 from apps.venta.models import Venta, Detalle_venta
 from apps.empresa.models import Empresa
@@ -71,11 +73,10 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'detalle':
                 id = request.POST['id']
                 if id:
-                    # inventario__produccion__producto__producto_base_id
                     data = []
                     result = self.model.objects.get(id=id)
                     for p in result.detalle_venta_set.all():
-                        item=p.toJSON()
+                        item = p.toJSON()
                         data.append(item)
             elif action == 'estado':
                 id = request.POST['id']
@@ -144,8 +145,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
+                        c.user_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -177,8 +177,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
+                        c.user_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -190,31 +189,52 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1)[
-                                             :i['cantidad']]:
-                                    dv = Detalle_venta()
-                                    dv.venta_id = v.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.producto.pvp)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 0
-                                    in_pr.save()
-                                    dv.save()
+                                dv = Detalle_venta()
+                                dv.venta_id = v.id
+                                dv.inventario_id = i['id']
+                                dv.cantidad = int(i['cantidad_venta'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(
-                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1).count())
+                                stock.stock -= int(int(i['cantidad_venta']))
                                 stock.save()
                         data['id'] = v.id
                         data['resp'] = True
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
+            elif action == 'add_cliente':
+                f = ClienteForm(request.POST)
+                datos = request.POST
+                data = self.save_data(f, datos)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def save_data(self, f, datos):
+        data = {}
+        if f.is_valid():
+            use = User()
+            use.username = datos['cedula']
+            use.cedula = datos['cedula']
+            use.first_name = datos['first_name']
+            use.last_name = datos['last_name']
+            use.sexo = datos['sexo']
+            use.email = datos['email']
+            use.telefono = datos['telefono']
+            use.celular = datos['celular']
+            use.direccion = datos['direccion']
+            use.tipo = 0
+            use.password = make_password(datos['cedula'])
+            use.save()
+            data['resp'] = True
+            data['cliente'] = use.toJSON()
+        else:
+            data['error'] = f.errors
+        return data
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -250,8 +270,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
+                        c.user_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -262,21 +281,15 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'],
-                                                                                estado=1)[:i['cantidad']]:
-                                    dv = Detalle_venta()
-                                    dv.venta_id = v.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.produccion.producto.pvp)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 0
-                                    in_pr.save()
-                                    dv.save()
+                                dv = Detalle_venta()
+                                dv.venta_id = v.id
+                                dv.inventario_id = i['id']
+                                dv.cantidad = int(i['cantidad_venta'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(
-                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'],
-                                                                       estado=1).count())
+                                stock.stock -= int(int(i['cantidad_venta']))
                                 stock.save()
                     data['id'] = v.id
                     data['resp'] = True
@@ -289,8 +302,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
+                        c.user_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -302,20 +314,15 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1)[
-                                             :i['cantidad']]:
-                                    dv = Detalle_venta()
-                                    dv.venta_id = v.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.produccion.producto.pvp)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 0
-                                    in_pr.save()
-                                    dv.save()
+                                dv = Detalle_venta()
+                                dv.venta_id = v.id
+                                dv.inventario_id = i['id']
+                                dv.cantidad = int(i['cantidad_venta'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(
-                                    Inventario_producto.objects.filter(produccion__producto_id=i['id'], estado=1).count())
+                                stock.stock -= int(int(i['cantidad_venta']))
                                 stock.save()
                         data['id'] = v.id
                         data['resp'] = True
@@ -356,7 +363,7 @@ def CrudView_online(request):
             data['form'] = TransaccionForm()
             data['form2'] = Detalle_VentaForm()
             data['detalle'] = []
-            user = Cliente.objects.get(cedula=request.user.cedula)
+            user = request.user.cedula
             data['user'] = user
             return render(request, 'front-end/venta/venta_online.html', data)
     else:
@@ -489,7 +496,7 @@ def dataChart2():
                                              inventario_id=p).aggregate(
             r=Coalesce(Sum('venta__transaccion__total'), 0)).get('r')
         data.append({
-            'name': p.producto_base.nombre + '/'+p.talla.talla_full()+' /'+p.color.nombre,
+            'name': p.producto_base.nombre + '/' + p.talla.talla_full() + ' /' + p.color.nombre,
             'y': float(total)
         })
 
@@ -591,7 +598,7 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 if start_date == '' and end_date == '':
                     query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username') \
                         .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=1)
                 else:
@@ -649,7 +656,7 @@ class report_total_reserva(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 if start_date == '' and end_date == '':
                     query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                                                 'transaccion__cliente__apellidos', 'transaccion__user__username') \
                         .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=2)
                 else:

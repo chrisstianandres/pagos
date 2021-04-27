@@ -3,6 +3,7 @@ from datetime import *
 from .models import Transaccion
 
 from ..cliente.models import Cliente
+from ..user.models import User
 
 
 class TransaccionForm(forms.ModelForm):
@@ -17,10 +18,10 @@ class TransaccionForm(forms.ModelForm):
                 'readonly': True,
                 'class': 'form-control'
             }
-            self.fields['cliente'].widget.attrs = {
+            self.fields['user'].widget.attrs = {
                 'class': 'custom-select select2'
             }
-            self.fields["cliente"].queryset = Cliente.objects.none()
+            self.fields["user"].queryset = User.objects.none()
             self.fields['subtotal'].widget.attrs = {
                 'value': '0.00',
                 'class': 'form-control',
@@ -43,14 +44,14 @@ class TransaccionForm(forms.ModelForm):
         model = Transaccion
         fields = [
             'fecha_trans',
-            'cliente',
+            'user',
             'subtotal',
             'iva',
             'total'
         ]
         labels = {
             'fecha_trans': 'Fecha',
-            'cliente': 'Cliente',
+            'user': 'Cliente',
             'subtotal': 'Subtotal',
             'iva': 'I.V.A.',
             'total': 'TOTAL'

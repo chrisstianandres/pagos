@@ -71,8 +71,8 @@
     {% if sale.fecha_ingreso != None %}<b>FECHA DE RECEPCION:</b> {{ sale.fecha_ingreso }}<br>{% endif %}
     {% if sale.fecha_entrega != None %}<b>FECHA DE ENTREGA:</b> {{ sale.fecha_entrega }}
         <br>{% endif %}
-    <b>CLIENTE:</b> {{ sale.transaccion.cliente.nombres|upper }}&nbsp;{{ sale.transaccion.cliente.apellidos|upper }}<br>
-    <b>CEDULA:</b> {{ sale.transaccion.cliente.cedula }}<br>
+    <b>CLIENTE:</b> {{ sale.transaccion.user.first_name|upper }}&nbsp;{{ sale.transaccion.user.last_name|upper }}<br>
+    <b>CEDULA:</b> {{ sale.transaccion.user.cedula }}<br>
 
 </p>
 <table id="invoice">

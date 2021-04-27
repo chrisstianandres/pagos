@@ -164,7 +164,7 @@ $(function () {
         columns: [
             {data: 'transaccion.fecha_trans'},
             {data: 'fecha_entrega'},
-            {data: "transaccion.cliente.full_name_list"},
+            {data: "transaccion.user.full_name"},
             {data: "transaccion.subtotal"},
             {data: "transaccion.iva"},
             {data: "transaccion.total"},
@@ -215,6 +215,7 @@ $(function () {
             }
         ],
         createdRow: function (row, data, dataIndex) {
+            console.log(data.confeccion.estado);
             if (data.estado === 1) {
                 $('td', row).eq(7).html('<span class="badge badge-success" style="color: white"> ENTREGADA');
                 $('td', row).eq(8).find('a[rel="entregar"]').hide();
@@ -222,12 +223,19 @@ $(function () {
                     $('td', row).eq(8).find('a[rel="devolver"]').hide();
                 }
             } else if (data.estado === 0) {
-                $('td', row).eq(7).html('<span class="badge badge-warning" style="color: white"> POR ENTREGAR');
-                $('td', row).eq(1).html('<span class="badge badge-warning" style="color: white"> SIN FECHA');
-                if (user_tipo === '0') {
+                if (data.confeccion.estado === 1) {
+                    $('td', row).eq(7).html('<span class="badge badge-warning" style="color: white"> EN PRODUCCION');
+                    $('td', row).eq(1).html('<span class="badge badge-warning" style="color: white"> SIN FECHA');
                     $('td', row).eq(8).find('a[rel="entregar"]').hide();
-                    $('td', row).eq(8).find('a[rel="devolver"]').hide();
+                } else {
+                    $('td', row).eq(7).html('<span class="badge badge-warning" style="color: white"> POR ENTREGAR');
+                    $('td', row).eq(1).html('<span class="badge badge-warning" style="color: white"> SIN FECHA');
+                    if (user_tipo === '0') {
+                        $('td', row).eq(8).find('a[rel="entregar"]').hide();
+                        $('td', row).eq(8).find('a[rel="devolver"]').hide();
+                    }
                 }
+
             } else if (data.estado === 2) {
                 $('td', row).eq(7).html('<span class="badge badge-danger" style="color: white"> ANULADA');
                 $('td', row).eq(1).html('<span class="badge badge-danger" style="color: white"> ANULADA');
@@ -254,9 +262,9 @@ $(function () {
             var data = datatable.row(tr.row).data();
             var parametros = {'id': data.id, 'action': 'anular'};
             save_estado('Alerta',
-                window.location.pathname, 'Esta seguro que desea anular esta confeccion?', parametros,
+                window.location.pathname, 'Esta seguro que desea anular/delvover esta confeccion?', parametros,
                 function () {
-                    menssaje_ok('Exito!', 'Exito al anular la confeccion', 'far fa-smile-wink', function () {
+                    menssaje_ok('Exito!', 'Exito al anular/delvover la confeccion', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false);
                     })
                 });
@@ -280,7 +288,6 @@ $(function () {
             $('.tooltip').remove();
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var resp = {};
             $('#Modal').modal('show');
             $("#tbldetalle_productos").DataTable({
                 responsive: true,
@@ -293,7 +300,7 @@ $(function () {
                     url: window.location.pathname,
                     type: 'Post',
                     data: {
-                        'id': data.id,
+                        'id': data.confeccion.id,
                         'action': 'detalle'
                     },
                     dataSrc: ""
@@ -301,7 +308,6 @@ $(function () {
                 columns: [
                     {data: 'producto'},
                     {data: 'categoria'},
-                    {data: 'presentacion'},
                     {data: 'color'},
                     {data: 'talla'},
                     {data: 'cantidad'},

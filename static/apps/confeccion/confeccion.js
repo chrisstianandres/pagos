@@ -1,4 +1,4 @@
-var tblventa;
+var tblventa, tbl_prod_list;
 var ventas = {
     items: {
         fecha_venta: '',
@@ -12,7 +12,7 @@ var ventas = {
     get_ids: function () {
         var ids = [];
         $.each(this.items.productos, function (key, value) {
-            ids.push(value.producto_base.id);
+            ids.push(value.id);
         });
         return ids;
     },
@@ -20,6 +20,7 @@ var ventas = {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
+            console.log(dict);
             dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
@@ -33,7 +34,6 @@ var ventas = {
     },
     add: function (data) {
         this.items.productos.push(data[0]);
-        this.items.productos = this.exclude_duplicados(this.items.productos);
         this.list();
     },
     list: function () {
@@ -51,9 +51,8 @@ var ventas = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "presentacion.nombre"},
-                {data: "producto_base.color.nombre"},
-                {data: "talla.talla"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
                 {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
@@ -62,7 +61,6 @@ var ventas = {
                 {
                     targets: [0],
                     class: 'text-center',
-                    width: '5%',
                     orderable: false,
                     render: function (data, type, row) {
                         return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat rounded-pill" style="color: white" data-toggle="tooltip" title="Quitar Producto"><i class="fa fa-times"></i></a>';
@@ -77,12 +75,6 @@ var ventas = {
                     render: function (data, type, row) {
                         return '$' + parseFloat(data).toFixed(2);
                     }
-                },
-                {
-                    targets: [5],
-                    class: 'text-center',
-                    orderable: false,
-                    width: '8%',
                 },
                 {
                     targets: [-3],
@@ -111,6 +103,7 @@ var ventas = {
     }
 };
 $(function () {
+    $('.sidebar-mini').addClass('sidebar-collapse');
     var action = '';
     var pk = '';
     //seleccionar producto del select producto
@@ -134,13 +127,12 @@ $(function () {
                 type: 'POST',
                 url: '/producto/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search_rep',
                         'id': '',
                         'ids': JSON.stringify(ventas.get_ids())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -172,6 +164,67 @@ $(function () {
 
             })
         });
+
+
+    $('#buscar_producto_tabla').on('click', function () {
+        $('#Modal_lista_producto').modal('show');
+        tbl_prod_list = $('#tbl_prod_search').DataTable({
+            destroy: true,
+            autoWidth: false,
+            dataSrc: "",
+            responsive: true,
+            language: {
+                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+            },
+            ajax: {
+                url: '/producto/lista',
+                type: 'POST',
+                data: {'action': 'search_asig_table', 'ids': JSON.stringify(ventas.get_ids())},
+                dataSrc: ""
+            },
+            columns: [
+                {data: "producto_base.nombre"},
+                {data: "producto_base.categoria.nombre"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
+                {data: "id"},
+            ],
+            columnDefs: [
+                {
+                    targets: [-1],
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a type="button" rel="take" class="btn btn-success btn-xs" style="color: white"><i class="fas fa-arrow-circle-right"></i>';
+
+                    }
+                },
+                {
+                    targets: '_all',
+                    class: 'text-center'
+                },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.estado === 0) {
+                    $('td', row).eq(3).html('<span class = "badge badge-success" style="color: white ">' + data.estado_full + '</span>');
+                } else if (data.estado === 1) {
+                    $('td', row).eq(3).html('<span class = "badge badge-danger" style="color: white ">' + data.estado_full + '</span>');
+                } else if (data.estado === 2) {
+                    $('td', row).eq(3).html('<span class = "badge badge-primary" style="color: white ">' + data.estado_full + '</span>');
+                }
+            }
+        });
+    });
+
+    $('#tbl_prod_search tbody')
+        .on('click', 'a[rel="take"]', function () {
+            var tr = tbl_prod_list.cell($(this).closest('td, li')).index();
+            var data = tbl_prod_list.row(tr.row).data();
+            data['cantidad'] = 5;
+            var ex =[];
+            ex.push(data);
+            ventas.add(ex);
+            $('#Modal_lista_producto').modal('hide');
+        });
     //remover producto del detalle
     $('#tblproductos tbody')
         .on('click', 'a[rel="remove"]', function () {
@@ -202,7 +255,7 @@ $(function () {
     });
     //boton guardar
     $('#save').on('click', function () {
-        if ($('select[name="cliente"]').val() === "") {
+        if ($('select[name="user"]').val() === "") {
             menssaje_error('Error!', "Debe seleccionar un cliente", 'far fa-times-circle');
             return false
         } else if (ventas.items.productos.length === 0) {
@@ -211,7 +264,7 @@ $(function () {
         }
         var parametros;
         ventas.items.fecha_venta = $('input[name="fecha_trans"]').val();
-        ventas.items.cliente = $('#id_cliente option:selected').val();
+        ventas.items.cliente = $('#id_user option:selected').val();
 
         parametros = {'confeccion': JSON.stringify(ventas.items)};
         parametros['action'] = 'add';
@@ -236,26 +289,26 @@ $(function () {
     //enviar formulario de nuevo cliente
     $('#form').on('submit', function (e) {
         e.preventDefault();
-        action = 'add';
+        action = 'add_cliente';
         var parametros = new FormData(this);
         parametros.append('action', action);
         parametros.append('id', pk);
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
+                window.location.pathname, 'Esta seguro que desea guardar este cliente?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
                         var newOption = new Option(response.cliente['full_name'], response.cliente['id'], false, true);
-                        $('#id_cliente').append(newOption).trigger('change');
+                        $('#id_user').append(newOption).trigger('change');
                     });
                 });
         }
 
     });
     //buscar cliente en el select cliente
-    $('#id_cliente').select2({
+    $('#id_user').select2({
         theme: "classic",
         language: {
             inputTooShort: function () {
@@ -274,11 +327,10 @@ $(function () {
             type: 'POST',
             url: '/cliente/lista',
             data: function (params) {
-                var queryParameters = {
+                return {
                     term: params.term,
                     'action': 'search'
                 };
-                return queryParameters;
             },
             processResults: function (data) {
                 return {

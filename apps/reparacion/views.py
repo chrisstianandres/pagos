@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.utils.decorators import method_decorator
 
 from apps.cliente.models import Cliente
@@ -14,7 +15,7 @@ from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
-from apps.backEnd import nombre_empresa
+from apps.backEnd import nombre_empresa, verificar
 from apps.cliente.forms import ClienteForm
 from apps.producto_base.models import Producto_base
 from apps.reparacion.forms import ReparacionForm, Detalle_reparacionform
@@ -125,8 +126,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
+                        c.user_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -150,11 +150,41 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
+            elif action == 'save_user':
+                f = ClienteForm(request.POST)
+                datos = request.POST
+                data = self.save_data(f, datos)
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def save_data(self, f, datos):
+        data = {}
+        if f.is_valid():
+            if verificar(f.data['cedula']):
+                use = User()
+                use.username = datos['cedula']
+                use.cedula = datos['cedula']
+                use.first_name = datos['first_name']
+                use.last_name = datos['last_name']
+                use.sexo = datos['sexo']
+                use.email = datos['email']
+                use.telefono = datos['telefono']
+                use.celular = datos['celular']
+                use.direccion = datos['direccion']
+                use.tipo = 0
+                use.password = make_password(datos['cedula'])
+                use.save()
+                data['resp'] = True
+                data['cliente'] = use.toJSON()
+            else:
+                f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
+                data['error'] = f.errors
+        else:
+            data['error'] = f.errors
+        return data
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -186,14 +216,11 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
         action = request.POST['action']
         try:
             datos = json.loads(request.POST['reparacion'])
-            us = User.objects.get(id=request.user.id)
-            cli = Cliente.objects.get(cedula=us.cedula)
             if action == 'add':
                 if datos:
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = cli.id
                         c.user_id = request.user.id
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
@@ -223,7 +250,6 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = cli.id
                         c.user_id = request.user.id
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
@@ -263,7 +289,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
         data['form'] = TransaccionForm()
         data['form2'] = Detalle_reparacionform()
         data['detalle'] = []
-        user = Cliente.objects.get(cedula=self.request.user.cedula)
+        user = User.objects.get(id=self.request.user.id)
         data['formc'] = ClienteForm(instance=user)
         return data
 

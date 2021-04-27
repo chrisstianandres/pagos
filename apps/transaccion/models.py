@@ -28,7 +28,6 @@ tipo = (
 
 class Transaccion(models.Model):
     tipo = models.IntegerField(choices=tipo, default=0)
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     fecha_trans = models.DateField(default=datetime.now)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
@@ -36,12 +35,11 @@ class Transaccion(models.Model):
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
     def __str__(self):
-        return '%s %s %s' % (self.cliente, self.fecha_trans, self.total)
+        return '%s %s %s' % (self.user.get_full_name(), self.fecha_trans, self.total)
 
     def toJSON(self):
         item = model_to_dict(self)
         item['fecha_trans'] = self.fecha_trans.strftime('%d-%m-%Y')
-        item['cliente'] = self.cliente.toJSON()
         item['user'] = self.user.toJSON()
         item['subtotal'] = format(self.subtotal, '.2f')
         item['iva'] = format(self.iva, '.2f')

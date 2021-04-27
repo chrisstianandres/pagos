@@ -15,7 +15,7 @@ ESTADO = (
 )
 
 tipo = (
-    (1, 'USER'),
+    (1, 'USUARIO'),
     (0, 'CLIENTE'),
 )
 

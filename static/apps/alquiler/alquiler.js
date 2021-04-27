@@ -300,7 +300,7 @@ $(function () {
     });
     //boton guardar
     $('#save').on('click', function () {
-        if ($('select[name="cliente"]').val() === "") {
+        if ($('select[name="user"]').val() === "") {
             menssaje_error('Error!', "Debe seleccionar un cliente", 'far fa-times-circle');
             return false
         } else if (ventas.items.productos.length === 0) {
@@ -310,7 +310,7 @@ $(function () {
         var parametros;
         ventas.items.fecha_venta = $('input[name="fecha_trans"]').val();
         ventas.items.fecha_salida = $('input[name="fecha_salida"]').val();
-        ventas.items.cliente = $('#id_cliente option:selected').val();
+        ventas.items.cliente = $('#id_user option:selected').val();
 
         parametros = {'ventas': JSON.stringify(ventas.items)};
         parametros['action']='add';
@@ -335,26 +335,26 @@ $(function () {
     //enviar formulario de nuevo cliente
     $('#form').on('submit', function (e) {
         e.preventDefault();
-        action = 'add';
+        action = 'add_cliente';
         var parametros = new FormData(this);
         parametros.append('action', action);
         parametros.append('id', pk);
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
+                window.location.pathname, 'Esta seguro que desea guardar este cliente?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
                         var newOption = new Option(response.cliente['full_name'], response.cliente['id'], false, true);
-                        $('#id_cliente').append(newOption).trigger('change');
+                        $('#id_user').append(newOption).trigger('change');
                     });
                 });
         }
 
     });
     //buscar cliente en el select cliente
-    $('#id_cliente').select2({
+    $('#id_user').select2({
         theme: "classic",
         language: {
             inputTooShort: function () {

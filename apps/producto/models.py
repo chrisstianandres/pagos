@@ -2,6 +2,7 @@ from django.db import models
 from django.forms import model_to_dict
 
 from apps.color.models import Color
+from apps.empresa.models import Empresa
 from apps.producto_base.models import Producto_base
 from apps.talla.models import Talla
 from pagos.settings import STATIC_URL, MEDIA_URL
@@ -29,6 +30,7 @@ class Producto(models.Model):
         item['imagen'] = self.get_image()
         item['talla'] = self.talla.toJSON()
         item['color'] = self.color.toJSON()
+        item['iva_emp'] = Empresa.objects.first().iva
         return item
 
     def get_image(self):

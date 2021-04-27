@@ -18,7 +18,6 @@ estado = (
 class Asig_recurso(models.Model):
     fecha_asig = models.DateField(default=datetime.now)
     fecha_fin = models.DateField(default=datetime.now)
-    lote = models.CharField(unique=True, max_length=100)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     estado = models.IntegerField(choices=estado, default=1)
 
@@ -27,7 +26,7 @@ class Asig_recurso(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
-        item['user'] = self.user.toJSON()
+        item['user'] = '{} - {}'.format(self.user.get_full_name(), self.user.get_tipo_display())
         item['fecha_asig'] = self.fecha_asig.strftime('%d/%m/%Y')
         item['fecha_fin'] = self.fecha_fin.strftime('%d/%m/%Y')
         item['estado_label'] = self.get_estado_display()
@@ -111,6 +110,7 @@ class Detalle_produccion(models.Model):
         item = model_to_dict(self)
         item['asignacion'] = self.asignacion.toJSON()
         item['producto'] = self.producto.toJSON()
+        item['cantidad'] = self.cantidad
         return item
 
     class Meta:

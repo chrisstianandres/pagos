@@ -701,7 +701,6 @@ $(function () {
                 });
             } else {
                 var parametros;
-                produccion.items.lote = $('#id_lote').val();
                 parametros = {'ingresos': JSON.stringify(produccion.items)};
                 parametros['action'] = 'finalizar';
                 save_with_ajax('Alerta',

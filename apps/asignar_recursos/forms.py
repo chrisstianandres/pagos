@@ -22,21 +22,15 @@ class Asig_recursoForm(forms.ModelForm):
                 'readonly': True,
                 'class': 'form-control'
             }
-            self.fields['lote'].widget.attrs = {
-                'class': 'form-control'
-            }
         # habilitar, desabilitar, y mas
 
     class Meta:
         model = Asig_recurso
         fields = [
             'fecha_asig',
-            'lote',
-
         ]
         labels = {
             'fecha_asig': 'Duracion de Produccion',
-            'lote': 'Lote',
         }
         widgets = {
             'fecha_asig': forms.DateInput(

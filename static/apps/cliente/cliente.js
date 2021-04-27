@@ -27,13 +27,13 @@ $(document).ready(function () {
     validar();
     $("#form").validate({
         rules: {
-            nombres: {
+            first_name: {
                 required: true,
                 minlength: 3,
                 maxlength: 50,
                 lettersonly: true,
             },
-            apellidos: {
+            last_name: {
                 required: true,
                 minlength: 3,
                 maxlength: 50,
@@ -46,14 +46,14 @@ $(document).ready(function () {
                 digits: true,
                 val_ced: true
             },
-            correo: {
+            email: {
                 required: true,
                 email: true
             },
             telefono: {
                 required: true,
-                minlength: 10,
-                maxlength: 10,
+                minlength: 9,
+                maxlength: 9,
                 digits: true
             },
             direccion: {
@@ -65,39 +65,39 @@ $(document).ready(function () {
 
         },
         messages: {
-            nombres: {
-                required: "Porfavor ingresa tus nombres",
+            first_name: {
+                required: "Por favor ingresa tus nombres",
                 minlength: "Debe ingresar al menos un nombre",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
-            apellidos: {
-                required: "Porfavor ingresa tus apellidos",
+            last_name: {
+                required: "Por favor ingresa tus apellidos",
                 minlength: "Debe ingresar al menos un apellido",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             cedula: {
-                required: "Porfavor ingresa tu numero de documento",
+                required: "Por favor ingresa tu numero de documento",
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
                 maxlength: "Tu numero de documento debe tener maximo 10 digitos",
                 val_ced: "Numero de cedula no valido para Ecuador"
             },
-            correo: "Debe ingresar un correo valido",
+            email: "Debe ingresar un correo valido",
             telefono: {
-                required: "Porfavor ingresa tu numero celular",
-                minlength: "Tu numero de documento debe tener al menos 10 digitos",
+                required: "Por favor ingresa tu numero celular",
+                minlength: "Tu numero de documento debe tener al menos 9 digitos",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+                maxlength: "Tu numero de documento debe tener maximo 9 digitos",
             },
             direccion: {
-                required: "Porfavor ingresa una direccion",
+                required: "Por favor ingresa una direccion",
                 minlength: "Ingresa al menos 5 letras",
                 maxlength: "Tu direccion debe tener maximo 50 caracteres",
             },
         },
     });
 
-    $('#id_nombres').keyup(function () {
+    $('#id_first_name').keyup(function () {
         var changue = $(this).val().replace(/\b\w/g, function (l) {
             return l.toUpperCase()
         });

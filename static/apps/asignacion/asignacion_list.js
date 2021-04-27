@@ -53,7 +53,7 @@ $(function () {
         },
         columns: [
             {"data": "fecha_asig"},
-            {"data": "lote"},
+            {"data": "user"},
             {"data": "estado_label"},
             {"data": "id"}
         ],
@@ -90,7 +90,7 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [0, 1, 2],
+                        columns: [0, 1, 2, 3],
                         search: 'applied',
                         order: 'applied'
                     },
@@ -159,7 +159,7 @@ $(function () {
                             return 4;
                         };
                         doc.content[0].layout = objLayout;
-                        doc.content[1].table.widths = ['*', '*', '*', '*', '*', '*'];
+                        doc.content[1].table.widths = ['*', '*', '*', '*'];
                         doc.styles.tableBodyEven.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center';
                     }
@@ -211,11 +211,11 @@ $(function () {
             $('.tooltip').remove();
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var parametros = {'id': data['4']};
+            var parametros = {'id': data.id};
             save_estado('Alerta',
-                window.location.pathname, 'Esta seguro que desea anular esta asignacion?', parametros,
+                window.location.pathname, 'Esta seguro que desea anular esta confeccion?', parametros,
                 function () {
-                    menssaje_ok('Exito!', 'Exito al anular esta asignacion', 'far fa-smile-wink', function () {
+                    menssaje_ok('Exito!', 'Exito al anular esta confeccion', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false);
                     })
                 });

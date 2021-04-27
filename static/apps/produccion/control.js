@@ -8,7 +8,8 @@ var produccion = {
         materiales: [],
         maquinas: [],
         perdidas: [],
-        productos: []
+        productos: [],
+        productos_eliminados: []
     },
     get_ids_maquina: function () {
         var ids = [];
@@ -1074,7 +1075,7 @@ $(function () {
                 var tr = tblproductos.cell($(this).closest('td, li')).index();
                 borrar_todo_alert('Alerta de Eliminación',
                     'Esta seguro que desea eliminar esta prenda de la produccion?', function () {
-                        var p = produccion.items.productos[tr.row];
+                        produccion.items.productos_eliminados.push(tblproductos.row(tr.row).data());
                         produccion.items.productos.splice(tr.row, 1);
                         menssaje_ok('Confirmacion!', 'Prenda eliminada', 'far fa-smile-wink', function () {
                             produccion.list_estimado();
@@ -1095,7 +1096,6 @@ $(function () {
     $('#save').on('click', function () {
         var parametros;
         parametros = {'ingresos': JSON.stringify(produccion.items)};
-        console.log(produccion.items);
         parametros['action'] = 'add';
         save_with_ajax('Alerta',
             window.location.pathname, 'Esta seguro que desea guardar estos parametros de la confeccion?', parametros, function (response) {

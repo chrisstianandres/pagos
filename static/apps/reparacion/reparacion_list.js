@@ -165,7 +165,7 @@ $(function () {
             {data: 'transaccion.fecha_trans'},
             {data: 'fecha_ingreso'},
             {data: 'fecha_entrega'},
-            {data: "transaccion.cliente.full_name_list"},
+            {data: "transaccion.user.full_name"},
             {data: "transaccion.subtotal"},
             {data: "transaccion.iva"},
             {data: "transaccion.total"},

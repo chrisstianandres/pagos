@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.contrib.staticfiles import finders
 from django.db import transaction
 from django.db.models import Sum
@@ -14,7 +15,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 from xhtml2pdf import pisa
 
-from apps.backEnd import nombre_empresa
+from apps.asignar_recursos.models import Asig_recurso, Detalle_produccion
+from apps.backEnd import nombre_empresa, verificar
 from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.confeccion.forms import ConfeccionForm, Detalle_confeccionform
@@ -29,7 +31,7 @@ from apps.user.forms import UserForm
 from apps.user.models import User
 
 opc_icono = 'fab fa-shirtsinbulk'
-opc_entidad = 'Confeccion'
+opc_entidad = 'Confeccion para clientes'
 crud = '/confeccion/crear'
 empresa = nombre_empresa()
 
@@ -61,15 +63,14 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    result = Detalle_confeccion.objects.filter(confeccion_id=id)
+                    result = Detalle_confeccion.objects.filter(producto__asignacion_id=id)
                     for p in result:
                         data.append({
-                            'producto': p.producto.producto_base.nombre,
-                            'categoria': p.producto.producto_base.categoria.nombre,
-                            'presentacion': p.producto.presentacion.nombre,
-                            'color': p.producto.producto_base.color.nombre,
-                            'talla': '{} / {}'.format(p.producto.talla.talla, p.producto.talla.eqv_letra),
-                            'cantidad': p.cantidad,
+                            'producto': p.producto.producto.producto_base.nombre,
+                            'categoria': p.producto.producto.producto_base.categoria.nombre,
+                            'color': p.producto.producto.color.nombre,
+                            'talla': p.producto.producto.talla.talla_full(),
+                            'cantidad': p.producto.cantidad,
                             'pvp': p.pvp_by_confec,
                             'subtotal': p.subtotal
                         })
@@ -78,6 +79,15 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 result = Confeccion.objects.get(id=id)
                 result.estado = 2
                 result.save()
+                asignar = Asig_recurso.objects.get(id=result.confeccion_id)
+                if asignar.estado == 1:
+                    asignar.estado = 0
+                    asignar.save()
+                elif asignar.estado == 2:
+                    for d in asignar.detalle_produccion_set.all():
+                        prd = Producto.objects.get(id=d.producto.id)
+                        prd.stock += d.cantidad
+                        prd.save()
                 data['resp'] = True
             elif action == 'entregar':
                 id = request.POST['id']
@@ -85,18 +95,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 result.estado = 1
                 result.fecha_entrega = datetime.now()
                 result.save()
-                det = Detalle_confeccion.objects.filter(confeccion_id=id)
-                for p in det:
-                    a = Inventario_producto.objects.filter(produccion__producto_id=p.producto.id, estado=1).count()
-                    if a >= p.cantidad:
-                        for inv in Inventario_producto.objects.filter(produccion__producto_id=p.producto.id, estado=1)[0:p.cantidad]:
-                            inv.estado = 0
-                            inv.save()
-                            pp = Producto.objects.get(p.producto.id)
-                            pp.stock = a
-                            pp.save()
-                    else:
-                        data['error'] = 'Inventario insuficiente, por favor revisa el inventario y vuelve a intentarlo'
                 data['resp'] = True
             elif action == 'estado':
                 id = request.POST['id']
@@ -107,7 +105,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -115,7 +113,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Nueva Confeccion'
-        data['titulo'] = 'Listado de Confecciones'
+        data['titulo'] = 'Listado de Confecciones para Clientes'
         data['nuevo'] = '/confeccion/nuevo'
         data['empresa'] = empresa
         return data
@@ -132,16 +130,18 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 datos = json.loads(request.POST['confeccion'])
                 if datos:
                     with transaction.atomic():
+                        asig = Asig_recurso()
+                        asig.fecha_asig = datos['fecha_venta']
+                        asig.user_id = datos['cliente']
+                        asig.save()
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
+                        c.user_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -149,13 +149,17 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.save()
                         v = Confeccion()
                         v.transaccion_id = c.id
+                        v.confeccion_id = asig.id
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
+                                dtp = Detalle_produccion()
+                                dtp.asignacion_id = asig.id
+                                dtp.producto_id = int(i['id'])
+                                dtp.cantidad = int(i['cantidad'])
+                                dtp.save()
                                 dv = Detalle_confeccion()
-                                dv.confeccion_id = v.id
-                                dv.producto_id = int(i['id'])
-                                dv.cantidad = int(i['cantidad'])
+                                dv.producto_id = dtp.id
                                 dv.pvp_by_confec = float(i['pvp'])
                                 dv.subtotal = float(i['subtotal'])
                                 dv.save()
@@ -164,11 +168,41 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
+            elif action == 'add_cliente':
+                f = ClienteForm(request.POST)
+                datos = request.POST
+                data = self.save_data(f, datos)
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def save_data(self, f, datos):
+        data = {}
+        if f.is_valid():
+            if verificar(f.data['cedula']):
+                use = User()
+                use.username = datos['cedula']
+                use.cedula = datos['cedula']
+                use.first_name = datos['first_name']
+                use.last_name = datos['last_name']
+                use.sexo = datos['sexo']
+                use.email = datos['email']
+                use.telefono = datos['telefono']
+                use.celular = datos['celular']
+                use.direccion = datos['direccion']
+                use.tipo = 0
+                use.password = make_password(datos['cedula'])
+                use.save()
+                data['resp'] = True
+                data['cliente'] = use.toJSON()
+            else:
+                f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
+                data['error'] = f.errors
+        else:
+            data['error'] = f.errors
+        return data
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)

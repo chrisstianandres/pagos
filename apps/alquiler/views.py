@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.utils.decorators import method_decorator
 
 from apps.alquiler.forms import Detalle_AlquilerForm, AlquilerForm
@@ -16,7 +17,7 @@ from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
-from apps.backEnd import nombre_empresa
+from apps.backEnd import nombre_empresa, verificar
 from apps.cliente.forms import ClienteForm
 # from apps.compra.models import Compra
 # from apps.delvoluciones_venta.models import Devolucion
@@ -143,8 +144,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
+                        c.user_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -168,6 +168,10 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                 stock.save()
                     data['id'] = v.id
                     data['resp'] = True
+            elif action == 'add_user':
+                f = ClienteForm(request.POST)
+                datos = request.POST
+                data = self.save_data(f, datos)
             else:
                 data['resp'] = False
                 data['error'] = "Datos Incompletos"
@@ -175,6 +179,32 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         except Exception as e:
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def save_data(self, f, datos):
+        data = {}
+        if f.is_valid():
+            if verificar(f.data['cedula']):
+                use = User()
+                use.username = datos['cedula']
+                use.cedula = datos['cedula']
+                use.first_name = datos['first_name']
+                use.last_name = datos['last_name']
+                use.sexo = datos['sexo']
+                use.email = datos['email']
+                use.telefono = datos['telefono']
+                use.celular = datos['celular']
+                use.direccion = datos['direccion']
+                use.tipo = 0
+                use.password = make_password(datos['cedula'])
+                use.save()
+                data['resp'] = True
+                data['cliente'] = use.toJSON()
+            else:
+                f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
+                data['error'] = f.errors
+        else:
+            data['error'] = f.errors
+        return data
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -211,8 +241,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = datos['cliente']
-                        c.user_id = request.user.id
+                        c.user_id =  datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -224,21 +253,15 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'],
-                                                                                estado=1)[
-                                             :i['cantidad']]:
-                                    dv = Detalle_alquiler()
-                                    dv.alquiler_id = v.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_by_alquiler = float(in_pr.produccion.producto.pvp_alq)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 2
-                                    in_pr.save()
-                                    dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(Inventario_producto.objects.filter(produccion__producto_id=i['id'],
-                                                                                     estado=1).count())
+                                dv = Detalle_alquiler()
+                                dv.alquiler_id = v.id
+                                dv.inventario_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad_venta'])
+                                dv.pvp_by_alquiler = stock.pvp_alq
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                                stock.stock -= int(i['cantidad_venta'])
                                 stock.save()
                         data['id'] = v.id
                         data['resp'] = True
@@ -248,11 +271,8 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
             elif action == 'reserva':
                 if datos:
                     with transaction.atomic():
-                        us = User.objects.get(id=int(datos['cliente']))
-                        cli = Cliente.objects.get(cedula=us.cedula)
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.cliente_id = cli.id
                         c.user_id = request.user.id
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
@@ -265,20 +285,16 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario_producto.objects.filter(produccion__producto_id=i['id'],
-                                                                                estado=1)[:i['cantidad']]:
-                                    dv = Detalle_alquiler()
-                                    dv.alquiler_id = v.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_by_alquiler = float(in_pr.produccion.producto.pvp_alq)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 2
-                                    in_pr.save()
-                                    dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(Inventario_producto.objects.filter(produccion__producto_id=i['id'],
-                                                                                     estado=1).count())
+                                dv = Detalle_alquiler()
+                                dv.alquiler_id = v.id
+                                dv.inventario_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad_venta'])
+                                dv.pvp_by_alquiler = stock.pvp_alq
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                                stock.stock -= int(i['cantidad_venta'])
+                                stock.save()
                         data['id'] = v.id
                         data['resp'] = True
                 else:
@@ -300,7 +316,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
         data['form'] = TransaccionForm()
         data['form2'] = Detalle_AlquilerForm()
         data['detalle'] = []
-        user = Cliente.objects.get(cedula=self.request.user.cedula)
+        user = User.objects.get(id=self.request.user.id)
         data['formc'] = ClienteForm(instance=user)
         return data
 

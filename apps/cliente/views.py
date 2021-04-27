@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -24,7 +25,7 @@ empresa = nombre_empresa()
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
-    model = Cliente
+    model = User
     template_name = "front-end/cliente/cliente_list.html"
     permission_required = 'cliente.view_cliente'
 
@@ -38,13 +39,13 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
-                for c in Cliente.objects.all():
+                for c in self.model.objects.all():
                     data.append(c.toJSON())
             elif action == 'search':
                 data = []
                 term = request.POST['term']
-                query = Cliente.objects.filter(
-                    Q(nombres__icontains=term) | Q(apellidos__icontains=term) | Q(cedula__icontains=term))[0:10]
+                query = self.model.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) |
+                                                  Q(cedula__icontains=term), tipo=0)[0:10]
                 for a in query:
                     item = a.toJSON()
                     item['text'] = a.get_full_name()
@@ -81,12 +82,14 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         try:
             if action == 'add':
                 f = ClienteForm(request.POST)
-                data = self.save_data(f)
+                datos = request.POST
+                data = self.save_data(f, datos)
             elif action == 'edit':
                 pk = request.POST['id']
                 cliente = Cliente.objects.get(pk=int(pk))
                 f = ClienteForm(request.POST, instance=cliente)
-                data = self.save_data(f)
+                datos = request.POST
+                data = self.save_data(f, datos)
             elif action == 'delete':
                 pk = request.POST['id']
                 cli = Cliente.objects.get(pk=pk)
@@ -98,15 +101,25 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-
-    def save_data(self, f):
+    def save_data(self, f, datos):
         data = {}
         if f.is_valid():
-            f.save(commit=False)
             if verificar(f.data['cedula']):
-                cli = f.save()
+                use = User()
+                use.username = datos['cedula']
+                use.cedula = datos['cedula']
+                use.first_name = datos['first_name']
+                use.last_name = datos['last_name']
+                use.sexo = datos['sexo']
+                use.email = datos['email']
+                use.telefono = datos['telefono']
+                use.celular = datos['celular']
+                use.direccion = datos['direccion']
+                use.tipo = 0
+                use.password = make_password(datos['cedula'])
+                use.save()
                 data['resp'] = True
-                data['cliente'] = cli.toJSON()
+                data['cliente'] = use.toJSON()
             else:
                 f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
                 data['error'] = f.errors

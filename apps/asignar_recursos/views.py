@@ -1,7 +1,7 @@
 import json
 
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import JsonResponse, HttpResponse
 
 from django.utils.decorators import method_decorator
@@ -13,6 +13,7 @@ from apps.asignar_recursos.forms import Asig_recursoForm, Detalle_Asig_recursoFo
 from apps.asignar_recursos.models import Asig_recurso, Detalle_asig_recurso, Detalle_asig_maquina, Detalle_produccion, \
     Novedades, Detalle_perdidas_materiales
 from apps.backEnd import nombre_empresa
+from apps.confeccion.models import Confeccion
 from apps.maquina.models import Maquina
 from apps.material.models import Material
 from apps.mixins import ValidatePermissionRequiredMixin
@@ -20,7 +21,7 @@ from apps.producto.models import Producto
 from apps.producto_base.models import Producto_base
 
 opc_icono = 'fas fa-toolbox'
-opc_entidad = 'Confeccion de Prendas'
+opc_entidad = 'Confeccion de Prendas (Produccion)'
 crud = '/asignar/crear'
 empresa = nombre_empresa()
 
@@ -70,7 +71,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         data.append(item)
                 else:
                     data['error'] = 'Ha ocurrido un error'
-
             elif action == 'detalle_prendas':
                 id = request.POST['id']
                 if id:
@@ -100,21 +100,26 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         data.append(item)
                 else:
                     data['error'] = 'Ha ocurrido un error'
-
             elif action == 'finalizar':
                 id = request.POST['id']
                 if id:
                     asignar = Asig_recurso.objects.get(id=id)
                     asignar.estado = 2
                     asignar.save()
-                    for m in Detalle_asig_maquina.objects.filter(asig_recurso_id=id):
-                        for x in Maquina.objects.filter(id=m.maquina.pk):
-                            x.estado = 0
-                            x.save()
-                    for d in asignar.detalle_produccion_set.all():
-                        prd = Producto.objects.get(id=d.producto.id)
-                        prd.stock += d.cantidad
-                        prd.save()
+                    if asignar.detalle_asig_recurso_set.all():
+                        for m in Detalle_asig_maquina.objects.filter(asig_recurso_id=id):
+                            for x in Maquina.objects.filter(id=m.maquina.pk):
+                                x.estado = 0
+                                x.save()
+                        if Confeccion.objects.get(confeccion_id=asignar.id):
+                            pass
+                        else:
+                            for d in asignar.detalle_produccion_set.all():
+                                prd = Producto.objects.get(id=d.producto.id)
+                                prd.stock += d.cantidad
+                                prd.save()
+                    else:
+                        data['error'] = 'No ha ingresado insumos a la confeccion'
                 else:
                     data['error'] = 'Ha ocurrido un error'
             elif action == 'search':
@@ -125,6 +130,14 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     result = {'id': int(a.id),
                               'text': str('Lote N°: ' + a.lote + ' / Fecha : ' + a.fecha_asig.strftime('%d-%m-%Y'))}
                     data.append(result)
+            elif action == 'anular':
+                asignar = self.model.objects.get(id=request.POST['id'])
+                asignar.estado = 0
+                asignar.save()
+                if Confeccion.objects.filter(Q(estado=0) | Q(estado=1) | Q(estado=3), confeccion_id=asignar.id):
+                    confeccion = Confeccion.objects.get(confeccion_id=asignar.id)
+                    confeccion.estado = 2
+                    confeccion.save()
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -136,7 +149,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Nueva Confeccion'
-        data['titulo'] = 'Listado de Confecciones'
+        data['titulo'] = 'Listado de Confecciones (Produccion)'
         data['nuevo'] = '/asignacion/nuevo'
         data['empresa'] = empresa
         return data
@@ -160,7 +173,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Asig_recurso()
                         c.fecha_asig = datos['fecha_ingreso']
-                        c.lote = datos['lote']
                         c.user_id = request.user.id
                         c.save()
                         for i in datos['materiales']:
@@ -278,51 +290,62 @@ class Control(ValidatePermissionRequiredMixin, UpdateView):
                 datos = json.loads(request.POST['ingresos'])
                 if datos:
                     with transaction.atomic():
+
                         pk = self.kwargs.get('pk', 0)
                         c = self.model.objects.get(id=pk)
                         for m in c.detalle_asig_recurso_set.all():
-                            ma = Material.objects.get(id=m.inventario_material.id)
-                            ma.stock_actual += m.cantidad
-                            ma.save()
-                        c.detalle_asig_maquina_set.all().delete()
+                                ma = Material.objects.get(id=m.inventario_material.id)
+                                ma.stock_actual += m.cantidad
+                                ma.save()
+                                c.detalle_asig_maquina_set.all().delete()
                         for px in c.detalle_asig_recurso_set.all():
-                            for t in Detalle_perdidas_materiales.objects.filter(det_asignacion_id=px.id):
-                                t.delete()
-                            px.delete()
-                        c.detalle_produccion_set.all().delete()
+                                for t in Detalle_perdidas_materiales.objects.filter(det_asignacion_id=px.id):
+                                    t.delete()
+                                    px.delete()
+                                    c.detalle_produccion_set.all().delete()
                         for i in datos['materiales']:
-                            dv = Detalle_asig_recurso()
-                            dv.asig_recurso_id = c.id
-                            dv.inventario_material_id = i['id']
-                            dv.cantidad = int(i['cant'])
-                            dv.ingreso_inicial = int(i['cant'])
-                            dv.ingreso_actual = int(i['cant'])
-                            dv.save()
-                            for p in datos['perdidas']:
-                                if p['id'] == i['id']:
-                                    dtp = Detalle_perdidas_materiales()
-                                    dtp.det_asignacion_id = dv.id
-                                    dtp.cantidad = int(p['cantidad'])
-                                    dtp.save()
-                                    dv.ingreso_actual -= int(p['cantidad'])
-                                    dv.save()
-                            s = Material.objects.get(pk=i['id'])
-                            s.stock_actual -= int(i['cant'])
-                            s.save()
+                                dv = Detalle_asig_recurso()
+                                dv.asig_recurso_id = c.id
+                                dv.inventario_material_id = i['id']
+                                dv.cantidad = int(i['cant'])
+                                dv.ingreso_inicial = int(i['cant'])
+                                dv.ingreso_actual = int(i['cant'])
+                                dv.save()
+                                for p in datos['perdidas']:
+                                    if p['id'] == i['id']:
+                                        dtp = Detalle_perdidas_materiales()
+                                        dtp.det_asignacion_id = dv.id
+                                        dtp.cantidad = int(p['cantidad'])
+                                        dtp.save()
+                                        dv.ingreso_actual -= int(p['cantidad'])
+                                        dv.save()
+                                s = Material.objects.get(pk=i['id'])
+                                s.stock_actual -= int(i['cant'])
+                                s.save()
                         for m in datos['maquinas']:
-                            dm = Detalle_asig_maquina()
-                            dm.asig_recurso_id = c.id
-                            dm.maquina_id = m['id']
-                            dm.save()
-                            x = Maquina.objects.get(pk=m['id'])
-                            x.estado = 1
-                            x.save()
-                        for p in datos['productos']:
-                            dtp = Detalle_produccion()
-                            dtp.asignacion_id = c.id
-                            dtp.producto_id = int(p['id'])
-                            dtp.cantidad = int(p['cantidad'])
-                            dtp.save()
+                                dm = Detalle_asig_maquina()
+                                dm.asig_recurso_id = c.id
+                                dm.maquina_id = m['id']
+                                dm.save()
+                                x = Maquina.objects.get(pk=m['id'])
+                                x.estado = 1
+                                x.save()
+                        if Confeccion.objects.get(confeccion_id=pk):
+                                for p in datos['productos']:
+                                    if c.detalle_produccion_set.filter(producto_id=int(p['id'])):
+                                        prod = c.detalle_produccion_set.get(producto_id=int(p['id']))
+                                        prod.cantidad = int(p['cantidad'])
+                                        prod.save()
+                                for pe in datos['productos_eliminados']:
+                                    if c.detalle_produccion_set.filter(producto_id=int(pe['id'])):
+                                        c.detalle_produccion_set.get(producto_id=int(p['id'])).delete()
+                        else:
+                            for p in datos['productos']:
+                                dtp = Detalle_produccion()
+                                dtp.asignacion_id = c.id
+                                dtp.producto_id = int(p['id'])
+                                dtp.cantidad = int(p['cantidad'])
+                                dtp.save()
                         data['id'] = c.id
                         data['resp'] = True
                 else:

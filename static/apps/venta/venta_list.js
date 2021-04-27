@@ -72,7 +72,7 @@ $(function () {
             },
             buttons: [
                 {
-                    text: '<i class="fa fa-file-excel"> </i>Excel', className: "btn btn-success my_class",
+                    text: '<i class="fa fa-file-excel"> </i> Excel', className: "btn btn-success my_class",
                     extend: 'excel'
                 },
                 {
@@ -162,7 +162,7 @@ $(function () {
         },
         columns: [
             {data: 'transaccion.fecha_trans'},
-            {data: "transaccion.cliente.full_name_list"},
+            {data: "transaccion.user.full_name"},
             {data: "transaccion.subtotal"},
             {data: "transaccion.iva"},
             {data: "transaccion.total"},

@@ -31,7 +31,6 @@ class Venta(models.Model):
         db_table = 'venta'
         verbose_name = 'venta'
         verbose_name_plural = 'ventas'
-#
 
 
 class Detalle_venta(models.Model):
