@@ -9,11 +9,18 @@ var alquiler = {
         total: 0.00,
         productos: []
     },
+    get_ids: function () {
+        var ids = [];
+        $.each(this.items.productos, function (key, value) {
+            ids.push(value.id);
+        });
+        return ids;
+    },
     calculate: function () {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
-            dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
+            dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
         });
@@ -53,9 +60,10 @@ var alquiler = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
-                {data: "producto_base.stock"},
-                {data: "cantidad"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
+                {data: "stock"},
+                {data: "cantidad_venta"},
                 {data: "pvp"},
                 {data: "subtotal"}
             ],
@@ -92,12 +100,22 @@ var alquiler = {
             ], rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: data.producto_base.stock,
+                    max: data.stock,
                     step: 1,
                     buttondown_class: 'btn btn-primary btn-sm',
                     buttonup_class: 'btn btn-primary btn-sm',
 
-                });
+                }).keypress(function (e) {
+                    if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                        return false;
+                    }
+                }).keyup(function (e) {
+                    e.preventDefault();
+                    if ($(this).val() > data.stock) {
+                        menssaje_error('Error!', 'No puede elegir una cantidad mayor que el stock disponible', 'fas fa-exclamation-circle');
+                    }
+
+                });//Para solo numeros
             }
         });
     },
@@ -111,6 +129,7 @@ var alquiler = {
 };
 
 $(function () {
+    $('.sidebar-mini').addClass('sidebar-collapse');
     alquiler.list();
     $('#tblproductos tbody')
         .on('click', 'a[rel="remove"]', function () {
@@ -125,57 +144,11 @@ $(function () {
         .on('change keyup', 'input[name="cantidad"]', function () {
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
-            alquiler.items.productos[tr.row].cantidad = cantidad;
+            alquiler.items.productos[tr.row].cantidad_venta = cantidad;
             alquiler.calculate();
-            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + alquiler.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + alquiler.items.productos[tr.row].subtotal.toFixed(2));
 
         });
-    paypal.Buttons({
-        createOrder: function (data, actions) {
-            // This function sets up the details of the transaction, including the amount and line item details.
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: $('#id_total').val()
-                    }
-                }]
-            });
-        },
-        onApprove: function (data, actions) {
-            // This function captures the funds from the transaction.
-            return actions.order.capture().then(function (details) {
-                // This function shows a transaction success message to your buyer.
-                if (alquiler.items.productos.length === 0) {
-                    menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
-                    return false
-                }
-                var parametros;
-                alquiler.items.fecha_venta = $('input[name="fecha_trans"]').val();
-                alquiler.items.fecha_salida = $('input[name="fecha_salida"]').val();
-                alquiler.items.cliente = $('#id_cliente option:selected').val();
-
-                parametros = {'ventas': JSON.stringify(alquiler.items)};
-                parametros['action'] = 'add';
-                parametros['id'] = '';
-                $.ajax({
-                    dataType: 'JSON',
-                    type: 'POST',
-                    url: '/alquiler/nuevo_online',
-                    data: parametros,
-                }).done(function (data) {
-                    if (!data.hasOwnProperty('error')) {
-                        callback_2(data, 'alquiler');
-                        return false;
-                    }
-                    menssaje_error('Error', data.error, 'fas fa-exclamation-circle');
-
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    alert(textStatus + ': ' + errorThrown);
-                });
-            });
-        }
-    }).render('#paypal-button-container');
-    //This function displays Smart Payment Buttons on your web page.
 
 //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {
@@ -213,25 +186,26 @@ $(function () {
             });
     });
 
-    $('#id_inventario').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $('#id_inventario option:selected').val(),
-                'action': 'get'
-            },
-            dataType: 'json',
-            success: function (data) {
-                alquiler.add(data);
-                $('#id_inventario').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                alert(data);
-            },
+    $('#id_inventario')
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/producto/lista',
+                data: {
+                    "id": $('#id_inventario option:selected').val(),
+                    'action': 'get',
+                },
+                dataType: 'json',
+                success: function (data) {
+                    alquiler.add(data);
+                    $('#id_inventario').val(null).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
 
+            })
         })
-    })
         .select2({
             theme: "classic",
             language: {
@@ -251,12 +225,12 @@ $(function () {
                 type: 'POST',
                 url: '/producto/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search',
-                        'id': ''
+                        'id': '',
+                        'ids': JSON.stringify(alquiler.get_ids())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -266,7 +240,90 @@ $(function () {
                 },
 
             },
-            placeholder: 'Busca un Producto',
+            placeholder: 'Busca una Prenda',
             minimumInputLength: 1,
         });
+
+    $('#id_search_producto').on('click', function () {
+        $('#Modal_lista').modal('show');
+        tbl_prod = $("#tbl_prod").DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+            },
+            ajax: {
+                url: '/producto/lista',
+                type: 'POST',
+                data: {'action': 'list_venta', 'ids': JSON.stringify(alquiler.get_ids())},
+                dataSrc: ""
+            },
+            columns: [
+                {"data": "producto_base.nombre"},
+                {"data": "producto_base.categoria.nombre"},
+                {"data": "color.nombre"},
+                {"data": "talla.talla_full"},
+                {"data": "stock"},
+                {"data": "producto_base.descripcion"},
+                {"data": "pvp_alq"},
+                {"data": "imagen"},
+                {"data": "id"}
+            ],
+
+            columnDefs: [
+                {
+                    targets: [-3],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span>$ ' + parseFloat(data).toFixed(2) + '</span>';
+                    }
+                },
+                {
+                    targets: '__all',
+                    class: 'text-center'
+                },
+                {
+                    targets: [-2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
+                    }
+                },
+                {
+                    targets: [-1],
+                    class: 'text-center',
+                    width: '10%',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
+                            'data-toggle="tooltip" title="Seleccionar prenda"><i class="fas fa-arrow-circle-right"></i></a>' + ' '
+                    }
+                },
+            ]
+        });
+    });
+    //select producto de table
+    $('#tbl_prod tbody').on('click', 'a[rel="check"]', function () {
+        var tr = tbl_prod.cell($(this).closest('td, li')).index();
+        var data = tbl_prod.row(tr.row).data();
+        var parametros = {'id': data.id, 'action': 'get'};
+        $.ajax({
+            dataType: 'JSON',
+            type: 'POST',
+            url: '/producto/lista',
+            data: parametros,
+        }).done(function (data) {
+            if (!data.hasOwnProperty('error')) {
+                alquiler.add(data);
+                $('#Modal_lista').modal('hide');
+                return false;
+            }
+            menssaje_error(data.error, data.content, 'fa fa-times-circle');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown);
+        });
+    });
 });

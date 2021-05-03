@@ -1,17 +1,5 @@
 var datatable;
-var logotipo;
 var user_tipo = $('input[name="user_tipo"]').val();
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
-
-toDataURL('/media/imagen.PNG').then(dataUrl => {
-    logotipo = dataUrl;
-});
 var datos = {
     fechas: {
         'start_date': '',
@@ -115,8 +103,13 @@ $(function () {
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logotipo, width: 300}],
-                                margin: [280, 10, 0, 50] //[izquierda, arriba, derecha, abajo]
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
                             }
                         });
                         doc['footer'] = (function (page, pages) {
@@ -199,10 +192,11 @@ $(function () {
                 class: 'text-center',
                 width: '15%',
                 render: function (data, type, row) {
+                    console.log(row);
                     var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
-                    var entregar = '<a type="button" rel="entregar" class="btn btn-warning btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Entregar" ><i class="fa fa-check"></i></a>' + ' ';
-                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ';
-                    var pdf = '<a type="button" href= "/confeccion/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>';
+                    var entregar = row.transaccion.user.tipo === 1 ? '<a type="button" rel="entregar" class="btn btn-warning btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Entregar" ><i class="fa fa-check"></i></a>' + ' ': '';
+                    var devolver = row.transaccion.user.tipo === 1 ? '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ': '';
+                    var pdf = row.transaccion.user.tipo === 1 ? '<a type="button" href= "/confeccion/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>':'';
                     var dar = row.estado === 3 ? '<a type="button" rel="dar" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Confirmar"><i class="fas fa-thumbs-up"></i></a>' : '';
                     return detalle + dar + entregar + devolver + pdf;
                 }

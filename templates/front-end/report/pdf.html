@@ -61,7 +61,7 @@
     <b>{{ empresa.direccion|upper }} / ECUADOR</b>
 </p>
 <h1 class="head">
-    {{ title|upper }} {% if sale.estado == 2 %} (RESERVADA) {% endif %}</h1>
+    {{ title|upper }} {% if sale.estado == 2  %} (RESERVADA) {% elif sale.estado == 3 %} (RESERVADA){% endif %}</h1>
 <p class="fact">
     <b>FACTURA N°:</b><br>
     <b class="n">{{ sale.transaccion.id|stringformat:"010d" }}</b>

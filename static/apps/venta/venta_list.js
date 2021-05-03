@@ -1,17 +1,4 @@
-var datatable;
-var user_tipo = $('input[name="user_tipo"]').val();
-var logotipo;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
-
-toDataURL('/media/imagen.PNG').then(dataUrl => {
-    logotipo = dataUrl;
-});
+var datatable, user_tipo = $('input[name="user_tipo"]').val();
 var datos = {
     fechas: {
         'start_date': '',
@@ -54,7 +41,7 @@ $(function () {
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
         },
-        order: [[6, "desc"]],
+        order: [[5, "desc"]],
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
             "<'row'<'col-sm-12 col-md-12'f>>" +
@@ -76,7 +63,7 @@ $(function () {
                     extend: 'excel'
                 },
                 {
-                    text: '<i class="fa fa-file-pdf"> </i>PDF',
+                    text: '<i class="fa fa-file-pdf"> </i> PDF',
                     className: 'btn btn-danger my_class',
                     extend: 'pdfHtml5',
                     //filename: 'dt_custom_pdf',
@@ -114,8 +101,13 @@ $(function () {
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logotipo, width: 300}],
-                                margin: [280, 10, 0, 50] //[izquierda, arriba, derecha, abajo]
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
                             }
                         });
                         doc['footer'] = (function (page, pages) {
@@ -166,7 +158,7 @@ $(function () {
             {data: "transaccion.subtotal"},
             {data: "transaccion.iva"},
             {data: "transaccion.total"},
-            {data: "id"},
+            {data: "transaccion.id"},
             {data: "estado"},
             {data: "id"},
         ],

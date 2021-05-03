@@ -21,11 +21,14 @@ var ventas = {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
+            console.log('estoy calculando');
             dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
+            console.log(dict);
         });
         this.items.subtotal = subtotal;
+        console.log(subtotal);
         this.items.iva = this.items.subtotal * iva_emp;
         this.items.total = this.items.subtotal + this.items.iva;
         $('input[name="subtotal"]').val(this.items.subtotal.toFixed(2));
@@ -38,6 +41,7 @@ var ventas = {
         this.list();
     },
     list: function () {
+        console.log('estoy listando');
         this.calculate();
         tblventa = $("#tblproductos").DataTable({
             destroy: true,
@@ -52,6 +56,8 @@ var ventas = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
                 {data: "stock"},
                 {data: "cantidad_venta"},
                 {data: "pvp"},
@@ -65,8 +71,6 @@ var ventas = {
                     orderable: false,
                     render: function (data, type, row) {
                         return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat rounded-pill" style="color: white" data-toggle="tooltip" title="Quitar Producto"><i class="fa fa-times"></i></a>';
-                        //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
-
                     }
                 },
                 {
@@ -91,7 +95,17 @@ var ventas = {
                     min: 1,
                     max: data.stock,
                     step: 1
-                });
+                }).keypress(function (e) {
+                    if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                        return false;
+                    }
+                }).keyup(function (e) {
+                    e.preventDefault();
+                    if($(this).val()>data.stock){
+                         menssaje_error('Error!', 'No puede elegir una cantidad mayor que el stock disponible', 'fas fa-exclamation-circle');
+                    }
+
+                });//Para solo numeros
             }
         });
     },
@@ -106,6 +120,7 @@ $(function () {
     if (localStorage.getItem('carrito')) {
         carro_respaldo = JSON.parse(localStorage.getItem('carrito'));
         ventas.items.productos = carro_respaldo;
+        console.log('estoy cargando el carrito del localstorge');
         ventas.list();
     } else {
         ventas.list();
@@ -128,7 +143,7 @@ $(function () {
             var tr = tblventa.cell($(this).closest('td, li')).index();
             ventas.items.productos[tr.row].cantidad_venta = cantidad;
             ventas.calculate();
-            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
         });
     //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {

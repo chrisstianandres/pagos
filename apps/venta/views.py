@@ -264,8 +264,9 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
         data = {}
         action = request.POST['action']
         try:
+            datos = json.loads(request.POST['ventas'])
+            print(datos)
             if action == 'add':
-                datos = json.loads(request.POST['ventas'])
                 if datos:
                     with transaction.atomic():
                         c = Transaccion()
@@ -297,7 +298,6 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
             elif action == 'reserva':
-                datos = json.loads(request.POST['ventas'])
                 if datos:
                     with transaction.atomic():
                         c = Transaccion()
@@ -363,8 +363,9 @@ def CrudView_online(request):
             data['form'] = TransaccionForm()
             data['form2'] = Detalle_VentaForm()
             data['detalle'] = []
-            user = request.user.cedula
-            data['user'] = user
+            user = request.user
+            data['user_id'] = user.id
+            data['user_name'] = user.get_full_name()
             return render(request, 'front-end/venta/venta_online.html', data)
     else:
         data['key'] = 1

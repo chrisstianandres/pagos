@@ -8,17 +8,20 @@ from django.views.generic import *
 from django.http import HttpResponse, JsonResponse
 
 from apps.backEnd import nombre_empresa
+from apps.categoria.models import Categoria
 from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from django.http import HttpResponseRedirect
 import json
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from apps.mixins import ValidatePermissionRequiredMixin
+from apps.producto.models import Producto
 from apps.sitioweb.forms import SitiowebForm
 from apps.sitioweb.models import SitioWeb
 from apps.user.models import User
 from apps.proveedor.models import Proveedor
+from apps.venta.models import Detalle_venta
 
 opc_icono = 'fa fa-newspaper fa'
 opc_entidad = 'Sitio Web'
@@ -158,7 +161,8 @@ class report(ListView):
 
 
 def sitio(request):
-    data = {'empresa': empresa, 'sitio': SitioWeb.objects.first(), 'title': empresa.nombre}
+    data = {'empresa': empresa, 'sitio': SitioWeb.objects.first(), 'title': empresa.nombre,
+            'productos': get_productos_vendidos(), 'categorias': get_categoria()}
     if request.user.is_authenticated:
         data['group'] = request.user.get_tipo_display
     else:
@@ -166,5 +170,20 @@ def sitio(request):
     return render(request,  'front-end/sitio/index.html', data)
 
 
+def get_productos_vendidos():
+    productos =[]
+    query = Detalle_venta.objects.values('inventario_id').filter(venta__estado=1).annotate(Count('inventario_id'))
+    for p in query:
+        producto = Producto.objects.get(id=p['inventario_id'])
+        productos.append(producto.toJSON())
+    return productos
 
 
+def get_categoria():
+    categorias =[]
+    query = Producto.objects.values('producto_base__categoria_id').annotate(Count('producto_base__categoria_id')).order_by()
+    categorias.append({'id': 0, 'nombre': 'Todas las categorias'})
+    for p in query:
+        categoria = Categoria.objects.get(id=p['producto_base__categoria_id'])
+        categorias.append({'id': categoria.id, 'nombre': categoria.nombre})
+    return categorias

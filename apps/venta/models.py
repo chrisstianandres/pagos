@@ -19,7 +19,7 @@ class Venta(models.Model):
     estado = models.IntegerField(choices=estado, default=1)
 
     def __str__(self):
-        return '%s %s %s' % (self.transaccion.cliente.nombres, self.transaccion.fecha_trans, self.transaccion.total)
+        return '%s %s %s' % (self.transaccion.user.get_full_name(), self.transaccion.fecha_trans, self.transaccion.total)
 
     def toJSON(self):
         item = model_to_dict(self)

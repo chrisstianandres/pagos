@@ -5,23 +5,11 @@
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active nav-menu-link" id="popular-tab" data-toggle="tab" href="#popular"
-                   role="tab" aria-controls="popular" aria-selected="true">Popular</a>
+                   role="tab" aria-controls="popular" aria-selected="true">Ultimos vendidos</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link nav-menu-link" id="moreven-tab" data-toggle="tab" href="#moreven"
-                   role="tab" aria-controls="moreven" aria-selected="false">Más vendidos</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-menu-link" id="cat_hombres-tab" data-toggle="tab" href="#cat_hombres" onclick="catalogo('hombre')"
-                   role="tab" aria-controls="cat_hombres" aria-selected="false">Catalogo de Hombres</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-menu-link" id="cat_mujeres-tab" data-toggle="tab" href="#cat_mujeres" onclick="catalogo('mujer')"
-                   role="tab" aria-controls="cat_mujeres" aria-selected="false">Catalogo de Mujeres</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-menu-link" id="cat_niños-tab" data-toggle="tab" href="#cat_niños" onclick="catalogo('niño')"
-                   role="tab" aria-controls="cat_niños" aria-selected="false">Catalogo de Niños</a>
+                <a class="nav-link nav-menu-link" id="moreven-tab" data-toggle="tab" href="#moreven" role="tab"
+                   aria-controls="moreven" aria-selected="false">Por categoria</a>
             </li>
         </ul>
     </div>
@@ -29,79 +17,46 @@
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="popular" role="tabpanel" aria-labelledby="popular-tab">
             <div class="container container-full" id="popular">
+                <div class="columns is-centered is-multiline">
+                    <div class="column is-full"></div>
+                    {% for p in productos %}
+                        <div class="column is-half-tablet is-one-third-desktop column-half">
+                            <div class="card"><input type="hidden" class="set_venta" value="{{ p.id }}">
+                                <input type="hidden" class="set_alquiler" value="{{ p.id }}">
+                                <img src="{{ p.imagen }}" alt="">
+                                <div class="card-info">
+                                    <h4 class="has-text-black has-text-centered has-text-weight-bold"> {{ p.nombre_full }}</h4>
+                                    <p class="has-text-centered">{{ p.descripcion }}</p>
+                                    <p class="has-text-centered"><strong>Precio de venta:</strong> ${{ p.pvp }}</p>
+                                    <p class="has-text-centered"><strong>Precio de Alquiler:</strong> ${{ p.pvp_alq }}
+                                    </p>
+                                    <p class="has-text-centered"><strong>STOCK: </strong>{{ p.stock }}</p>
+                                    <div class="card-buttons">
+                                        <button class="btn btn--mini-rounded" name="vender" value="{{ p.id }}"
+                                                data-toggle="tooltip"
+                                                title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i>
+                                        </button>
+                                        <p>Los precios aqui mostrados no incluyen IVA</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
         <div class="tab-pane fade" id="moreven" role="tabpanel" aria-labelledby="moreven-tab">
+            <div class="form-group">
+                <h2><label for="categorias" style="color: black"> Busca un categoria: </label></h2>
+                <select name="select" id="categorias" class="form-control select2" style="width: 50%">
+                    {% for c in categorias %}
+                        <option value="{{ c.id }}">{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <hr>
             <div class="container container-full" id="masvendidos">
-            </div>
-        </div>
-        <div class="tab-pane fade" id="cat_hombres" role="tabpanel" aria-labelledby="cat_hombres-tab">
-            <div class="container container-full" id="catalogo_hombres">
-            </div>
-        </div>
 
-    <div class="tab-pane fade" id="cat_mujeres" role="tabpanel" aria-labelledby="cat_mujeres-tab">
-            <div class="container container-full" id="catalogo_mujeres">
-            </div>
-        </div>
-
-    <div class="tab-pane fade" id="cat_niños" role="tabpanel" aria-labelledby="cat_niños-tab">
-            <div class="container container-full" id="catalogo_niños">
             </div>
         </div>
     </div>
-{#    <div class="container container-full">#}
-{#        <div class="columns is-centered is-multiline">#}
-{#            <div class="column is-full">#}
-{#                <div class="separator"></div>#}
-{#            </div>#}
-{#            <div class="column is-half-tablet is-one-third-desktop column-half">#}
-{#                <div class="card card-second">#}
-{#                    <img class="card-second-image" src="{% static 'sitio_web/img/lookbook-men.png' %}" alt="">#}
-{#                    <div class="card-second-body --text-right">#}
-{#                        <h1 class="has-text-right is-size-4 has-text-weight-semibold-bold">Catálogo para#}
-{#                            hombres</h1>#}
-{#                        <p class="has-text-right">Las mejores prendas para caballero, para que puedan sacar lo mejor#}
-{#                            de#}
-{#                            si mismos#}
-{#                        </p>#}
-{#                        <div>#}
-{#                            <a href="#" rel="cat_hombre" class="btn btn-default is-size-7">Ver ahora</a>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#            <div class="column is-half-tablet is-one-third-desktop column-half">#}
-{#                <div class="card card-second">#}
-{#                    <img class="card-second-image" src="{% static 'sitio_web/img/lookbook-women.png' %}" alt="">#}
-{#                    <div class="card-second-body --text-right">#}
-{#                        <h1 class="has-text-right is-size-4 has-text-weight-semibold-bold">Catálogo para#}
-{#                            Mujeres</h1>#}
-{#                        <p class="has-text-right">Las mejores prendas para mujer que puedes encontrar a niel#}
-{#                            nacional#}
-{#                        </p>#}
-{#                        <div>#}
-{#                            <a href="#" class="btn btn-default is-size-7" rel="cat_mujer">Ver ahora</a>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{##}
-{#            </div>#}
-{#            <div class="column is-half-tablet is-one-third-desktop">#}
-{#                <div class="card card-second">#}
-{#                    <img class="card-second-image" src="{% static 'sitio_web/img/lookbook-child.png' %}" alt="">#}
-{#                    <div class="card-second-body --text-right">#}
-{#                        <h1 class="has-text-right is-size-4 has-text-weight-semibold-bold">Catálogo para Niños</h1>#}
-{#                        <p class="has-text-right">Explora nuestros productos para niños y niñas#}
-{#                        </p>#}
-{#                        <div>#}
-{#                            <a class="btn btn-default is-size-7" rel="cat_niño" href="#cat_niños">Ver ahora</a>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
 {% endblock %}
-
-

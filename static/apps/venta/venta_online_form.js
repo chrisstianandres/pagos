@@ -9,7 +9,7 @@ var carrito = {
     get_ids: function () {
         var ids = [];
         $.each(this.items.productos, function (key, value) {
-            ids.push(value.producto_base.id);
+            ids.push(value.id);
         });
         return ids;
     },
@@ -17,7 +17,7 @@ var carrito = {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
-            dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
+            dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
         });
@@ -37,7 +37,6 @@ var carrito = {
     },
     list: function () {
         this.calculate();
-        console.log(carrito.items.productos.length);
         if (carrito.items.productos.length >= 1) {
             $('#paypal_btn').show();
         } else {
@@ -64,10 +63,10 @@ var carrito = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "presentacion.nombre"},
-                {data: "producto_base.color.nombre"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
                 {data: "stock"},
-                {data: "cantidad"},
+                {data: "cantidad_venta"},
                 {data: "pvp"},
                 {data: "subtotal"}
             ],
@@ -104,12 +103,22 @@ var carrito = {
             ], rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: data.producto_base.stock,
+                    max: data.stock,
                     step: 1,
                     buttondown_class: 'btn btn-primary btn-sm',
                     buttonup_class: 'btn btn-primary btn-sm',
 
-                });
+                }).keypress(function (e) {
+                    if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                        return false;
+                    }
+                }).keyup(function (e) {
+                    e.preventDefault();
+                    if($(this).val()>data.stock){
+                         menssaje_error('Error!', 'No puede elegir una cantidad mayor que el stock disponible', 'fas fa-exclamation-circle');
+                    }
+
+                });//Para solo numeros
             }
         });
     },
@@ -149,10 +158,10 @@ $(function () {
             localStorage.clear();
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
-            carrito.items.productos[tr.row].cantidad = cantidad;
+            carrito.items.productos[tr.row].cantidad_venta = cantidad;
             carrito.calculate();
             localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
-            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
 
         });
 
@@ -177,7 +186,7 @@ $(function () {
                 }
                 var parametros;
                 carrito.items.fecha_venta = $('input[name="fecha_trans"]').val();
-                carrito.items.cliente = $('input[name="cliente_id"]').val();
+                carrito.items.cliente = $('#user_id').val();
                 parametros = {'ventas': JSON.stringify(carrito.items)};
                 parametros['action'] = 'add';
                 parametros['id'] = '';
@@ -209,7 +218,7 @@ $(function () {
         }
         var parametros;
         carrito.items.fecha_venta = $('input[name="fecha_trans"]').val();
-        carrito.items.cliente = $('input[name="cliente_id"]').val();
+        carrito.items.cliente = $('#user_id').val();
         parametros = {'ventas': JSON.stringify(carrito.items)};
         parametros['action'] = 'reserva';
         parametros['id'] = '';
@@ -248,12 +257,11 @@ $(function () {
                 type: 'POST',
                 url: '/producto/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search',
                         'ids': JSON.stringify(carrito.get_ids())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -306,28 +314,19 @@ $(function () {
             columns: [
                 {"data": "producto_base.nombre"},
                 {"data": "producto_base.categoria.nombre"},
-                {"data": "presentacion.nombre"},
-                {"data": "producto_base.color.nombre"},
+                {"data": "color.nombre"},
+                {"data": "talla.talla_full"},
                 {"data": "stock"},
                 {"data": "producto_base.descripcion"},
                 {"data": "pvp"},
                 {"data": "pvp_alq"},
-                {"data": "pvp_confec"},
                 {"data": "imagen"},
                 {"data": "id"}
             ],
 
             columnDefs: [
                 {
-                    targets: [-7],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<span>' + data + '</span>';
-                    }
-                },
-                {
-                    targets: [-3, -4, -5],
+                    targets: [-3, -4],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
@@ -352,23 +351,12 @@ $(function () {
                     width: '10%',
                     orderable: false,
                     render: function (data, type, row) {
-                        var check = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
-                            'data-toggle="tooltip" title="Seleccionar producto"><i class="fa fa-check-circle"></i></a>' + ' ';
-                        return check
+                        return '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="check" ' +
+                            'data-toggle="tooltip" title="Seleccionar producto"><i class="fa fa-check-circle"></i></a>' + ' '
 
                     }
                 },
-            ],
-            createdRow: function (row, data, dataIndex) {
-                if (data.stock >= 51) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
-                } else if (data.stock >= 10) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
-                } else if (data.stock <= 9) {
-                    $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
-                }
-
-            }
+            ]
 
         });
     });

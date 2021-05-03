@@ -31,6 +31,7 @@ class Producto(models.Model):
         item['talla'] = self.talla.toJSON()
         item['color'] = self.color.toJSON()
         item['iva_emp'] = Empresa.objects.first().iva
+        item['nombre_full'] = '{} - {} - {}'.format(self.producto_base.nombre, self.color.nombre, self.talla.talla_full())
         return item
 
     def get_image(self):

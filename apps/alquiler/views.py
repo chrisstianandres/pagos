@@ -63,9 +63,16 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 end = request.POST['end_date']
                 data = []
                 if start == '' and end == '':
-                    query = Alquiler.objects.filter(transaccion__tipo=2)
+                    if request.user.tipo == 1:
+                        query = Alquiler.objects.filter(transaccion__tipo=2)
+                    else:
+                        query = Alquiler.objects.filter(transaccion__tipo=2, transaccion__user=request.user.id)
                 else:
-                    query = Alquiler.objects.filter(transaccion__tipo=2, transaccion__fecha_trans__range=[start, end])
+                    if request.user.tipo == 1:
+                        query = Alquiler.objects.filter(transaccion__tipo=2, transaccion__fecha_trans__range=[start, end])
+                    else:
+                        query = Alquiler.objects.filter(transaccion__tipo=2, transaccion__user=request.user.id,
+                                                        transaccion__fecha_trans__range=[start, end])
                 for c in query:
                     data.append(c.toJSON())
             elif action == 'detalle':
@@ -241,7 +248,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Transaccion()
                         c.fecha_trans = datos['fecha_venta']
-                        c.user_id =  datos['cliente']
+                        c.user_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
@@ -249,7 +256,6 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         c.save()
                         v = Alquiler()
                         v.transaccion_id = c.id
-                        v.fecha_salida = datos['fecha_salida']
                         v.save()
                         if datos['productos']:
                             for i in datos['productos']:

@@ -9,7 +9,7 @@ var carrito = {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
-            dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
+            dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
         });
@@ -75,9 +75,10 @@ var carrito = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "presentacion.nombre"},
+                {data: "color.nombre"},
+                {data: "talla.talla_full"},
                 {data: "stock"},
-                {data: "cantidad"},
+                {data: "cantidad_venta"},
                 {data: "pvp"},
                 {data: "subtotal"}
             ],
@@ -119,7 +120,17 @@ var carrito = {
                     buttondown_class: 'btn btn-primary btn-sm',
                     buttonup_class: 'btn btn-primary btn-sm',
 
-                });
+                }).keypress(function (e) {
+                    if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                        return false;
+                    }
+                }).keyup(function (e) {
+                    e.preventDefault();
+                    if ($(this).val() > data.stock) {
+                        menssaje_error('Error!', 'No puede elegir una cantidad mayor que el stock disponible', 'fas fa-exclamation-circle');
+                    }
+
+                });//Para solo numeros
             }
         });
     },
@@ -143,33 +154,32 @@ var carrito = {
     }
 };
 
-function container_popular() {
+
+function catalogo(tipo) {
     $.ajax({
         url: '/producto/sitio',
         type: 'POST',
-        data: {'action': 'sitio'},
+        data: {'action': 'categoria', 'id': tipo},
         dataSrc: "",
     }).done(function (data) {
+        console.log(data);
         var html = '<div class="columns is-centered is-multiline">' +
             '<div class="column is-full">' +
             '</div>';
-
-        $.each(data['masvendidos'], function (key, value) {
+        $.each(data, function (key, value) {
             html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
                 '<div class="card">' +
-                '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
-                '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
-                '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
+                '<input type="hidden" class="set_venta" value="' + value['id'] + '">' +
+                '<input type="hidden" class="set_alquiler" value="' + value['id'] + '">' +
                 '<img src="' + value['imagen'] + '" alt="">' +
                 '<div class="card-info">' +
-                '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
-                '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
+                '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['nombre_full'] + '</h4>' +
+                '<p class="has-text-centered">' + value.producto_base['descripcion'] + '</p>' +
                 '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
                 '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
-                '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
-                '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
+                '<p class="has-text-centered"> <strong>STOCK: </strong>' + value['stock'] + '</p>' +
                 '<div class="card-buttons">' +
-                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
+                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
                 '<p>Los precios aqui mostrados no incluyen IVA</p>' +
                 '</div>' +
                 '</div>' +
@@ -177,131 +187,24 @@ function container_popular() {
                 '</div>'
         });
         $('#masvendidos').html(html);
-
-        var html2 = '<div class="columns is-centered is-multiline">' +
-            '<div class="column is-full">' +
-            '</div>';
-
-        $.each(data['popular'], function (key, value) {
-            html2 += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
-                '<div class="card">' +
-                '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
-                '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
-                '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
-                '<img src="' + value['imagen'] + '" alt="">' +
-                '<div class="card-info">' +
-                '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
-                '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
-                '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
-                '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
-                '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
-                '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
-                '<div class="card-buttons">' +
-                '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                '<p>Los precios aqui mostrados no incluyen IVA</p>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '</div>'
-        });
-        $('#popular').html(html2);
-    });
-
-}
-
-function catalogo(tipo) {
-    $.ajax({
-        url: '/producto/sitio',
-        type: 'POST',
-        data: {'action': 'categoria', 'tipo': tipo},
-        dataSrc: "",
-    }).done(function (data) {
-        var html = '<div class="columns is-centered is-multiline">' +
-            '<div class="column is-full">' +
-            '</div>';
-        if (tipo === 'mujer') {
-            $.each(data['result'], function (key, value) {
-                html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
-                    '<div class="card">' +
-                    '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
-                    '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
-                    '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
-                    '<img src="' + value['imagen'] + '" alt="">' +
-                    '<div class="card-info">' +
-                    '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
-                    '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
-                    '<div class="card-buttons">' +
-                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                    '<p>Los precios aqui mostrados no incluyen IVA</p>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>'
-            });
-            $('#catalogo_mujeres').html(html);
-        }
-        if (tipo === 'hombre') {
-            $.each(data['result'], function (key, value) {
-                html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
-                    '<div class="card">' +
-                    '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
-                    '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
-                    '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
-                    '<img src="' + value['imagen'] + '" alt="">' +
-                    '<div class="card-info">' +
-                    '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
-                    '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
-                    '<div class="card-buttons">' +
-                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                    '<p>Los precios aqui mostrados no incluyen IVA</p>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>'
-            });
-
-            $('#catalogo_hombres').html(html);
-        }
-        if (tipo === 'niño') {
-            $.each(data['result'], function (key, value) {
-                html += '<div class="column is-half-tablet is-one-third-desktop column-half">' +
-                    '<div class="card">' +
-                    '<input type="hidden" class="set_venta" value="' + value['id_venta'] + '">' +
-                    '<input type="hidden" class="set_alquiler" value="' + value['id_alquiler'] + '">' +
-                    '<input type="hidden" class="set_confeccion" value="' + value['id_confeccion'] + '">' +
-                    '<img src="' + value['imagen'] + '" alt="">' +
-                    '<div class="card-info">' +
-                    '<h4 class="has-text-black has-text-centered has-text-weight-bold"> ' + value['info'] + '</h4>' +
-                    '<p class="has-text-centered">' + value['descripcion'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de venta:</strong> $' + value['pvp'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de Alquiler:</strong> $' + value['pvp_alq'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>Precio de Confeccion:</strong> $' + value['pvp_confec'] + '</p>' +
-                    '<p class="has-text-centered"> <strong>STOCK:</strong>' + value['stock'] + '</p>' +
-                    '<div class="card-buttons">' +
-                    '<button class="btn btn--mini-rounded" name="vender" value="' + value['id_venta'] + '" data-toggle="tooltip" title="Añadir al carrito"><i class="zmdi zmdi-shopping-cart"></i></button>' +
-                    '<p>Los precios aqui mostrados no incluyen IVA</p>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>'
-            });
-
-            $('#catalogo_niños').html(html);
-        }
-
-
     });
 }
 
 $(function () {
+    $('#categorias').select2({
+        theme: "classic",
+        language: {
+            inputTooShort: function () {
+                return "Ingresa al menos un caracter...";
+            },
+            "noResults": function () {
+                return "Sin resultados";
+            },
+            "searching": function () {
+                return "Buscando...";
+            }
+        },
+    });
     var superuser = $('input[name="superuser"]').val();
     if (localStorage.getItem('carrito')) {
         carro_respaldo = JSON.parse(localStorage.getItem('carrito'));
@@ -315,18 +218,18 @@ $(function () {
         e.preventDefault();
         $.ajax({
             type: "POST",
-            url: '/producto/get',
+            url: '/producto/lista',
             data: {
                 "id": $(this).val(),
                 'action': 'get'
             },
             dataType: 'json',
             success: function (data) {
-                if(data[0].stock===0){
+                if (data[0].stock === 0) {
                     menssaje_error('Error', 'Lo sentimos este producto no tiene stok disponible', 'far fa-sad-tear', function () {
                     })
                 } else {
-                     carrito.add(data);
+                    carrito.add(data);
                 }
 
             },
@@ -341,8 +244,8 @@ $(function () {
     $(document).on('click', 'a[rel="btn_carrito"]', function (e) {
         e.preventDefault();
         $('#myModal').animate({
-                height: "toggle"
-            }, 1200).css("display", "block")
+            height: "toggle"
+        }, 1200).css("display", "block")
 
     });
 
@@ -353,15 +256,17 @@ $(function () {
             // some point in future.
             $('#myModal').animate({
                 height: "toggle"
-            }, 1200).css("display", "block")
+            }, 100).css("display", "block")
         }, 1300);
 
 
     });
 
     $(document).on('click', 'a[rel="pay"]', function (e) {
+        e.preventDefault();
+        console.log(superuser);
         if (carrito.items.productos.length === 0) return false;
-        if (superuser === 'USER') {
+        if (superuser === 'USUARIO') {
             window.location.href = '/venta/nuevo'
         } else {
             window.location.href = '/venta/online'
@@ -383,9 +288,16 @@ $(function () {
         });
     });
 
-    $(document).on('click', 'a[rel="cat_hombre"]', function (e) {
+
+    $(document).on('click', '#moreven-tab', function (e) {
         e.preventDefault();
-        catalogo('hombre');
+        var categoria = $('#categorias');
+        if ($(this).hasClass("active")) {
+            catalogo(categoria.val());
+            categoria.on('change', function () {
+                catalogo(categoria.val());
+            })
+        }
     });
 
     $(document).on('click', 'a[rel="cat_mujer"]', function (e) {
@@ -405,7 +317,7 @@ $(function () {
 
     $('#datatable tbody')
         .on('click', 'a[rel="remove"]', function () {
-             localStorage.clear();
+            localStorage.clear();
             var tr = tblventa.cell($(this).closest('td, li')).index();
             borrar_todo_alert('Alerta de Eliminación',
                 'Esta seguro que desea eliminar este producto del carrito <br> ' +
@@ -419,10 +331,10 @@ $(function () {
             localStorage.clear();
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
-            carrito.items.productos[tr.row].cantidad = cantidad;
+            carrito.items.productos[tr.row].cantidad_venta = cantidad;
             carrito.calculate();
             localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
-            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
 
         });
 });

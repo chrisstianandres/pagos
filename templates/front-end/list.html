@@ -18,10 +18,13 @@
     <div class="container col-lg-12">
         {% block botones %}
             <div class="row">
-                <br>
+
+                {% if request.user.tipo == 1 %}
+                    <br>
                 <a type="button" class="btn btn-success btn-sm" id="nuevo" style="color: white">
                     <i class="fa fa-plus" aria-hidden="true"></i> {{ boton }}
                 </a>
+                {% endif %}
                 &nbsp;
                 <a type="button" class="btn btn-default btn-sm" id="reload"
                    onclick=" location.reload();">
@@ -40,10 +43,10 @@
                             {% endblock %}
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
+        <br><br><br><br>
     </div>
     {% block modal %}
         <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -75,9 +78,7 @@
                     </div>
                 </div>
             </form>
-
         </div>
-
     {% endblock %}
 {% endblock %}
 {% block script %}

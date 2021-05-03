@@ -206,93 +206,20 @@ class sitio(ListView):
         data = {}
         try:
             action = request.POST['action']
-            if action == 'sitio':
-                mas = []
-                pop = []
-                h = datetime.today()
-                query = Detalle_venta.objects.filter(venta__estado=1).values(
-                    'inventario__produccion__producto_id').annotate(
-                    total=Sum('cantidad')).order_by('-total')[0:6]
-                for i in query:
-                    pr = Producto.objects.get(id=int(i['inventario__produccion__producto_id']))
-                    item = {'info': pr.producto_base.nombre, 'descripcion': pr.producto_base.descripcion}
-                    item['id_venta'] = int(i['inventario__produccion__producto_id'])
-                    item['id_reparacion'] = int(pr.id)
-                    item['id_confeccion'] = int(pr.id)
-                    item['pvp'] = format(pr.pvp, '.2f')
-                    item['pvp_alq'] = format(pr.pvp_alq, '.2f')
-                    item['pvp_confec'] = format(pr.pvp_confec, '.2f')
-                    item['imagen'] = pr.get_image()
-                    item['stock'] = pr.stock
-                    mas.append(item)
-                data['masvendidos'] = mas
 
-                query2 = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,
-                                                      venta__estado=2).values('inventario__producto__producto_base_id',
-                                                                              'inventario__producto_id',
-                                                                              'inventario__producto__pvp',
-                                                                              'inventario__producto__pvp_alq',
-                                                                              'inventario__producto__pvp_confec',
-                                                                              'inventario__producto__imagen').annotate(
-                    total=Sum('cantidad')).order_by('-total')[0:6]
-                for i in query2:
-                    px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
-                    pr = Producto.objects.get(id=int(i['inventario__producto_id']))
-                    item = {'info': px.nombre, 'descripcion': px.descripcion}
-                    item['id_venta'] = int(i['inventario__producto_id'])
-                    item['id_reparacion'] = int(pr.id)
-                    item['id_confeccion'] = int(pr.id)
-                    item['pvp'] = format(i['inventario__producto__pvp'], '.2f')
-                    item['pvp_alq'] = format(i['inventario__producto__pvp_alq'], '.2f')
-                    item['pvp_confec'] = format(i['inventario__producto__pvp_confec'], '.2f')
-                    item['imagen'] = pr.get_image()
-                    item['stock'] = px.stock
-                    pop.append(item)
-                data['popular'] = pop
             if action == 'categoria':
-                tipo = str(request.POST['tipo'])
-                mas = []
-                query = Producto.objects.filter(producto_base__categoria__nombre__icontains=tipo). \
-                    values('producto_base_id', 'producto_base__nombre', 'producto_base__descripcion', 'id',
-                           'pvp', 'pvp_alq', 'pvp_confec')
+                data = []
+                id = request.POST['id']
+                if id == '0':
+                    query = Producto.objects.all()
+                else:
+                    query = Producto.objects.filter(producto_base__categoria_id=id)
                 for i in query:
-                    pb = Producto.objects.get(id=i['id'])
-                    item = {'info': i['producto_base__nombre'], 'descripcion': i['producto_base__descripcion']}
-                    item['id_venta'] = int(i['id'])
-                    item['id_reparacion'] = int(i['id'])
-                    item['id_confeccion'] = int(i['id'])
-                    item['pvp'] = format(i['pvp'], '.2f')
-                    item['pvp_alq'] = format(i['pvp_alq'], '.2f')
-                    item['pvp_confec'] = format(i['pvp_confec'], '.2f')
-                    item['imagen'] = pb.get_image()
-                    item['stock'] = pb.stock
-                    mas.append(item)
-                data['result'] = mas
-                # query2 = Detalle_venta.objects.filter(venta__transaccion__fecha_trans__month=h.month,
-                #                                      venta__estado=2).values('inventario__producto__producto_base_id',
-                #                                                              'inventario__producto_id',
-                #                                                              'inventario__producto__pvp',
-                #                                                              'inventario__producto__pvp_alq',
-                #                                                              'inventario__producto__pvp_confec',
-                #                                                              'inventario__producto__imagen').annotate(
-                #     total=Sum('cantidad')).order_by('-total')[0:3]
-                # for i in query2:
-                #     px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
-                #     pr = Producto.objects.get(id=int(i['inventario__producto_id']))
-                #     item = {'info': px.nombre, 'descripcion': px.descripcion}
-                #     item['id_venta'] = int(i['inventario__producto_id'])
-                #     item['id_reparacion'] = int(pr.id)
-                #     item['id_confeccion'] = int(pr.id)
-                #     item['pvp'] = format(i['inventario__producto__pvp'], '.2f')
-                #     item['pvp_alq'] = format(i['inventario__producto__pvp_alq'], '.2f')
-                #     item['pvp_confec'] = format(i['inventario__producto__pvp_confec'], '.2f')
-                #     item['imagen'] = pr.get_image()
-                #     pop.append(item)
-                # data['popular'] = pop
+                    data.append(i.toJSON())
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):

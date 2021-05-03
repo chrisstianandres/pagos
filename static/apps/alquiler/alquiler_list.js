@@ -1,17 +1,5 @@
 var datatable;
-var logotipo;
 var user_tipo = $('input[name="user_tipo"]').val();
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
-
-toDataURL('/media/imagen.png').then(dataUrl => {
-    logotipo = dataUrl;
-});
 var datos = {
     fechas: {
         'start_date': '',
@@ -55,7 +43,7 @@ $(function () {
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
         },
-        order: [[0, "desc"]],
+        order: [[7, "desc"]],
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
             "<'row'<'col-sm-12 col-md-12'f>>" +
@@ -100,7 +88,7 @@ $(function () {
                             var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
                             // 01, 02, 03, ... 10, 11, 12
                             // month < 10 ? '0' + month : '' + month; // ('' + month) for string result
-                            var MM = monthNames[date.getMonth() + 1]; //monthNames[d.getMonth()])
+                            var MM = monthNames[date.getMonth()]; //monthNames[d.getMonth()])
                             // 1970, 1971, ... 2015, 2016, ...
                             var yyyy = date.getFullYear();
                             // create the format you want
@@ -115,8 +103,13 @@ $(function () {
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logotipo, width: 300}],
-                                margin: [280, 10, 0, 50] //[izquierda, arriba, derecha, abajo]
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
                             }
                         });
                         doc['footer'] = (function (page, pages) {
@@ -154,7 +147,7 @@ $(function () {
                             return 4;
                         };
                         doc.content[0].layout = objLayout;
-                        doc.content[1].table.widths = [65, '*', "*", 85, 75, 85, '*','*', '*'];
+                        doc.content[1].table.widths = ['*','*','*','*','*','*','*','*','*','*'];
                         doc.styles.tableBodyEven.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center';
                     }
@@ -201,11 +194,11 @@ $(function () {
                 width: "15%",
                 render: function (data, type, row) {
                     var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
-                    var entregar = row.estado === 0 ?'<a type="button" rel="entregar" class="btn btn-warning btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Recibir prenda" ><i class="fa fa-check"></i></a>' + ' ':' ';
-                    var devolver = row.estado === 0 ?'<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ':' ';
-                    var pdf = row.estado === 0 || row.estado ===1 || row.estado ===3 ?'<a type="button" href= "/alquiler/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>'+' ':' ';
+                    var entregar = row.estado === 0 ? '<a type="button" rel="entregar" class="btn btn-warning btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Recibir prenda" ><i class="fa fa-check"></i></a>' + ' ' : ' ';
+                    var devolver = row.estado === 0 ? '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Anular"><i class="fa fa-times"></i></a>' + ' ' : ' ';
+                    var pdf = row.estado === 0 || row.estado === 1 || row.estado === 3 ? '<a type="button" href= "/alquiler/printpdf/' + data + '" rel="pdf" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Reporte PDF"><i class="fa fa-file-pdf"></i></a>' + ' ' : ' ';
                     var dar = row.estado === 3 ? '<a type="button" rel="dar" class="btn btn-primary btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Dar prendas"><i class="fas fa-hand-holding-water"></i></a>' : ' ';
-                    return detalle + dar+  entregar + devolver + pdf;
+                    return detalle + dar + entregar + devolver + pdf;
                 }
             },
             {
@@ -218,29 +211,29 @@ $(function () {
         createdRow: function (row, data, dataIndex) {
             console.log(data);
             if (data.estado === 1) {
-                $('td', row).eq(8).html('<span class="badge badge-success" style="color: white">'+data.estado_text);
+                $('td', row).eq(8).html('<span class="badge badge-success" style="color: white">' + data.estado_text);
                 if (user_tipo === '0') {
                     $('td', row).eq(9).find('a[rel="entregar"]').hide();
-                     $('td', row).eq(9).find('a[rel="devolver"]').hide();
+                    $('td', row).eq(9).find('a[rel="devolver"]').hide();
                 }
             } else if (data.estado === 0) {
-                $('td', row).eq(8).html('<span class="badge badge-warning" style="color: white">'+data.estado_text);
-                $('td', row).eq(2).html('<span class="badge badge-warning" style="color: white">'+data.estado_text);
+                $('td', row).eq(8).html('<span class="badge badge-warning" style="color: white">' + data.estado_text);
+                $('td', row).eq(2).html('<span class="badge badge-warning" style="color: white">' + data.estado_text);
                 if (user_tipo === '0') {
                     $('td', row).eq(9).find('a[rel="entregar"]').hide();
-                   $('td', row).eq(9).find('a[rel="devolver"]').hide();
+                    $('td', row).eq(9).find('a[rel="devolver"]').hide();
                 }
             } else if (data.estado === 2) {
-                $('td', row).eq(8).html('<span class="badge badge-danger" style="color: white">'+data.estado_text);
-                $('td', row).eq(2).html('<span class="badge badge-danger" style="color: white">'+data.estado_text);
+                $('td', row).eq(8).html('<span class="badge badge-danger" style="color: white">' + data.estado_text);
+                $('td', row).eq(2).html('<span class="badge badge-danger" style="color: white">' + data.estado_text);
                 if (user_tipo === '0') {
                     $('td', row).eq(9).find('a[rel="entregar"]').hide();
                     $('td', row).eq(9).find('a[rel="pdf"]').hide();
                 }
             } else if (data.estado === 3) {
-                $('td', row).eq(8).html('<span class="badge badge-primary" style="color: white">'+data.estado_text);
-                $('td', row).eq(1).html('<span class="badge badge-primary" style="color: white">'+data.estado_text);
-                $('td', row).eq(2).html('<span class="badge badge-primary" style="color: white">'+data.estado_text);
+                $('td', row).eq(8).html('<span class="badge badge-primary" style="color: white">' + data.estado_text);
+                $('td', row).eq(1).html('<span class="badge badge-primary" style="color: white">' + data.estado_text);
+                $('td', row).eq(2).html('<span class="badge badge-primary" style="color: white">' + data.estado_text);
                 if (user_tipo === '0') {
                     $('td', row).eq(9).find('a[rel="entregar"]').hide();
                     $('td', row).eq(9).find('a[rel="dar"]').hide();
@@ -347,7 +340,7 @@ $(function () {
         if (user_tipo === '0') {
             window.location.href = '/alquiler/nuevo_online'
         } else {
-            window.location.href ='/alquiler/nuevo'
+            window.location.href = '/alquiler/nuevo'
         }
 
     })

@@ -1,15 +1,4 @@
-var logotipo;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
 
-toDataURL('/media/imagen.PNG').then(dataUrl => {
-    logotipo = dataUrl;
-});
 $(function () {
     var action = '';
     var pk = '';
@@ -24,9 +13,9 @@ $(function () {
         },
         columns: [
             {"data": "id"},
-            {"data": "full_name_list"},
+            {"data": "full_name"},
             {"data": "cedula"},
-            {"data": "correo"},
+            {"data": "email"},
             {"data": "sexo"},
             {"data": "direccion"},
             {"data": "telefono"},
@@ -98,8 +87,13 @@ $(function () {
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logo, width: 300}],
-                                margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
                             }
                         });
                         doc['footer'] = (function (page, pages) {
@@ -149,6 +143,12 @@ $(function () {
             {
                 targets: '_all',
                 class: 'text-center',
+            },
+            {
+                targets: [3],
+                class: 'text-center',
+                orderable: false,
+               "width": "20%",
             },
             {
                 targets: [-1],

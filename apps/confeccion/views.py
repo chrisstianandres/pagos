@@ -55,9 +55,16 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 end = request.POST['end_date']
                 data = []
                 if start == '' and end == '':
-                    query = Confeccion.objects.filter(transaccion__tipo=3)
+                    if request.user.tipo == 1:
+                        query = Confeccion.objects.filter(transaccion__tipo=3)
+                    else:
+                        query = Confeccion.objects.filter(transaccion__tipo=3, transaccion__user_id=request.user.id)
                 else:
-                    query = Confeccion.objects.filter(transaccion__tipo=3, transaccion__fecha_trans__range=[start, end])
+                    if request.user.tipo == 1:
+                        query = Confeccion.objects.filter(transaccion__tipo=3, transaccion__fecha_trans__range=[start, end])
+                    else:
+                        query = Confeccion.objects.filter(transaccion__tipo=3, transaccion__user_id=request.user.id,
+                                                          transaccion__fecha_trans__range=[start, end])
                 for c in query:
                     data.append(c.toJSON())
             elif action == 'detalle':
