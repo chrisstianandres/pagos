@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Group
 from django.utils.decorators import method_decorator
 
 from apps.cliente.forms import ClienteForm
@@ -137,7 +138,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 datos = json.loads(request.POST['ventas'])
@@ -232,6 +232,10 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             use.save()
             data['resp'] = True
             data['cliente'] = use.toJSON()
+            grupo = Group.objects.get(name__icontains='cliente')
+            usersave = User.objects.get(id=use.id)
+            usersave.groups.add(grupo)
+            usersave.save()
         else:
             data['error'] = f.errors
         return data
@@ -265,7 +269,6 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
         action = request.POST['action']
         try:
             datos = json.loads(request.POST['ventas'])
-            print(datos)
             if action == 'add':
                 if datos:
                     with transaction.atomic():

@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Group
 from django.db import transaction
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -120,6 +121,10 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 use.save()
                 data['resp'] = True
                 data['cliente'] = use.toJSON()
+                grupo = Group.objects.get(name__icontains='cliente')
+                usersave = User.objects.get(id=use.id)
+                usersave.groups.add(grupo)
+                usersave.save()
             else:
                 f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
                 data['error'] = f.errors
