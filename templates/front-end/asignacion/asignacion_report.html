@@ -14,9 +14,9 @@
 
         <div class="col-lg-4" id="year_seccion">
             <label for="year">Año:</label>
-            <select name="year"   id="year" class="form-control select2">
+            <select name="year" id="year" class="form-control select2">
                 {% for y in year %}
-                    <option value="{{y.year}}">{{ y.year }}</option>
+                    <option value="{{ y.year }}">{{ y.year }}</option>
                 {% endfor %}
 
             </select>
@@ -28,34 +28,31 @@
     </div>
     <br>
 {% endblock %}
+{% block botones %}
+    <div class="row">
+        &nbsp;
+        <a type="button" class="btn btn-default btn-sm" id="reload"
+           onclick=" location.reload();">
+            <i class="fas fa-sync-alt"></i> Actualizar
+        </a>
+    </div>
+{% endblock %}
 {% block table %}
     <thead>
     <tr>
+        <th>Cod Produccion</th>
         <th>Fecha</th>
-        <th>Cliente</th>
-        <th>Total (sin Iva)</th>
-        <th>Total (Iva)</th>
-        <th>Total (con Iva)</th>
+        <th>Prenda</th>
+        <th>Categoria</th>
+        <th>Color</th>
+        <th>Talla</th>
+        <th>Cantidad</th>
     </tr>
     </thead>
     <tbody>
     </tbody>
-    <tfoot>
-    <tr>
-        <th></th>
-        <th><strong>Totales: Esta pagina (Total filtrado)</strong></th>
-        <th></th>
-        <th></th>
-        <th></th>
+{% endblock %}
 
-    </tr>
-    </tfoot>
-{% endblock %}
-{% block botones %}
-    <a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
-        <i class="fas fa-sync-alt"></i> Actualizar
-    </a>
-{% endblock %}
 {% block extra %}
-    <script src="{% static 'apps/confeccion/confeccion_report_total.js' %}"></script>
+    <script src="{% static "apps/asignacion/asignacion_report.js" %}"></script>
 {% endblock %}

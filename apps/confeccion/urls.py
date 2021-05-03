@@ -15,6 +15,7 @@ urlpatterns = [
     path('report_total', login_required(report_total.as_view()), name='report_total'),
     path('report_total_pendientes', login_required(report_total_alquilada.as_view()), name='report_total_pendientes'),
     path('report_total_reservadas', login_required(report_total_reservada.as_view()), name='report_total_reservadas'),
+    path('report_total_anuladas', login_required(report_total_anuladas.as_view()), name='report_total_anuladas'),
     # path('get_producto', login_required(views.get_producto), name='get_producto'),
     # path('get_servicio', login_required(views.get_servicio), name='get_servicio'),
     # path('crear', login_required(views.crear), name='crear'),

@@ -193,7 +193,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                             <li class="nav-item">
+                            <li class="nav-item">
                                 <a href="{% url 'asignacion:lista' %}" class="nav-link">
                                     <i class="fas fa-calendar-check"></i>
                                     <p>Confeccion de Prendas</p>
@@ -214,13 +214,13 @@
                             <li class="nav-item">
                                 <a href="{% url 'confeccion:lista' %}" class="nav-link">
                                     <i class="fab fa-shirtsinbulk"></i>
-                                    <p>Confeccion</p>
+                                    <p>Confeccion (Para clientes)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{% url 'reparacion:lista' %}" class="nav-link">
                                     <i class="fa fa fa-tools"></i>
-                                    <p>Reparacion</p>
+                                    <p>Reparacion de prendas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -241,10 +241,45 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            <li class="nav-item has-treeview">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>
+                                        Produccion
+                                        <i class="fas fa-angle-left right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{% url 'asignacion:report' %}" class="nav-link">
+                                            <i class="fa fa-arrow-alt-circle-right"></i>
+                                            <p>Por Fecha</p>
+                                        </a>
+                                    </li><li class="nav-item">
+                                        <a href="{% url 'asignacion:clientes' %}" class="nav-link">
+                                            <i class="fa fa-arrow-alt-circle-right"></i>
+                                            <p>Por cliente</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{% url 'asignacion:prendas' %}" class="nav-link">
+                                            <i class="fa fa-arrow-alt-circle-right"></i>
+                                            <p>Por Prendas</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
                             <li class="nav-item">
                                 <a href="{% url 'compra:report_total' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Compras</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'asignacion:perdidas' %}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Perdidas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -281,13 +316,13 @@
                             <li class="nav-item">
                                 <a href="{% url 'confeccion:report_total' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Confecciones</p>
+                                    <p>Confecciones (Para clientes)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{% url 'reparacion:report_total' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Reparaciones</p>
+                                    <p>Reparacion de prendas</p>
                                 </a>
                             </li>
                             <li class="nav-item">

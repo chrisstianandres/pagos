@@ -52,6 +52,7 @@ class Detalle_confeccion(models.Model):
         item = model_to_dict(self)
         item['producto'] = self.producto.toJSON()
         item['subtotal'] = format(self.subtotal, '.2f') #format(self.iva, '.2f')
+        item['pvp_by_confec'] = format(self.pvp_by_confec, '.2f') #format(self.iva, '.2f')
         return item
 
     class Meta:

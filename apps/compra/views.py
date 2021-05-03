@@ -29,6 +29,7 @@ opc_icono = 'fa fa-shopping-bag'
 opc_entidad = 'Compras'
 crud = '/compra/crear'
 empresa = nombre_empresa()
+year = [{'id': y, 'year': (datetime.now().year)-y}for y in range(0, 5)]
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
@@ -280,6 +281,7 @@ class report(ValidatePermissionRequiredMixin, ListView):
         data['boton'] = 'Nueva Compra'
         data['titulo'] = 'Reporte de Compras'
         data['empresa'] = empresa
+        data['year'] = year
         return data
 
 
@@ -329,4 +331,5 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
         data['entidad'] = opc_entidad
         data['titulo'] = 'Reporte de Compras Totales'
         data['empresa'] = empresa
+        data['year'] = year
         return data

@@ -1,13 +1,15 @@
 import json
 
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.http import JsonResponse, HttpResponse
+from django.utils.datetime_safe import datetime
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
+from apps.user.models import User
 from apps.asignar_recursos.forms import Asig_recursoForm, Detalle_Asig_recursoForm, Detalle_Asig_maquinaForm, \
     NovedadesForm
 from apps.asignar_recursos.models import Asig_recurso, Detalle_asig_recurso, Detalle_asig_maquina, Detalle_produccion, \
@@ -24,6 +26,7 @@ opc_icono = 'fas fa-toolbox'
 opc_entidad = 'Confeccion de Prendas (Produccion)'
 crud = '/asignar/crear'
 empresa = nombre_empresa()
+year = [{'id': y, 'year': (datetime.now().year) - y} for y in range(0, 5)]
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
@@ -294,51 +297,51 @@ class Control(ValidatePermissionRequiredMixin, UpdateView):
                         pk = self.kwargs.get('pk', 0)
                         c = self.model.objects.get(id=pk)
                         for m in c.detalle_asig_recurso_set.all():
-                                ma = Material.objects.get(id=m.inventario_material.id)
-                                ma.stock_actual += m.cantidad
-                                ma.save()
-                                c.detalle_asig_maquina_set.all().delete()
+                            ma = Material.objects.get(id=m.inventario_material.id)
+                            ma.stock_actual += m.cantidad
+                            ma.save()
+                            c.detalle_asig_maquina_set.all().delete()
                         for px in c.detalle_asig_recurso_set.all():
-                                for t in Detalle_perdidas_materiales.objects.filter(det_asignacion_id=px.id):
-                                    t.delete()
-                                    px.delete()
-                                    c.detalle_produccion_set.all().delete()
+                            for t in Detalle_perdidas_materiales.objects.filter(det_asignacion_id=px.id):
+                                t.delete()
+                                px.delete()
+                                c.detalle_produccion_set.all().delete()
                         for i in datos['materiales']:
-                                dv = Detalle_asig_recurso()
-                                dv.asig_recurso_id = c.id
-                                dv.inventario_material_id = i['id']
-                                dv.cantidad = int(i['cant'])
-                                dv.ingreso_inicial = int(i['cant'])
-                                dv.ingreso_actual = int(i['cant'])
-                                dv.save()
-                                for p in datos['perdidas']:
-                                    if p['id'] == i['id']:
-                                        dtp = Detalle_perdidas_materiales()
-                                        dtp.det_asignacion_id = dv.id
-                                        dtp.cantidad = int(p['cantidad'])
-                                        dtp.save()
-                                        dv.ingreso_actual -= int(p['cantidad'])
-                                        dv.save()
-                                s = Material.objects.get(pk=i['id'])
-                                s.stock_actual -= int(i['cant'])
-                                s.save()
+                            dv = Detalle_asig_recurso()
+                            dv.asig_recurso_id = c.id
+                            dv.inventario_material_id = i['id']
+                            dv.cantidad = int(i['cant'])
+                            dv.ingreso_inicial = int(i['cant'])
+                            dv.ingreso_actual = int(i['cant'])
+                            dv.save()
+                            for p in datos['perdidas']:
+                                if p['id'] == i['id']:
+                                    dtp = Detalle_perdidas_materiales()
+                                    dtp.det_asignacion_id = dv.id
+                                    dtp.cantidad = int(p['cantidad'])
+                                    dtp.save()
+                                    dv.ingreso_actual -= int(p['cantidad'])
+                                    dv.save()
+                            s = Material.objects.get(pk=i['id'])
+                            s.stock_actual -= int(i['cant'])
+                            s.save()
                         for m in datos['maquinas']:
-                                dm = Detalle_asig_maquina()
-                                dm.asig_recurso_id = c.id
-                                dm.maquina_id = m['id']
-                                dm.save()
-                                x = Maquina.objects.get(pk=m['id'])
-                                x.estado = 1
-                                x.save()
+                            dm = Detalle_asig_maquina()
+                            dm.asig_recurso_id = c.id
+                            dm.maquina_id = m['id']
+                            dm.save()
+                            x = Maquina.objects.get(pk=m['id'])
+                            x.estado = 1
+                            x.save()
                         if Confeccion.objects.get(confeccion_id=pk):
-                                for p in datos['productos']:
-                                    if c.detalle_produccion_set.filter(producto_id=int(p['id'])):
-                                        prod = c.detalle_produccion_set.get(producto_id=int(p['id']))
-                                        prod.cantidad = int(p['cantidad'])
-                                        prod.save()
-                                for pe in datos['productos_eliminados']:
-                                    if c.detalle_produccion_set.filter(producto_id=int(pe['id'])):
-                                        c.detalle_produccion_set.get(producto_id=int(p['id'])).delete()
+                            for p in datos['productos']:
+                                if c.detalle_produccion_set.filter(producto_id=int(p['id'])):
+                                    prod = c.detalle_produccion_set.get(producto_id=int(p['id']))
+                                    prod.cantidad = int(p['cantidad'])
+                                    prod.save()
+                            for pe in datos['productos_eliminados']:
+                                if c.detalle_produccion_set.filter(producto_id=int(pe['id'])):
+                                    c.detalle_produccion_set.get(producto_id=int(p['id'])).delete()
                         else:
                             for p in datos['productos']:
                                 dtp = Detalle_produccion()
@@ -432,194 +435,228 @@ class Control(ValidatePermissionRequiredMixin, UpdateView):
         data['empresa'] = empresa
         return data
 
-# query = Distribucion.objects.get(id=id, lote__estado=0)
-#                 lote_data = [query.toJSON()]
-#                 for p in query.peso_set.all():
-#                     peso_data.append(p.toJSON())
-# class lista(SuperUserRequiredMixin, ListView):
-#     model = Asig_insumo
-#     template_name = 'front-end/asig_insumo/asig_insumo_list.html'
-#
-#     def get_context_data(self, **kwargs):
-#         data = super().get_context_data(**kwargs)
-#         data['icono'] = opc_icono
-#         data['entidad'] = opc_entidad
-#         data['boton'] = 'Nueva Asignacion de Insumos'
-#         data['titulo'] = 'Listado de Asignacion de Insumos'
-#         data['nuevo'] = '/asig_insumo/nuevo'
-#         return data
 
-#
-# def nuevo(request):
-#     data = {
-#         'icono': opc_icono, 'entidad': opc_entidad, 'crud': '../compra/get_insumo',
-#         'boton': 'Guardar Asignacion', 'action': 'add', 'titulo': 'Nuevo Registro de una Asognacion',
-#         'key': ''
-#     }
-#     if request.method == 'GET':
-#         data['form'] = Asig_InsumoForm()
-#         data['form2'] = Detalle_Asig_InsumoForm()
-#         data['detalle'] = []
-#     return render(request, 'front-end/asig_insumo/asig_insumo_form.html', data)
-#
-#
-# @csrf_exempt
-# def crear(request):
-#     data = {}
-#     if request.method == 'POST':
-#         datos = json.loads(request.POST['asignar'])
-#         if datos:
-#             with transaction.atomic():
-#                 c = Asig_insumo()
-#                 c.fecha_asig = datos['fecha_asig']
-#                 c.periodo_id = datos['periodo']
-#                 c.cantero_id = datos['cantero']
-#                 c.save()
-#                 for i in datos['insumos']:
-#                     dv = Detalle_asig_insumo()
-#                     dv.asig_insumo_id = c.id
-#                     dv.insumo_id = i['id']
-#                     dv.cantidad = int(i['cantidad'])
-#                     print(i['cantidad'])
-#                     dv.save()
-#                     x = Insumo.objects.get(pk=i['id'])
-#                     x.stock = x.stock - int(i['cantidad'])
-#                     x.save()
-#                     data['resp'] = True
-#         else:
-#             data['resp'] = False
-#             data['error'] = "Datos Incompletos"
-#     return HttpResponse(json.dumps(data), content_type="application/json")
-#
-#
-# def editar(request, id):
-#     data = {
-#         'icono': opc_icono, 'entidad': opc_entidad, 'crud': '../../asig_insumo/get_insumo',
-#         'boton': 'Editar Asignacion de Insumos', 'action': 'edit', 'titulo': 'Editar Registro de una Asignacion',
-#         'key': id
-#     }
-#     asig_insumo = Asig_insumo.objects.get(id=id)
-#     if request.method == 'GET':
-#         data['form'] = Asig_InsumoForm(instance=asig_insumo)
-#         data['form2'] = Detalle_asig_insumo()
-#         data['detalle'] = json.dumps(get_detalle_productos(id))
-#     return render(request, 'front-end/asig_insumo/asig_insumo_form.html', data)
-#
-#
-# @csrf_exempt
-# def editar_save(request):
-#     data = {}
-#     datos = json.loads(request.POST['asignar'])
-#     if request.POST['action'] == 'edit':
-#
-#         with transaction.atomic():
-#             # c = Compra.objects.get(pk=self.get_object().id)
-#             c = Asig_insumo.objects.get(pk=request.POST['key'])
-#             c.fecha_asig = datos['fecha_asig']
-#             c.cantero_id = datos['cantero']
-#             c.periodo_id = datos['periodo']
-#             c.save()
-#             c.detalle_asig_insumo_set.all().delete()
-#             for i in datos['insumos']:
-#                 dv = Detalle_asig_insumo()
-#                 dv.asig_insumo_id = c.id
-#                 dv.insumo_id = i['id']
-#                 dv.cantidad = int(i['cantidad'])
-#                 dv.save()
-#                 x = Insumo.objects.get(pk=i['id'])
-#                 x.stock = x.stock - int(i['cantidad'])
-#                 x.save()
-#                 data['resp'] = True
-#     else:
-#         data['resp'] = False
-#         data['error'] = "Datos Incompletos"
-#     return HttpResponse(json.dumps(data), content_type="application/json")
-#
-#
-# def get_detalle_productos(id):
-#     data = []
-#     try:
-#         for i in Detalle_asig_insumo.objects.filter(compra_id=id):
-#             item = i.insumo.toJSON()
-#             item['cantidad'] = i.cantidad
-#             data.append(item)
-#     except:
-#         pass
-#     return data
-#
-#
-# @csrf_exempt
-# def get_insumo(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             insumo = Insumo.objects.filter(pk=id)
-#             data = []
-#             for i in insumo:
-#                 item = i.toJSON()
-#                 item['cantidad'] = 1
-#                 data.append(item)
-#         else:
-#             data['error'] = 'No ha selecionado ningun Insumo'
-#     except Exception as e:
-#         data['error'] = 'Ha ocurrido un error'
-#     return JsonResponse(data, safe=False)
-#
-#
-# @csrf_exempt
-# def get_detalle(request):
-#     data = {}
-#     try:
-#         id = request.POST['id']
-#         if id:
-#             data = []
-#             for p in Detalle_asig_insumo.objects.filter(asig_insumo__cantero_id=id):
-#                 data.append(p.toJSON())
-#         else:
-#             data['error'] = 'Ha ocurrido un error'
-#     except Exception as e:
-#         data['error'] = str(e)
-#     return JsonResponse(data, safe=False)
-#
-#
-# def report(request):
-#     data = { 'icono': opc_icono, 'entidad': opc_entidad, 'titulo': 'Reporte de Asignacion de Isumos', 'key': ''}
-#     return render(request, 'front-end/asig_insumo/asig_insumo_report.html', data)
-#
-#
-# @csrf_exempt
-# def data(request):
-#     data = []
-#     start_date = request.POST.get('start_date', '')
-#     end_date = request.POST.get('end_date', '')
-#     try:
-#         if start_date == '' and end_date == '':
-#             asig_insumo = Detalle_asig_insumo.objects.all()
-#             for c in asig_insumo:
-#                 data.append([
-#                     c.id,
-#                     c.asig_insumo.fecha_asig.strftime('%d-%m-%Y'),
-#                     c.asig_insumo.periodo.nombre,
-#                     c.asig_insumo.cantero.nombre,
-#                     c.insumo.nombre,
-#                     c.insumo.categoria.nombre,
-#                     c.insumo.presentacion.nombre,
-#                     c.cantidad
-#                 ])
-#         else:
-#             asig_insumo = Detalle_asig_insumo.objects.filter(asig_insumo__fecha_asig__range=[start_date, end_date])
-#             for c in asig_insumo:
-#                 data.append([
-#                     c.id,
-#                     c.asig_insumo.fecha_asig.strftime('%d-%m-%Y'),
-#                     c.asig_insumo.periodo.nombre,
-#                     c.asig_insumo.cantero.nombre,
-#                     c.insumo.nombre,
-#                     c.insumo.categoria.nombre,
-#                     c.insumo.presentacion.nombre,
-#                     c.cantidad
-#                 ])
-#     except:
-#         pass
-#     return JsonResponse(data, safe=False)
+class PerdidasView(ValidatePermissionRequiredMixin, ListView):
+    template_name = 'front-end/produccion/perdidas_list.html'
+    model = Detalle_perdidas_materiales
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'report':
+                start = request.POST['start_date']
+                end = request.POST['end_date']
+                data = []
+                if start and end:
+                    perdida = self.model.objects.values('det_asignacion__inventario_material_id')\
+                        .filter(det_asignacion__asig_recurso__fecha_asig__range=[start, end])\
+                        .annotate(Sum('cantidad')).order_by()
+
+                else:
+                    perdida = self.model.objects.values('det_asignacion__inventario_material_id').\
+                        annotate(Sum('cantidad')).order_by()
+                for c in perdida:
+                    mat = Material.objects.get(id=c['det_asignacion__inventario_material_id'])
+                    data.append([
+                        mat.producto_base.nombre,
+                        mat.producto_base.categoria.nombre,
+                        mat.get_calidad_display(),
+                        mat.color.nombre,
+                        mat.tipo_material.nombre,
+                        mat.get_unidad_medida_display(),
+                        c['cantidad__sum']
+                    ])
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = 'Reporte de Perdidas de materiales'
+        data['titulo'] = 'Reporte de Perdidas de materiales'
+        data['empresa'] = empresa
+        data['year'] = year
+        return data
+
+
+class ProdClienteView(ValidatePermissionRequiredMixin, ListView):
+    template_name = 'front-end/produccion/report_by_cliente_list.html'
+    model = Asig_recurso
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'report':
+                cliente = request.POST['cliente']
+                data = []
+                if cliente:
+                    det = Asig_recurso.objects.filter(user__tipo=0, user_id=cliente, estado=2)
+                    for a in det:
+                        for d in Detalle_produccion.objects.filter(asignacion_id=a.id):
+                            data.append([
+                                d.asignacion.id,
+                                d.asignacion.fecha_fin,
+                                d.producto.producto_base.nombre,
+                                d.producto.producto_base.categoria.nombre,
+                                d.producto.color.nombre,
+                                d.producto.talla.talla_full(),
+                                d.cantidad
+                            ])
+                else:
+                    data = []
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = 'fa fa-user'
+        data['entidad'] = 'Reporte de Produccion por cliente'
+        data['titulo'] = 'Reporte de Produccion por cliente'
+        data['empresa'] = empresa
+        data['year'] = year
+        return data
+
+
+class ProdPrendaView(ValidatePermissionRequiredMixin, ListView):
+    template_name = 'front-end/produccion/report_by_prenda_list.html'
+    model = Asig_recurso
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'report':
+                prenda = request.POST['prenda']
+                data = []
+                if prenda == '0':
+                    det = Asig_recurso.objects.filter(estado=2)
+                    for a in det:
+                        for d in Detalle_produccion.objects.filter(asignacion_id=a.id):
+                            data.append([
+                                d.asignacion.id,
+                                d.asignacion.fecha_fin,
+                                d.producto.producto_base.nombre,
+                                d.producto.producto_base.categoria.nombre,
+                                d.producto.color.nombre,
+                                d.producto.talla.talla_full(),
+                                d.cantidad
+                            ])
+                elif prenda:
+                    det = Asig_recurso.objects.filter(estado=2)
+                    for a in det:
+                        for d in Detalle_produccion.objects.filter(asignacion_id=a.id, producto_id=prenda):
+                            data.append([
+                                d.asignacion.id,
+                                d.asignacion.fecha_fin,
+                                d.producto.producto_base.nombre,
+                                d.producto.producto_base.categoria.nombre,
+                                d.producto.color.nombre,
+                                d.producto.talla.talla_full(),
+                                d.cantidad
+                            ])
+                else:
+                    data = []
+            elif action == 'search':
+                data = []
+                term = request.POST['term']
+                query = Producto.objects.filter(producto_base__nombre__icontains=term)
+                for a in query:
+                    result = {'id': int(a.id),
+                              'text': str(str(a.producto_base.nombre) + ' / ' + str(a.color.nombre) + ' / ' + str(
+                                  a.talla.talla_full()))}
+                    data.append(result)
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = 'fa fa-tshirt'
+        data['entidad'] = 'Reporte de Produccion por prenda'
+        data['titulo'] = 'Reporte de Produccion por prenda'
+        data['empresa'] = empresa
+        data['year'] = year
+        return data
+
+
+class reportView(ValidatePermissionRequiredMixin, ListView):
+    template_name = 'front-end/asignacion/asignacion_report.html'
+    model = Asig_recurso
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'report':
+                start = request.POST['start_date']
+                end = request.POST['end_date']
+                data = []
+                if start and end:
+                    det = Asig_recurso.objects.all()
+                    for a in det:
+                        for d in Detalle_produccion.objects.filter(asignacion_id=a.id,
+                                                                   asignacion__fecha_asig__range=[start, end]):
+                            data.append([
+                                d.asignacion.id,
+                                d.asignacion.fecha_fin,
+                                d.producto.producto_base.nombre,
+                                d.producto.producto_base.categoria.nombre,
+                                d.producto.color.nombre,
+                                d.producto.talla.talla_full(),
+                                d.cantidad
+                            ])
+                else:
+                    det = Asig_recurso.objects.all()
+                    for a in det:
+                        for d in Detalle_produccion.objects.filter(asignacion_id=a.id):
+                            data.append([
+                                d.asignacion.id,
+                                d.asignacion.fecha_fin,
+                                d.producto.producto_base.nombre,
+                                d.producto.producto_base.categoria.nombre,
+                                d.producto.color.nombre,
+                                d.producto.talla.talla_full(),
+                                d.cantidad
+                            ])
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = 'fa fa-calendar'
+        data['entidad'] = 'Reporte de Produccion por fechas'
+        data['titulo'] = 'Reporte de Produccion por fechas'
+        data['empresa'] = empresa
+        data['year'] = year
+        return data
+
+

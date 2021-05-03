@@ -1,16 +1,4 @@
 var datatable;
-var logotipo;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
-
-toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
-    logotipo = dataUrl;
-});
 var datos = {
     fechas: {
         'start_date': '',
@@ -21,6 +9,9 @@ var datos = {
         if (data.key === 1) {
             this.fechas['start_date'] = data.startDate.format('YYYY-MM-DD');
             this.fechas['end_date'] = data.endDate.format('YYYY-MM-DD');
+        } else if (data.key === 2) {
+            this.fechas['start_date'] = data.start_date;
+            this.fechas['end_date'] = data.end_date;
         } else {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
@@ -39,28 +30,7 @@ var datos = {
     },
 };
 
-function daterange() {
-    // $("div.toolbar").html('<br><div class="col-lg-3"><input type="text" name="fecha" class="form-control form-control-sm input-sm"></div> <br>');
-    $('input[name="fecha"]').daterangepicker({
-        locale: {
-            format: 'YYYY-MM-DD',
-            applyLabel: '<i class="fas fa-search"></i> Buscar',
-            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
-        }
-    }).on('apply.daterangepicker', function (ev, picker) {
-        picker['key'] = 1;
-        datos.add(picker);
-        // filter_by_date();
-
-    }).on('cancel.daterangepicker', function (ev, picker) {
-        picker['key'] = 0;
-        datos.add(picker);
-    });
-
-}
-
 $(function () {
-    daterange();
     datatable = $("#datatable").DataTable({
         responsive: true,
         autoWidth: false,
@@ -72,7 +42,7 @@ $(function () {
         },
         columns: [
             {"data": "id"},
-            {"data": "maquina.tipo.nombre"},
+            {"data": "maquina.full_name"},
             {"data": "fecha_ingreso"},
             {"data": "fecha_fin"}
         ],
@@ -136,8 +106,13 @@ $(function () {
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logotipo, width: 300}],
-                                margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
                             }
                         });
                         doc['footer'] = (function (page, pages) {
@@ -189,4 +164,49 @@ $(function () {
             ]
         }
     });
+     $('#search').on('change', function () {
+        daterange();
+        if ($(this).val() === '0') {
+            $('#year_seccion').show();
+            $('#range_date').hide();
+
+        } else {
+            $('#year_seccion').hide();
+            $('#range_date').show();
+        }
+    });
+    $('#year').on('change', function () {
+        daterange()
+    })
 });
+
+function daterange() {
+    // $("div.toolbar").html('<br><div class="col-lg-3"><input type="text" name="fecha" class="form-control form-control-sm input-sm"></div> <br>');
+    $('input[name="fecha"]').daterangepicker({
+        locale: {
+            format: 'YYYY-MM-DD',
+            applyLabel: '<i class="fas fa-search"></i> Buscar',
+            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
+        }
+    })
+        .on('apply.daterangepicker', function (ev, picker) {
+            picker['key'] = 1;
+            console.log(picker);
+            datos.add(picker);
+            // filter_by_date();
+
+        })
+        .on('cancel.daterangepicker', function (ev, picker) {
+            picker['key'] = 0;
+            datos.add(picker);
+        });
+
+    if ($('#search').val() === '0') {
+        var picker = {};
+        var year = $('#year').val();
+        picker['key'] = 2;
+        picker['start_date'] = year + '-01-01';
+        picker['end_date'] = year + '-12-31';
+        datos.add(picker);
+    }
+}

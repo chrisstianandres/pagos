@@ -381,7 +381,8 @@ function daterange() {
             format: 'YYYY-MM-DD',
             applyLabel: '<i class="fas fa-search"></i> Buscar',
             cancelLabel: '<i class="fas fa-times"></i> Cancelar',
-        }
+        },
+        showDropdowns: true,
     }).on('apply.daterangepicker', function (ev, picker) {
         picker['key'] = 1;
         datos.add(picker);

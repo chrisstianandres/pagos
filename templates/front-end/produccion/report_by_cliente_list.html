@@ -1,0 +1,51 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block elements %}
+    <br>
+        <div class="row">
+        <div class="col-lg-4">
+            <label for="cliente">Cliente:</label>
+            <select name="cliente" id="cliente" class="form-control select2">
+            </select>
+        </div>
+    </div>
+    <br>
+{% endblock %}
+{% block table %}
+    <thead>
+    <tr>
+        <th>Cod Produccion</th>
+        <th>Fecha</th>
+        <th>Prenda</th>
+        <th>Categoria</th>
+        <th>Color</th>
+        <th>Talla</th>
+        <th>Cantidad</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+     <tfoot>
+    <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th style="text-align:center"></th>
+        <th style="text-align:center"></th>
+       <th style="text-align:center"><strong>Total:</strong></th>
+        <th style="text-align:center"></th>
+    </tr>
+    </tfoot>
+{% endblock %}
+{% block botones %}
+<a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
+        <i class="fas fa-sync-alt"></i> Actualizar
+    </a>
+{% endblock %}
+
+{% block extra %}
+    <script src="{% static 'apps/produccion/produccion_report_cliente.js' %}"></script>
+{% endblock %}
+{% block javascript %}
+
+{% endblock %}

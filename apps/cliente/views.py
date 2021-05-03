@@ -149,9 +149,9 @@ class report(ValidatePermissionRequiredMixin, ListView):
             end_date = request.POST.get('end_date', '')
             try:
                 if start_date == '' and end_date == '':
-                    query = Cliente.objects.all()
+                    query = User.objects.filter(tipo=0)
                 else:
-                    query = Cliente.objects.filter(fecha__range=[start_date, end_date])
+                    query = Cliente.objects.filter(tipo=0, fecha__range=[start_date, end_date])
 
                 for p in query:
                     data.append(p.toJSON())

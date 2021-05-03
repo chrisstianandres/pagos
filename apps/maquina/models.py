@@ -39,6 +39,7 @@ class Maquina(models.Model):
         item = model_to_dict(self)
         item['tipo'] = self.tipo.toJSON()
         item['estado_full'] = self.get_estado_display()
+        item['full_name'] = '{} - {}'.format(self.tipo.nombre, self.serie)
         return item
 
     class Meta:

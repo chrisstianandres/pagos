@@ -1,3 +1,4 @@
+var empresa = $('#nombre_empresa').val();
 function borrar_todo_alert(title, content, callback, callback2) {
     $.confirm({
         title: title,

@@ -84,8 +84,14 @@ $(function () {
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logotipo, width: 300}],
-                                margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
+
                             }
                         });
                         doc['footer'] = (function (page, pages) {

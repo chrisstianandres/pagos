@@ -1,16 +1,4 @@
 var datatable;
-var logotipo;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
-
-toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
-    logotipo = dataUrl;
-});
 var datos = {
     fechas: {
         'start_date': '',
@@ -21,6 +9,9 @@ var datos = {
         if (data.key === 1) {
             this.fechas['start_date'] = data.startDate.format('YYYY-MM-DD');
             this.fechas['end_date'] = data.endDate.format('YYYY-MM-DD');
+        } else if (data.key === 2) {
+            this.fechas['start_date'] = data.start_date;
+            this.fechas['end_date'] = data.end_date;
         } else {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
@@ -39,11 +30,10 @@ var datos = {
     },
 };
 $(function () {
-    daterange();
     datatable = $("#datatable").DataTable({
         destroy: true,
-        scrollX: true,
-        autoWidth: true,
+        responsive: true,
+        autoWidth: false,
         order: [[2, "asc"]],
         ajax: {
             url: window.location.pathname,
@@ -53,38 +43,14 @@ $(function () {
         },
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
-            searchPanes: {
-                clearMessage: 'Limpiar Filtros',
-                collapse: {
-                    0: 'Filtros de Busqueda',
-                    _: 'Filtros seleccionados (%d)'
-                },
-                title: {
-                    _: 'Filtros seleccionados - %d',
-                    0: 'Ningun Filtro seleccionados',
-                },
-                activeMessage: 'Filtros activos (%d)',
-                emptyPanes: 'No existen suficientes datos para generar filtros :('
-
-            }
         },
 
-        dom:
-            "<'row'<'col-sm-12 col-md-12'B>>" +
+        dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
             "<'row'<'col-sm-12 col-md-12'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-        columns: [
-            {"data": "date_joined"},
-            {"data": "full_name"},
-            {"data": "cedula"},
-            {"data": "email"},
-            {"data": "sexo"},
-            {"data": "direccion"},
-            {"data": "telefono"},
-            {"data": "celular"},
-        ],
+        //"<'row'<'col-md-6'l><'col-md-6'Bf>>"
         buttons: {
             dom: {
                 button: {
@@ -97,13 +63,7 @@ $(function () {
             },
             buttons: [
                 {
-                    className: 'btn btn-info', extend: 'searchPanes',
-                    config: {
-                        cascadePanes: true,
-                    }
-                },
-                {
-                    text: '<i class="far fa-file-pdf"></i> Reporte PDF',
+                    text: '<i class="far fa-file-pdf"></i> PDF',
                     className: 'btn btn-danger',
                     extend: 'pdfHtml5',
                     footer: true,
@@ -112,7 +72,7 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: ':visible',
+                        columns: [0, 1, 2, 3, 4],
                         search: 'applied',
                         order: 'applied'
                     },
@@ -142,8 +102,13 @@ $(function () {
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logotipo, width: 300}],
-                                margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
                             }
                         });
                         doc['footer'] = (function (page, pages) {
@@ -181,21 +146,47 @@ $(function () {
                             return 4;
                         };
                         doc.content[0].layout = objLayout;
-                        doc.content[1].table.widths = ["*", "*", "*", "*", "*", "*", "*", "*"];
+                        doc.content[1].table.widths = ["*", "*", "*", "*", "*"];
                         doc.styles.tableBodyEven.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center';
                         doc.styles.tableFooter.alignment = 'center';
                     }
                 },
                 {
-                    text: '<i class="far fa-file-excel"></i> Reporte Excel', className: "btn btn-success my_class",
+                    text: '<i class="far fa-file-excel"></i> Excel', className: "btn btn-success my_class",
                     extend: 'excel',
                     footer: true
                 },
+                {
+                    text: '<i class="fas fa-tags"></i> Entregadas',
+                    className: 'btn btn-secondary',
+                    action: function (e, dt, node, config) {
+                        window.location.href = '/confeccion/report_total'
+                    }
+                },
+                {
+                    text: '<i class="fas fa-tags"></i> Reservadas',
+                    className: 'btn btn-info',
+                    action: function (e, dt, node, config) {
+                        window.location.href = '/confeccion/report_total_reservadas'
+                    }
+                },
+                {
+                    text: '<i class="fas fa-tags"></i> Pendientes de entrega',
+                    className: 'btn btn-primary',
+                    action: function (e, dt, node, config) {
+                        window.location.href = '/confeccion/report_total_pendientes'
+                    }
+                },
+                {
+                    text: '<i class="fab fa-amazon"></i> Por Prendas',
+                    className: 'btn btn-warning',
+                    action: function (e, dt, node, config) {
+                        window.location.href = '/confeccion/report_by_product'
+                    }
+                },
             ]
-
         },
-
         columnDefs: [
             {
                 targets: '_all',
@@ -203,16 +194,99 @@ $(function () {
 
             },
             {
-                searchPanes: {
-                    show: true,
-                },
-                targets: [1],
+                targets: [-1],
+                width: '20%',
+                render: function (data, type, row) {
+                    return '$ ' + data;
+                }
+            },
+            {
+                targets: [-2, -3],
+                render: function (data, type, row) {
+                    return '$ ' + parseFloat(data).toFixed(2);
+                }
             },
         ],
+        footerCallback: function (row, data, start, end, display) {
+            var api = this.api(), data;
+
+            // Remove the formatting to get integer data for summation
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                        i : 0;
+            };
+            // Total over this page
+            pageTotalsiniva = api
+                .column(2, {page: 'current'})
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+            // total full table
+            pageTotalsiniva = api.column(2).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+
+            // Total over this page
+            pageTotaliva = api
+                .column(3, {page: 'current'})
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+            // total full table
+            totaliva = api.column(3).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+// Total over this page
+            pageTotalconiva = api
+                .column(4, {page: 'current'})
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+            // total full table
+            totalconiva = api.column(4).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+
+
+            // Update footer
+            $(api.column(2).footer()).html(
+                '$ ' + parseFloat(pageTotalsiniva).toFixed(2) + ' ( $ ' + parseFloat(pageTotalsiniva).toFixed(2) + ')'
+                // parseFloat(data).toFixed(2)
+            );
+            $(api.column(3).footer()).html(
+                '$ ' + parseFloat(pageTotaliva).toFixed(2) + ' ( $ ' + parseFloat(pageTotaliva).toFixed(2) + ')'
+                // parseFloat(data).toFixed(2)
+            );
+            $(api.column(4).footer()).html(
+                '$ ' + parseFloat(pageTotalconiva).toFixed(2) + ' ( $ ' + parseFloat(pageTotalconiva).toFixed(2) + ')'
+                // parseFloat(data).toFixed(2)
+            );
+        },
+
     });
+    $('#search').on('change', function () {
+        daterange();
+        if ($(this).val() === '0') {
+            $('#year_seccion').show();
+            $('#range_date').hide();
+
+        } else {
+            $('#year_seccion').hide();
+            $('#range_date').show();
+        }
+    });
+    $('#year').on('change', function () {
+        daterange()
+    })
 });
 
 function daterange() {
+
     // $("div.toolbar").html('<br><div class="col-lg-3"><input type="text" name="fecha" class="form-control form-control-sm input-sm"></div> <br>');
     $('input[name="fecha"]').daterangepicker({
         locale: {
@@ -220,14 +294,26 @@ function daterange() {
             applyLabel: '<i class="fas fa-search"></i> Buscar',
             cancelLabel: '<i class="fas fa-times"></i> Cancelar',
         }
-    }).on('apply.daterangepicker', function (ev, picker) {
-        picker['key'] = 1;
-        datos.add(picker);
-        // filter_by_date();
+    })
+        .on('apply.daterangepicker', function (ev, picker) {
+            picker['key'] = 1;
+            datos.add(picker);
+            // filter_by_date();
 
-    }).on('cancel.daterangepicker', function (ev, picker) {
-        picker['key'] = 0;
+        })
+        .on('cancel.daterangepicker', function (ev, picker) {
+            picker['key'] = 0;
+            datos.add(picker);
+        });
+
+    if ($('#search').val() === '0') {
+        var picker = {};
+        var year = $('#year').val();
+        picker['key'] = 2;
+        picker['start_date'] = year + '-01-01';
+        picker['end_date'] = year + '-12-31';
         datos.add(picker);
-    });
+    }
+
 
 }

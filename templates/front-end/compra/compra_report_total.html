@@ -4,8 +4,27 @@
     <br>
     <div class="row">
         <div class="col-lg-4">
+            <label for="search">Buscar por:</label>
+            <select name="search" id="search" class="form-control select2">
+                <option value="0">Año</option>
+                <option value="1">Rango de fecha</option>
+            </select>
+
+        </div>
+
+        <div class="col-lg-4" id="year_seccion">
+            <label for="year">Año:</label>
+            <select name="year"   id="year" class="form-control select2">
+                {% for y in year %}
+                    <option value="{{y.year}}">{{ y.year }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+        <div class="col-lg-4" id="range_date" style="display: none">
             <label for="fecha"><strong>Rango de Fechas:</strong></label>
-            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm"></div>
+            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm">
+        </div>
     </div>
     <br>
 {% endblock %}

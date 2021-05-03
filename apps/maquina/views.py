@@ -18,6 +18,7 @@ opc_icono = 'fas fa-subway'
 opc_entidad = 'Maquinas'
 crud = '/maquina/crear'
 empresa = nombre_empresa()
+year = [{'id': y, 'year': (datetime.now().year)-y}for y in range(0, 5)]
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
@@ -248,4 +249,5 @@ class lista_mantenimiento(ValidatePermissionRequiredMixin, ListView):
         data['nuevo'] = '/maquina/mantenimiento'
         data['empresa'] = empresa
         data['action'] = 'add'
+        data['year'] = year
         return data

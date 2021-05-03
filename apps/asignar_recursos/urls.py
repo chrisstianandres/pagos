@@ -7,6 +7,10 @@ app_name = 'Asig_recurso'
 
 urlpatterns = [
     path('lista', login_required(lista.as_view()), name='lista'),
+    path('report', login_required(reportView.as_view()), name='report'),
+    path('perdidas', login_required(PerdidasView.as_view()), name='perdidas'),
+    path('clientes', login_required(ProdClienteView.as_view()), name='clientes'),
+    path('prendas', login_required(ProdPrendaView.as_view()), name='prendas'),
     path('nuevo', login_required(CrudView.as_view()), name='nuevo'),
     path('control/<int:pk>', login_required(Control.as_view()), name='control'),
     # path('nuevo', login_required(views.nuevo), name='nuevo'),
