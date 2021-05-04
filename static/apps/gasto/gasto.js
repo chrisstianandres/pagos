@@ -1,4 +1,8 @@
 $(document).ready(function () {
+    jQuery.validator.addMethod("lettersonly", function (value, element) {
+        return this.optional(element) || /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/i.test(value);
+        //[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$
+    }, "Letters and spaces only please");
     $('input[name="valor"]').TouchSpin({
         min: 0.05,
         max: 1000000,
@@ -36,7 +40,7 @@ $(document).ready(function () {
         },
         messages: {
             tipo_gasto: {
-                required: "Porfavor selecciona un tipo de gasto",
+                required: "Por favor selecciona un tipo de gasto",
             },
             detalle: {
                 required: "Porfavor ingresa un detalle",
@@ -49,6 +53,18 @@ $(document).ready(function () {
         var pal = $(this).val();
         var changue = pal.substr(0, 1).toUpperCase() + pal.substr(1);
         $(this).val(changue);
+    });
+
+
+    $('#id_valor').keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    });//Para solo numeros
+
+
+    $('#Modal').on('hidden.bs.modal', function () {
+        reset_form('form');
     });
 
 });

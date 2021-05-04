@@ -78,20 +78,24 @@ $(document).ready(function () {
 
             },
             ud_medida: {
-                 required: "Porfavor ingresa una unidad de medida",
+                required: "Porfavor ingresa una unidad de medida",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
         },
     });
-    $('#id_nombre').keyup(function () {
-        var pal = $(this).val();
-        var changue = pal.substr(0, 1).toUpperCase() + pal.substr(1);
-        $(this).val(changue);
-    });
+    $('#id_nombre')
+        .keyup(function () {
+            var changue = titleCase($(this).val());
+            $(this).val(changue);
+        })
+        .keypress(function (e) {
+            if (e.which >= 48 && e.which <= 57) {
+                return false;
+            }
+        });  //Para solo letras
     $('#id_descripcion').keyup(function () {
-        var pal = $(this).val();
-        var changue = pal.substr(0, 1).toUpperCase() + pal.substr(1);
+        var changue = titleCase($(this).val());
         $(this).val(changue);
     });
 
@@ -187,11 +191,27 @@ $(document).ready(function () {
         action = 'add';
         pk = '';
     });
+    jQuery.validator.addMethod("lettersonly", function (value, element) {
+        return this.optional(element) || /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/i.test(value);
+        //[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$
+    }, "Letters and spaces only please");
+
 
     $('#id_medida').TouchSpin({
         min: 1,
         max: 1000000,
         step: 1
     });
-
 });
+
+function titleCase(texto) {
+        const re = /(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])(?:([a-záéíóúüñ])|([A-ZÁÉÍÓÚÜÑ]))|([A-ZÁÉÍÓÚÜÑ]+)/gu;
+        return texto.replace(re,
+            (m, caracterPrevio, minuscInicial, mayuscInicial, mayuscIntermedias) => {
+                const locale = ['es', 'gl', 'ca', 'pt', 'en'];
+                if (mayuscIntermedias)
+                    return mayuscIntermedias.toLocaleLowerCase(locale);
+                return caracterPrevio + (minuscInicial ? minuscInicial.toLocaleUpperCase(locale) : mayuscInicial);
+            }
+        );
+    }

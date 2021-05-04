@@ -1,10 +1,11 @@
 $(document).ready(function () {
-    jQuery.validator.addMethod("lettersonly", function (value, element) {
-        return this.optional(element) || /^[a-z," "]+$/i.test(value);
+     jQuery.validator.addMethod("lettersonly", function (value, element) {
+        return this.optional(element) || /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/i.test(value);
+        //[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$
     }, "Letters and spaces only please");
 
 
-     $.validator.setDefaults({
+    $.validator.setDefaults({
         errorClass: 'invalid-feedback',
 
         highlight: function (element, errorClass, validClass) {
@@ -19,7 +20,7 @@ $(document).ready(function () {
         }
     });
 
-      $.validator.addMethod("tipo", function (value, element) {
+    $.validator.addMethod("tipo", function (value, element) {
 
         var tipo = $("#id_tipo").val();
         if (tipo === '0') {
@@ -29,7 +30,6 @@ $(document).ready(function () {
         }
     }, "");
 
-      validar();
     $("#form").validate({
         rules: {
             nombre: {
@@ -45,7 +45,7 @@ $(document).ready(function () {
                 required: true,
                 tipo: true,
                 digits: true,
-                val_ced: true
+                validar: true
             },
             correo: {
                 required: true,
@@ -71,7 +71,7 @@ $(document).ready(function () {
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             num_doc: {
-               required: "Por favor ingresa tu numero de documento",
+                required: "Por favor ingresa tu numero de documento",
                 tipo: "Error en el numero de digitos (10 para cedula o 13 para ruc)",
                 digits: "Debe ingresar unicamente numeros",
                 val_ced: "Numero de documento no valido para Ecuador",
@@ -91,11 +91,81 @@ $(document).ready(function () {
         },
     });
 
-    $('#id_nombres').keyup(function () {
-        var changue = $(this).val().replace(/\b\w/g, function (l) {
-            return l.toUpperCase()
-        });
-        $(this).val(changue);
-    });
+    $('#id_nombre')
+        .keyup(function () {
+            var changue = titleCase($(this).val());
+            $(this).val(changue);
+        })
+        .keypress(function (e) {
+            if (e.which >= 48 && e.which <= 57) {
+                return false;
+            }
+        });  //Para solo letras
+
+
+    $('#id_telefono').keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    });//Para solo numeros
+
+
+    $('#id_num_doc').keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    });//Para solo numeros
+
 
 });
+
+
+function titleCase(texto) {
+    const re = /(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])(?:([a-záéíóúüñ])|([A-ZÁÉÍÓÚÜÑ]))|([A-ZÁÉÍÓÚÜÑ]+)/gu;
+    return texto.replace(re,
+        (m, caracterPrevio, minuscInicial, mayuscInicial, mayuscIntermedias) => {
+            const locale = ['es', 'gl', 'ca', 'pt', 'en'];
+            if (mayuscIntermedias)
+                return mayuscIntermedias.toLocaleLowerCase(locale);
+            return caracterPrevio + (minuscInicial ? minuscInicial.toLocaleUpperCase(locale) : mayuscInicial);
+        }
+    );
+}
+ $('#Modal').on('hidden.bs.modal', function () {
+        reset_form('form');
+    });
+
+jQuery.validator.addMethod("validar", function (value, element) {
+    return validar(element);
+}, "Número de documento no valido para Ecuador");
+
+function validar(element) {
+    var cad = document.getElementById(element.id).value.trim();
+    var total = 0;
+    var longitud = cad.length;
+    var longcheck = longitud - 1;
+    if (longitud === 10) {
+        return aux(total, cad);
+    } else if (longitud === 13 && cad.slice(10, 13) !== '000') {
+        return aux(total, cad);
+    } else {
+        return false;
+    }
+}
+
+function aux(total, cad) {
+    if (cad !== "") {
+        for (var i = 0; i < 9; i++) {
+            if (i % 2 === 0) {
+                var aux = cad.charAt(i) * 2;
+                if (aux > 9) aux -= 9;
+                total += aux;
+            } else {
+                total += parseInt(cad.charAt(i)); // parseInt o concatenará en lugar de sumar
+            }
+        }
+
+        total = total % 10 ? 10 - total % 10 : 0;
+        return parseInt(cad.charAt(9)) === total;
+    }
+}

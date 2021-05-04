@@ -8,11 +8,6 @@ $(document).ready(function () {
         theme: "classic"
     });
 
-    jQuery.validator.addMethod("lettersonly", function (value, element) {
-        return this.optional(element) || /^[a-zA-z\s\ñ\Ñ," "]+$/i.test(value);
-    }, "Letters and spaces only please");
-
-
     $.validator.setDefaults({
         errorClass: 'invalid-feedback',
 
@@ -40,10 +35,10 @@ $(document).ready(function () {
         },
         messages: {
             tipo: {
-                required: "Porfavor escoje un tipo de maquina",
+                required: "Por favor escoje un tipo de maquina",
             },
             serie: {
-                required: "Porfavor ingresa una serie",
+                required: "Por favor ingresa una serie",
                 minlength: "Debe ingresar al menos 3 caracteres",
                 maxlength: "Debe ingresar hasta 50 caracteres"
             },

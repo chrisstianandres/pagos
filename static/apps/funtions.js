@@ -286,13 +286,12 @@ function save_with_ajax2(title, url, content, parametros, callback) {
     });
 }
 
-function reset() {
-    $("#form")[0].reset();
-    var validator = $("#form").validate();
-    validator.resetForm();
-    $('.is-valid').removeClass('is-valid');
-    $('.is-invalid').removeClass('is-invalid');
-}
+// function reset(formulario) {
+//     var validator = $(formulario).validate();
+//     validator.resetForm();
+//     $('.has-success').removeClass('has-success');
+//     $('.has-error').removeClass('has-error');
+// }
 
 
 function reset_form(form) {
@@ -345,25 +344,5 @@ function borrar_producto_carito(title, content, callback) {
 
 }
 
-function validar() {
-    jQuery.validator.addMethod("val_ced", function (value, element) {
-        if (value.length === 10 || value.length === 13) {
-            $.ajax({
-                type: "POST",
-                url: '/verificar/',
-                data: {'data': value.toString()},
-                dataType: 'json',
-                success: function (data) {
-                    if (!data.hasOwnProperty('error')) {
-                        $(element).addClass("is-valid").removeClass("is-invalid");
-                        return false;
-                    }
-                    $(element).addClass("is-invalid").removeClass("is-valid");
-                },
-            })
-        }
-        return true;
-        // return this.optional(element) || /^[a-z," "]+$/i.test(value);
-    }, "");
 
-}
+
