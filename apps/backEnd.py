@@ -38,7 +38,7 @@ def menu(request):
 def nosotros(request):
     sitio = SitioWeb.objects.first()
     data = {
-        'titulo': 'Nuestra empresa', 'empresa': nombre_empresa(),
+        'title': 'Nuestra empresa', 'empresa': nombre_empresa(),
         'icono': 'fas fa-low-vision', 'entidad': 'Nosotros', 'mision': sitio.mision, 'vision': sitio.vision
     }
     return render(request, 'front-end/sitio/nosotros.html', data)
