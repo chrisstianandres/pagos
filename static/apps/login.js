@@ -1,5 +1,8 @@
-var key;
+var key, pagar;
 $(function () {
+
+    pagar = localStorage.getItem('pagar');
+    console.log(pagar);
     key = $('#key').val();
     jQuery.validator.addMethod("lettersonly", function (value, element) {
         return this.optional(element) || /^[a-z," "]+$/i.test(value);
@@ -58,23 +61,32 @@ $(function () {
                 window.$.dialog({
                     icon: 'fa fa-spinner fa-spin',
                     title: 'Iniciando Sesion!',
-                    content: 'Estamos iniciando sesion, porfavor espera un momento'
+                    content: 'Estamos iniciando sesion, por favor espera un momento'
                 });
-                if (key === '1') {
-                     setTimeout(function () {
-                    location.href = '/venta/online';
-                }, 2000);
+                if (key === '0') {
+                    if (pagar === '1') {
+                        setTimeout(function () {
+                            location.href = '/venta/online';
+                        }, 2000);
+                    } else {
+                        location.href = '/';
+                    }
+
                 } else {
-                     setTimeout(function () {
-                    location.href = '/';
-                }, 2000);
+                    if (pagar === '1') {
+                        setTimeout(function () {
+                            location.href = '/venta/nuevo';
+                        }, 2000);
+                    } else {
+                        location.href = '/';
+                    }
                 }
 
 
             }, function () {
                 $('input[name="username"]').val("");
                 $('input[name="password"]').val("");
-                reset();
+                 reset_form('form');
 
             });
         }

@@ -15,7 +15,7 @@
 {% endblock %}
 {% block container %}
 
-    <input type="hidden" value="{{ key }}" id="key">
+    <input type="hidden" value="{{ request.user.tipo }}" id="key">
     <div class="container">
         <form action="" id="form" method="post">
             {% csrf_token %}
@@ -48,6 +48,10 @@
                                 </div>
                             <p class="text-center text-default">Ó</p>
                             <a href="{% url 'signin' %}" class="text-default text-center">Registrate como nuevo usuario <i class="fas fa-user-plus"></i></a>
+                            <p class="text-center text-default"></p>
+                            <div class="form-group">
+                                    <a type="button" href="/" class="btn btn-success btn-block"> <i class="far fa-arrow-alt-circle-left"></i> Volver al sitio web</a>
+                                </div>
                         </article>
                     </div> <!-- card.// -->
 

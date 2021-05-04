@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
 {% endblock %}
 {% block header %}
-<div class="banner banner-second">
+    <div class="banner banner-second">
         <div class="banner-container ">
             <h1><a href="/" style="color: white; text-decoration: none">{{ nomb.nombre }}</a></h1>
         </div>
@@ -33,8 +33,9 @@
                                     {{ form.as_p }}
                                 </div>
                                 <div class="form-group">
-                                   <p><label for="id_password_2">Confirma la Contraseña:</label>
-                                       <input type="password" name="password2" class="form-control" maxlength="128" required="" id="id_password_2"></p>
+                                    <p><label for="id_password_2">Confirma la Contraseña:</label>
+                                        <input type="password" name="password2" class="form-control" maxlength="128"
+                                               required="" id="id_password_2"></p>
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" id="log" class="btn btn-primary btn-block"><i
@@ -44,6 +45,11 @@
                                 <p class="text-center text-default">Ó</p>
                                 <p class="text-center"><a href="{% url 'login' %}" class="text-default text-center">Inicia
                                     sesion <i class="fas fa-sign-in-alt"></i></a></p>
+                                <p class="text-center text-default"></p>
+                                <div class="form-group">
+                                    <a type="button" href="/" class="btn btn-success btn-block"> <i
+                                            class="far fa-arrow-alt-circle-left"></i> Volver al sitio web</a>
+                                </div>
 
                             </article>
                         </div> <!-- card.// -->
@@ -66,12 +72,12 @@
 
 {% endblock %}
 {% block script_extra %}
-{#    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>#}
+    {#    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>#}
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.js"></script>
-{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>#}
-{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.js"></script>#}
-{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.min.js"></script>#}
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>#}
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.js"></script>#}
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.min.js"></script>#}
     <script src="{% static 'apps/signin.js' %}"></script>
     <script src="{% static 'apps/funtions.js' %}"></script>
 {% endblock %}

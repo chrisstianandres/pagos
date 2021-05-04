@@ -130,7 +130,19 @@ var carrito = {
                         menssaje_error('Error!', 'No puede elegir una cantidad mayor que el stock disponible', 'fas fa-exclamation-circle');
                     }
 
-                });//Para solo numeros
+                }).on('change', function (e) {
+                    if ($(this).val() === '') {
+                        $(this).val(1);
+                        localStorage.clear();
+                        var cantidad = parseInt($(this).val());
+                        var tr = tblventa.cell($(this).closest('td, li')).index();
+                        carrito.items.productos[tr.row].cantidad_venta = cantidad;
+                        carrito.calculate();
+                        localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
+                        $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
+                    }
+
+                })
             }
         });
     },
@@ -218,7 +230,7 @@ $(function () {
         e.preventDefault();
         $.ajax({
             type: "POST",
-            url: '/producto/lista',
+            url: '/producto/sitio',
             data: {
                 "id": $(this).val(),
                 'action': 'get'
@@ -264,8 +276,8 @@ $(function () {
 
     $(document).on('click', 'a[rel="pay"]', function (e) {
         e.preventDefault();
-        console.log(superuser);
         if (carrito.items.productos.length === 0) return false;
+        localStorage.setItem('pagar', 1);
         if (superuser === 'USUARIO') {
             window.location.href = '/venta/nuevo'
         } else {
@@ -298,16 +310,6 @@ $(function () {
                 catalogo(categoria.val());
             })
         }
-    });
-
-    $(document).on('click', 'a[rel="cat_mujer"]', function (e) {
-        e.preventDefault();
-        catalogo('mujer');
-    });
-
-    $(document).on('click', 'a[rel="cat_niño"]', function (e) {
-        $('html, #cat_niños').animate({scrollTop: 0}, 1250);
-        catalogo('mujer');
     });
 
     $('.close').on('click', function () {

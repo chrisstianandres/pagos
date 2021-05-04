@@ -20,20 +20,17 @@ class SitiowebForm(forms.ModelForm):
                 attrs={'placeholder': 'Ingrese la mision de la empresa', 'class': 'form-control form-rounded'})
             self.fields['vision'].widget = Textarea(
                 attrs={'placeholder': 'Ingrese la vision de la empresa', 'class': 'form-control form-rounded'})
-            self.fields['mapa'].widget = Textarea(
-                attrs={'placeholder': 'Copia y Pega un mapa de google', 'class': 'form-control form-rounded'})
         # habilitar, desabilitar, y mas
 
     class Meta:
         model = SitioWeb
-        fields = ['titulo', 'mision', 'vision', 'mapa'
+        fields = ['titulo', 'mision', 'vision'
                   ]
         labels = {
-            'titulo': 'Titulo', 'mision': 'Mision', 'vision': 'Vision', 'mapa': 'Mapa'
+            'titulo': 'Titulo', 'mision': 'Mision', 'vision': 'Vision'
         }
         widgets = {
             'titulo': forms.TextInput(),
             'mision': forms.Textarea(),
-            'vision': forms.TextInput(),
-            'mapa': forms.Textarea()
+            'vision': forms.TextInput()
         }

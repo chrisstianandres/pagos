@@ -82,10 +82,3 @@ function insertmapa() {
 }
 
 
-
-$(function () {
-    $('button[name="vender"]').on('click', function () {
-        console.log(25)
-    });
-});
-

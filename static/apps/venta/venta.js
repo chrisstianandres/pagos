@@ -21,14 +21,11 @@ var ventas = {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
-            console.log('estoy calculando');
             dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
-            console.log(dict);
         });
         this.items.subtotal = subtotal;
-        console.log(subtotal);
         this.items.iva = this.items.subtotal * iva_emp;
         this.items.total = this.items.subtotal + this.items.iva;
         $('input[name="subtotal"]').val(this.items.subtotal.toFixed(2));
@@ -41,7 +38,6 @@ var ventas = {
         this.list();
     },
     list: function () {
-        console.log('estoy listando');
         this.calculate();
         tblventa = $("#tblproductos").DataTable({
             destroy: true,

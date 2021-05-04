@@ -1,6 +1,37 @@
 {% extends 'front-end/sitio/header.html' %}
 {% load static %}
+{% block links %}
+    <nav class="nav-menu" id="mySidenav">
+        <a class="is-hidden-mobile brand is-uppercase has-text-weight-bold has-text-dark" href="/">
+            <h1><strong>{{ empresa.nombre }}</strong></h1></a>
+        <ul class="nav-menu-ul">
+            {% if request.user.is_authenticated %}
+                <li class="nav-menu-item"><a class="nav-menu-link"></a></li>
+                <li class="nav-menu-item"><a class="nav-menu-link"> </a></li>
+                <li class="nav-menu-item"><a class="nav-menu-link"> </a></li>
+                <li class="nav-menu-item"><a class="nav-menu-link"> </a></li>
+
+                <li class="nav-menu-item"><a href="{% url 'menu' %}" class="nav-menu-link"> Menu Principal
+                    &nbsp; <i class="fas fa-tachometer-alt"></i></a></li>
+                <li class="nav-menu-item"><a href="{% url 'sitio:' %}" class="nav-menu-link">
+                    Catalogo </a></li>
+                <li class="nav-menu-item"><a href="{% url 'logout' %}" class="nav-menu-link">
+                                Cerrar Sesion </a></li>
+            {% else %}
+                <li class="nav-menu-item"><a href="{% url 'sitio:' %}" class="nav-menu-link">
+                    Catalogo </a></li>
+                <li class="nav-menu-item"><a href="{% url 'signin' %}" class="nav-menu-link">Registro</a>
+                </li>
+                <li class="nav-menu-item"><a href="{% url 'login' %}" class="nav-menu-link">Iniciar
+                    Sesión</a>
+                </li>
+            {% endif %}
+
+        </ul>
+    </nav>
+{% endblock %}
 {% block container %}
+    <div id="ancla"></div>
     <div class="container">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
@@ -8,8 +39,8 @@
                    role="tab" aria-controls="popular" aria-selected="true">Mision</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link nav-menu-link" id="moreven-tab" data-toggle="tab" href="#moreven" role="tab"
-                   aria-controls="moreven" aria-selected="false">Vision</a>
+                <a class="nav-link nav-menu-link" id="vision-tab" data-toggle="tab" href="#vision" role="tab"
+                   aria-controls="vision" aria-selected="false">Vision</a>
             </li>
         </ul>
     </div>
@@ -20,7 +51,7 @@
                 <div class="columns is-centered is-multiline">
                     <div class="column is-full"></div>
                     <div class="container-fluid">
-                        <div class="panel col-lg-12">
+                        <div class="panel col-lg-12" style="color: black">
                             <div class="panel-title">
                                 <h1>Nuestra Mision</h1>
                             </div>
@@ -34,16 +65,16 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="moreven" role="tabpanel" aria-labelledby="moreven-tab">
-            <div class="container container-full" id="moreven">
+        <div class="tab-pane fade" id="vision" role="tabpanel" aria-labelledby="vision-tab">
+            <div class="container container-full" id="vision">
                 <div class="columns is-centered is-multiline">
                     <div class="column is-full"></div>
                     <div class="container-fluid">
-                        <div class="card card-blue">
-                            <div class="card-header">
+                        <div class="panel panel-info" style="color: black">
+                            <div class="panel-header">
                                 <h1>Nuestra Vision</h1>
                             </div>
-                            <div class="card-body">
+                            <div class="panel-body">
                                 <p>{{ vision }}</p>
                             </div>
 
@@ -54,4 +85,11 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block script_extra %}
+    <script>
+        $(document).ready(function () {
+            window.location.href = "#ancla"
+        });
+    </script>
 {% endblock %}

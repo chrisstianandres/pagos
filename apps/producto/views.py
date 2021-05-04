@@ -208,7 +208,6 @@ class sitio(ListView):
         data = {}
         try:
             action = request.POST['action']
-
             if action == 'categoria':
                 data = []
                 id = request.POST['id']
@@ -218,6 +217,18 @@ class sitio(ListView):
                     query = Producto.objects.filter(producto_base__categoria_id=id)
                 for i in query:
                     data.append(i.toJSON())
+            elif action == 'get':
+                data = []
+                id = request.POST['id']
+                producto = Producto.objects.filter(pk=id)
+                empresa = Empresa.objects.first()
+                for i in producto:
+                    item = i.toJSON()
+                    item['cantidad'] = 5
+                    item['cantidad_venta'] = 1
+                    item['subtotal'] = 0.00
+                    item['iva_emp'] = empresa.iva
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
