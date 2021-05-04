@@ -52,6 +52,12 @@
         color: #fff;
         background-color: rgba(255, 124, 148, 0.41);
     }
+
+
+        .sin {
+        color: #000000;
+        background-color: rgba(242, 0, 12, 0.02);
+    }
 </style>
 <body>
 <p class="head">
@@ -116,6 +122,20 @@
             <tr></tr>
             <tr style="border-top: 1px solid black; padding-top: 4px;"></tr>
         {% endfor %}
+    {% elif sale.transaccion.tipo == 3 %}
+        {% for d in det_sale %}
+            <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
+                <td>{{ d.producto }}</td>
+                <td>{{ d.categoria }}</td>
+                <td class="text-center">${{ d.pvp }}</td>
+                <td>{{ d.color }}</td>
+                <td>{{ d.producto.talla.talla }}&nbsp;{{d.talla }}</td>
+                <td class="text-center">{{ d.cantidad }}</td>
+                <td style="text-align: center;">${{ d.subtotal }}</td>
+            </tr>
+            <tr></tr>
+            <tr style="border-top: 1px solid black; padding-top: 4px;"></tr>
+        {% endfor %}
     {% else %}
         {% for d in sale.detalle_alquiler_set.all %}
             <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
@@ -148,6 +168,9 @@
     </tr>
     </tbody>
 </table>
+
+<h4>____________________________________</h4>
+<h4>Recibi conforme</h4>
 <table style="margin-top: 250px;">
     <thead>
     <tr>

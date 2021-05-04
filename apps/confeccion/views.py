@@ -145,7 +145,8 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 if datos:
                     with transaction.atomic():
                         asig = Asig_recurso()
-                        asig.fecha_asig = datos['fecha_venta']
+                        asig.fecha_asig = datos['inicio_produccion']
+                        asig.fecha_fin = datos['fin_produccion']
                         asig.user_id = datos['cliente']
                         asig.save()
                         c = Transaccion()
@@ -165,7 +166,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                 dtp = Detalle_produccion()
                                 dtp.asignacion_id = asig.id
                                 dtp.producto_id = int(i['id'])
-                                dtp.cantidad = int(i['cantidad'])
+                                dtp.cantidad = int(i['cantidad_venta'])
                                 dtp.save()
                                 dv = Detalle_confeccion()
                                 dv.producto_id = dtp.id
@@ -366,13 +367,18 @@ class printpdf(View):
     def pvp_cal(self, *args, **kwargs):
         data = []
         try:
-            for i in Detalle_confeccion.objects.filter(confeccion_id=self.kwargs['pk']):
-                item = i.confeccion.toJSON()
-                item['producto'] = {'producto': i.producto.toJSON()}
-                item['pvp'] = format(i.pvp_by_confec, '.2f')
-                item['cantidad'] = i.cantidad
-                item['subtotal'] = i.subtotal
-                data.append(item)
+            confec = Confeccion.objects.get(id=self.kwargs['pk'])
+            asig = Asig_recurso.objects.get(id=confec.confeccion_id)
+            for p in Detalle_confeccion.objects.filter(producto__asignacion_id=asig.id):
+                data.append({
+                    'producto': p.producto.producto.producto_base.nombre,
+                    'categoria': p.producto.producto.producto_base.categoria.nombre,
+                    'color': p.producto.producto.color.nombre,
+                    'talla': p.producto.producto.talla.talla_full(),
+                    'cantidad': p.producto.cantidad,
+                    'pvp': p.pvp_by_confec,
+                    'subtotal': p.subtotal
+                })
         except:
             pass
         return data

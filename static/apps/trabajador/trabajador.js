@@ -1,16 +1,12 @@
-var user_tipo = $('input[name="user_tipo"]').val();
 $(document).ready(function () {
     var option = $('input[name="option"]').val();
     if (option === 'editar') {
         $('#id_cedula').attr('readonly', 'true');
-
     }
-
     jQuery.validator.addMethod("lettersonly", function (value, element) {
-        return this.optional(element) || /^[a-z," "]+$/i.test(value);
+        return this.optional(element) || /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/i.test(value);
+        //[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$
     }, "Letters and spaces only please");
-
-
     $.validator.setDefaults({
         errorClass: 'invalid-feedback',
 
@@ -26,7 +22,6 @@ $(document).ready(function () {
         }
     });
 
-    validar();
     $("#form").validate({
         rules: {
             username: {
@@ -51,23 +46,22 @@ $(document).ready(function () {
                 minlength: 10,
                 maxlength: 10,
                 digits: true,
-                val_ced: true
+                validar: true
             },
-            correo: {
+            email: {
                 required: true,
                 email: true
             },
-            avatar: {
-                required: false
-            },
             telefono: {
-                required: true,
+                required: false,
                 minlength: 9,
+                maxlength: 9,
                 digits: true
             },
-            celular: {
+             celular: {
                 required: true,
                 minlength: 10,
+                maxlength: 10,
                 digits: true
             },
             direccion: {
@@ -77,84 +71,150 @@ $(document).ready(function () {
             },
             password: {
                 required: true,
-                minlength: 5
+                minlength: 5,
+                maxlength: 200
             },
 
 
         },
         messages: {
-            username: {
+             username: {
                 required: "Por favor ingresa un nombre de usuario",
-                minlength: "Debe ingresar al menos tres letras"
+                minlength: "Debe ingresar al menos un nombre"
             },
             first_name: {
                 required: "Por favor ingresa tus nombres",
-                minlength: "Debe ingresar al menos tres letras",
+                minlength: "Debe ingresar al menos un nombre",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             last_name: {
                 required: "Por favor ingresa tus apellidos",
-                minlength: "Debe ingresar al menos tres letras",
+                minlength: "Debe ingresar al menos un apellido",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             cedula: {
-                required: "Por favor ingresa tu numero de cedula",
+                required: "Por favor ingresa tu numero de documento",
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
                 maxlength: "Tu numero de documento debe tener maximo 10 digitos",
-                val_ced: "Tu numero de documento no es valido para Ecuador",
+                val_ced: "Numero de cedula no valido para Ecuador"
             },
-            correo: "Debe ingresar un correo valido",
-            cargo: "Debe seleccionar un cargo",
-            password: {
-                required: "Debe Ingresar una contraseña",
-                minlength: "Tu contraseña debe tener al menos 5 digitos"
-            },
-            telefono: {
-                required: "Por favor ingresa tu numero convencional",
-                minlength: "Tu numero de documento debe tener al menos 9 digitos",
-                digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 10 digitos",
-            },
+            email: "Debe ingresar un correo valido",
             celular: {
                 required: "Por favor ingresa tu numero celular",
-                minlength: "Tu numero de documento debe tener al menos 10 digitos",
+                minlength: "Tu numero de celular debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+                maxlength: "Tu numero de celular debe tener maximo 10 digitos",
+            },
+             telefono: {
+                minlength: "Tu numero de telefono debe tener al menos 9 digitos",
+                digits: "Debe ingresar unicamente numeros",
+                maxlength: "Tu numero de telelfono debe tener maximo 9 digitos",
             },
             direccion: {
                 required: "Por favor ingresa una direccion",
                 minlength: "Ingresa al menos 5 letras",
                 maxlength: "Tu direccion debe tener maximo 50 caracteres",
             },
+                        password: {
+                required: "Por favor ingresa una contraseña",
+                minlength: "Ingresa al menos 5 caracteres",
+                maxlength: "Tu contraseña debe tener maximo 200 caracteres",
+            },
         },
     });
 
-    $('#id_nombres').keyup(function () {
-        var changue = $(this).val().replace(/\b\w/g, function (l) {
-            return l.toUpperCase()
-        });
+    $('#id_first_name')
+        .keyup(function () {
+        var changue = titleCase($(this).val());
         $(this).val(changue);
-    });
-    $('#id_apellidos').keyup(function () {
-        var changue = $(this).val().replace(/\b\w/g, function (l) {
-            return l.toUpperCase()
-        });
+    })
+        .keypress(function (e) {
+        if (e.which >= 48 && e.which <= 57) {
+            return false;
+        }
+    });  //Para solo letras
+
+    $('#id_last_name')
+        .keyup(function () {
+        var changue = titleCase($(this).val());
         $(this).val(changue);
-    });
-    if (user_tipo==='0'){
-         $('#id_groups').select2({
-        theme: 'classic',
-        languaje: 'es',
-        placeholder: 'Buscar...',
-    }).prop('disabled',true);
-    } else {
-         $('#id_groups').select2({
-        theme: 'classic',
-        languaje: 'es',
-        placeholder: 'Buscar...',
-    });
+    })
+        .keypress(function (e) {
+        if (e.which >= 48 && e.which <= 57) {
+            return false;
+        }
+    });  //Para solo letras
+
+
+    $('#id_telefono').keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    });//Para solo numeros
+    $('#id_celular').keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    });//Para solo numero
+
+    $('#id_cedula').keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    });//Para solo numeros
+
+    function titleCase(texto) {
+        const re = /(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])(?:([a-záéíóúüñ])|([A-ZÁÉÍÓÚÜÑ]))|([A-ZÁÉÍÓÚÜÑ]+)/gu;
+        return texto.replace(re,
+            (m, caracterPrevio, minuscInicial, mayuscInicial, mayuscIntermedias) => {
+                const locale = ['es', 'gl', 'ca', 'pt', 'en'];
+                if (mayuscIntermedias)
+                    return mayuscIntermedias.toLocaleLowerCase(locale);
+                return caracterPrevio + (minuscInicial ? minuscInicial.toLocaleUpperCase(locale) : mayuscInicial);
+            }
+        );
     }
 
+    $('#Modal').on('hidden.bs.modal', function () {
+        reset_form('form');
+    });
+$('#id_groups').select2({
+    theme: "classic",
 
+})
 });
+ jQuery.validator.addMethod("validar", function (value, element) {
+        return validar(element);
+    }, "Número de documento no valido para Ecuador");
+
+    function validar(element) {
+            var cad = document.getElementById(element.id).value.trim();
+            var total = 0;
+            var longitud = cad.length;
+            var longcheck = longitud - 1;
+            if (longitud===10){
+             	return aux(total, cad);
+            } else if (longitud===13 && cad.slice(10,13) !== '000'){
+                return aux(total, cad);
+            } else { return false;}
+      }
+
+    function aux(total, cad){
+            if (cad !== ""){
+              for(var i = 0; i < 9; i++){
+                if (i%2 === 0) {
+                  var aux = cad.charAt(i) * 2;
+                  if (aux > 9) aux -= 9;
+                  total += aux;
+                } else {
+                  total += parseInt(cad.charAt(i)); // parseInt o concatenará en lugar de sumar
+                }
+              }
+
+              total = total % 10 ? 10 - total % 10 : 0;
+                return parseInt(cad.charAt(9)) === total;
+            }
+}
+
+

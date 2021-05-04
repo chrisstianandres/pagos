@@ -48,9 +48,15 @@ $(document).ready(function () {
                 email: true
             },
             telefono: {
-                required: true,
+                required: false,
                 minlength: 9,
                 maxlength: 9,
+                digits: true
+            },
+             celular: {
+                required: true,
+                minlength: 10,
+                maxlength: 10,
                 digits: true
             },
             direccion: {
@@ -80,11 +86,16 @@ $(document).ready(function () {
                 val_ced: "Numero de cedula no valido para Ecuador"
             },
             email: "Debe ingresar un correo valido",
-            telefono: {
+            celular: {
                 required: "Por favor ingresa tu numero celular",
-                minlength: "Tu numero de documento debe tener al menos 9 digitos",
+                minlength: "Tu numero de celular debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 9 digitos",
+                maxlength: "Tu numero de celular debe tener maximo 10 digitos",
+            },
+             telefono: {
+                minlength: "Tu numero de telefono debe tener al menos 9 digitos",
+                digits: "Debe ingresar unicamente numeros",
+                maxlength: "Tu numero de telelfono debe tener maximo 9 digitos",
             },
             direccion: {
                 required: "Por favor ingresa una direccion",

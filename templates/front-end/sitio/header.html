@@ -67,14 +67,16 @@
                     <h1><strong>{{ empresa.nombre }}</strong></h1></a>
                 <ul class="nav-menu-ul">
                     {% if request.user.is_authenticated %}
+                        <li class="nav-menu-item"><a class="nav-menu-link"></a></li>
                         <li class="nav-menu-item"><a class="nav-menu-link"> </a></li>
                         <li class="nav-menu-item"><a class="nav-menu-link"> </a></li>
                         <li class="nav-menu-item"><a class="nav-menu-link"> </a></li>
-                        <li class="nav-menu-item"><a class="nav-menu-link"> </a></li>
-                        <li class="nav-menu-item"><a class="nav-menu-link"> </a></li>
+
                         <li class="nav-menu-item"><a href="{% url 'menu' %}" class="nav-menu-link"> Menu Principal
                             &nbsp; <i class="fas fa-tachometer-alt"></i></a></li>
+                        <li class="nav-menu-item"><a  href="{% url 'nosotros' %}" class="nav-menu-link"> Nosotros </a></li>
                     {% else %}
+                         <li class="nav-menu-item"><a href="{% url 'nosotros' %}" class="nav-menu-link"> Nosotros </a></li>
                         <li class="nav-menu-item"><a href="{% url 'signin' %}" class="nav-menu-link">Registro</a></li>
                         <li class="nav-menu-item"><a href="{% url 'login' %}" class="nav-menu-link">Iniciar Sesión</a>
                         </li>

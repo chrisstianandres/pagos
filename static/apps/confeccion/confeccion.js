@@ -2,6 +2,8 @@ var tblventa, tbl_prod_list;
 var ventas = {
     items: {
         fecha_venta: '',
+        inicio_produccion: '',
+        fin_produccion: '',
         cliente: '',
         subtotal: 0.00,
         iva: 0.00,
@@ -21,7 +23,7 @@ var ventas = {
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
             console.log(dict);
-            dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
+            dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
         });
@@ -53,7 +55,7 @@ var ventas = {
                 {data: "producto_base.categoria.nombre"},
                 {data: "color.nombre"},
                 {data: "talla.talla_full"},
-                {data: "cantidad"},
+                {data: "cantidad_venta"},
                 {data: "pvp"},
                 {data: "subtotal"}
             ],
@@ -85,8 +87,15 @@ var ventas = {
 
                     }
                 },
-            ], rowCallback: function (row, data) {
-                $(row).find('input[name="cantidad"]').TouchSpin({
+            ],
+            rowCallback: function (row, data) {
+                $(row).find('input[name="cantidad"]')
+                    .keypress(function (e) {
+                    if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                        return false;
+                    }
+                })
+                    .TouchSpin({
                     min: 1,
                     max: 100,
                     step: 1
@@ -151,7 +160,7 @@ $(function () {
                 url: '/producto/lista',
                 data: {
                     "id": $('#id_producto option:selected').val(),
-                    'action': 'get_confec'
+                    'action': 'get'
                 },
                 dataType: 'json',
                 success: function (data) {
@@ -219,8 +228,7 @@ $(function () {
         .on('click', 'a[rel="take"]', function () {
             var tr = tbl_prod_list.cell($(this).closest('td, li')).index();
             var data = tbl_prod_list.row(tr.row).data();
-            data['cantidad'] = 5;
-            var ex =[];
+            var ex = [];
             ex.push(data);
             ventas.add(ex);
             $('#Modal_lista_producto').modal('hide');
@@ -239,9 +247,9 @@ $(function () {
         .on('change keyup', 'input[name="cantidad"]', function () {
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
-            ventas.items.productos[tr.row].cantidad = cantidad;
+            ventas.items.productos[tr.row].cantidad_venta = cantidad;
             ventas.calculate();
-            $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
         });
     //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {
@@ -264,6 +272,8 @@ $(function () {
         }
         var parametros;
         ventas.items.fecha_venta = $('input[name="fecha_trans"]').val();
+        ventas.items.inicio_produccion = $('#id_fecha_ingreso').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        ventas.items.fin_produccion = $('#id_fecha_ingreso').data('daterangepicker').endDate.format('YYYY-MM-DD');
         ventas.items.cliente = $('#id_user option:selected').val();
 
         parametros = {'confeccion': JSON.stringify(ventas.items)};
@@ -348,5 +358,37 @@ $(function () {
         reset();
         $('#form').trigger("reset");
     });
+
+
+    var start = moment();
+    var end = moment();
+
+
+    $('#id_fecha_ingreso').daterangepicker({
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'YYYY-MM-DD',
+            applyLabel: '<i class="fas fa-search"></i> Selccionar',
+            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
+            customRangeLabel: "Fecha personalizada",
+        },
+        minDate: moment(),
+        ranges: {
+            'Hoy': [moment(), moment()],
+            '7 Dias': [moment(), moment().add(6, 'days')],
+            '30 Dias': [moment(), moment().add(30, 'days')],
+            '90 Dias': [moment(), moment().add(90, 'days')],
+            '180 Dias': [moment(), moment().add(180, 'days')]
+        }
+    }, cb);
+
+
+    cb(start, end);
+
 });
+
+function cb(start, end) {
+    $('#id_fecha_ingreso span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+}
 

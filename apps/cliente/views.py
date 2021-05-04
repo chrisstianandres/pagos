@@ -40,7 +40,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
-                for c in self.model.objects.all():
+                for c in self.model.objects.filter(tipo=0):
                     data.append(c.toJSON())
             elif action == 'search':
                 data = []
@@ -81,16 +81,19 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data = {}
         action = request.POST['action']
         try:
+            print(action)
             if action == 'add':
                 f = ClienteForm(request.POST)
                 datos = request.POST
                 data = self.save_data(f, datos)
             elif action == 'edit':
                 pk = request.POST['id']
-                cliente = Cliente.objects.get(pk=int(pk))
+                cliente = User.objects.get(pk=int(pk))
                 f = ClienteForm(request.POST, instance=cliente)
-                datos = request.POST
-                data = self.save_data(f, datos)
+                if f.is_valid():
+                    f.edit()
+                else:
+                    data['error'] = f.errors
             elif action == 'delete':
                 pk = request.POST['id']
                 cli = Cliente.objects.get(pk=pk)

@@ -1,6 +1,7 @@
 from django import forms
 from datetime import *
 
+from django.contrib.auth.models import Group
 from django.db import transaction
 from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput
 
@@ -31,6 +32,8 @@ class ClienteForm(forms.ModelForm):
                 attrs={'placeholder': 'Ingrese una direccion (Maximo 50 caracteres)', 'class': 'form-control form-rounded'})
             self.fields['telefono'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese numero de telefono', 'class': 'form-control form-rounded'})
+            self.fields['celular'].widget = TextInput(
+                attrs={'placeholder': 'Ingrese numero de celular', 'class': 'form-control form-rounded'})
         # habilitar, desabilitar, y mas
 
     class Meta:
@@ -97,12 +100,30 @@ class ClienteForm(forms.ModelForm):
                 )
                 cliente.save()
                 u.save()
-                print(u.id)
                 grupo = Group.objects.get(name__icontains='cliente')
                 usersave = User.objects.get(id=u.id)
                 usersave.groups.add(grupo)
                 usersave.tipo = 0
                 usersave.save()
+            else:
+                data['error'] = form.errors
+        except Exception as e:
+            data['error'] = str(e)
+        return data
+    def edit(self, commit=True):
+        data = {}
+        form = super()
+        try:
+            if form.is_valid():
+                pwd = self.cleaned_data['password']
+                u = form.save(commit=False)
+                if u.pk is None:
+                    u.set_password(pwd)
+                else:
+                    user = User.objects.get(pk=u.pk)
+                    if user.password != pwd:
+                        u.set_password(pwd)
+                u.save()
             else:
                 data['error'] = form.errors
         except Exception as e:

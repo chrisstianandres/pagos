@@ -74,7 +74,7 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa el nombre del producto",
+                required: "Por favor ingresa el nombre del producto",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
@@ -82,7 +82,7 @@ $(document).ready(function () {
                 required: "Elige un producto producto"
             },
             descripcion: {
-                required: "Porfavor ingresa una descripcion del producto",
+                required: "Por favor ingresa una descripcion del producto",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
@@ -96,11 +96,14 @@ $(document).ready(function () {
             },
         },
     });
-    $('#id_nombre').keyup(function () {
-        var pal = $(this).val();
-        var changue = pal.substr(0, 1).toUpperCase() + pal.substr(1);
+    $('#id_nombre_producto').keyup(function () {
+        var changue = titleCase($(this).val());
         $(this).val(changue);
-    });
+    }).keypress(function (e) {
+        if (e.which >= 48 && e.which <= 57) {
+            return false;
+        }
+    });  //Para solo letras
     $('#id_descripcion').keyup(function () {
         var pal = $(this).val();
         var changue = pal.substr(0, 1).toUpperCase() + pal.substr(1);
@@ -438,7 +441,7 @@ $(document).ready(function () {
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar esta talla!', 'far fa-smile-wink', function () {
                         $('#Modal_talla').modal('hide');
-                        var newOption = new Option(response.talla['talla']+'/'+response.talla['eqv_letra'], response.talla['id'], false, true);
+                        var newOption = new Option(response.talla['talla'] + '/' + response.talla['eqv_letra'], response.talla['id'], false, true);
                         $('#id_talla').append(newOption).trigger('change');
                     });
                 });
@@ -464,12 +467,7 @@ $(document).ready(function () {
     });
 
 
-    $('#Modal_prod').on('hidden.bs.modal', function () {
-        $('#id_despcripcion_producto').val("").trigger('change');
-        $('#id_color').val("").trigger('change');
-    });
-
-     $('#form').on('submit', function (e) {
+    $('#form').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
         parametros.append('action', 'add');
@@ -479,10 +477,64 @@ $(document).ready(function () {
                 window.location.pathname, 'Esta seguro que desea guardar esta prenda?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar esta prenda!', 'far fa-smile-wink', function () {
-                       window.location.replace('/producto/lista')
+                        window.location.replace('/producto/lista')
                     });
                 });
         }
+    });
+
+
+    $("#form_prod").validate({
+        rules: {
+            nombre: {
+                required: true,
+                minlength: 3,
+                maxlength: 50
+            },
+            descripcion: {
+                required: true,
+                minlength: 3,
+                maxlength: 50
+            },
+            categoria: {
+                required: true
+            }
+        },
+        messages: {
+            nombre: {
+                required: "Por favor ingresa el nombre del producto",
+                minlength: "Debe ingresar al menos 3 letras",
+                lettersonly: "Debe ingresar unicamente letras y espacios"
+            },
+            producto_base: {
+                required: "Elige un producto producto"
+            },
+            descripcion: {
+                required: "Por favor ingresa una descripcion del producto",
+                minlength: "Debe ingresar al menos 3 letras",
+                lettersonly: "Debe ingresar unicamente letras y espacios"
+            },
+            categoria: {
+                required: "Debe escoger una categoria de producto",
+
+            }
+        },
+    });
+
+    $('#Modal_prod').on('hidden.bs.modal', function () {
+        reset_form('#form_prod');
+    });
+
+    $('#Modal').on('hidden.bs.modal', function () {
+        reset_form('#form_cat');
+    });
+
+     $('#Modal_color').on('hidden.bs.modal', function () {
+        reset_form('#form_color');
+    });
+
+     $('#Modal_talla').on('hidden.bs.modal', function () {
+        reset_form('#form_talla');
     });
 
 });

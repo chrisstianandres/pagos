@@ -77,8 +77,9 @@ $(document).ready(function () {
         pk = '';
     });
     var valu = $('#id_serie').val();
+    console.log(valu);
 
-    if (valu === 0) {
+    if (valu === '0') {
         $('#id_serie').val('');
     }
 
@@ -140,4 +141,9 @@ $(document).ready(function () {
 
     });
 
+    $('#id_serie').keyup(function (e) {
+        e.preventDefault();
+        var cadena = $(this).val().toUpperCase();
+        $(this).val(cadena);
+    });//Para solo numeros
 });

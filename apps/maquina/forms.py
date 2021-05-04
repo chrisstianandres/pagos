@@ -48,7 +48,8 @@ class MaquinaForm(forms.ModelForm):
 
             }
             self.fields['serie'].widget.attrs = {
-                'class': 'form-control'
+                'class': 'form-control',
+                'value': " "
             }
         # habilitar, desabilitar, y mas
 

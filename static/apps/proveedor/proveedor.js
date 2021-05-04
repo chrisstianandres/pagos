@@ -66,25 +66,24 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa tus nombres y apellidos",
+                required: "Por favor ingresa tus nombres y apellidos",
                 minlength: "Debe ingresar al menos un nombre y un apellido",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             num_doc: {
                 required: "Por favor ingresa tu numero de documento",
                 tipo: "Error en el numero de digitos (10 para cedula o 13 para ruc)",
-                digits: "Debe ingresar unicamente numeros",
-                val_ced: "Numero de documento no valido para Ecuador",
+                digits: "Debe ingresar unicamente numeros"
             },
             correo: "Debe ingresar un correo valido",
             telefono: {
-                required: "Porfavor ingresa tu numero celular",
+                required: "Por favor ingresa tu numero celular",
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
                 maxlength: "Tu numero de documento debe tener maximo 10 digitos",
             },
             direccion: {
-                required: "Porfavor ingresa una direccion",
+                required: "Por favor ingresa una direccion",
                 minlength: "Ingresa al menos 5 letras",
                 maxlength: "Tu direccion debe tener maximo 50 caracteres",
             },

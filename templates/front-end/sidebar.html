@@ -147,6 +147,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="{% url 'talla:lista' %}" class="nav-link">
+                                    <i class="fas fa-sort-numeric-down-alt"></i>
+                                    <p>Tallas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{% url 'material:lista' %}" class="nav-link">
                                     <i class="fas fa-hat-cowboy-side"></i>
                                     <p>Material</p>
@@ -174,6 +180,12 @@
                                 <a href="{% url 'gasto:lista' %}" class="nav-link">
                                     <i class="fas fa-hand-holding-usd"></i>
                                     <p>Gastos</p>
+                                </a>
+                            </li>
+                             <li class="nav-item">
+                                <a href="{% url 'tipo_gasto:lista' %}" class="nav-link">
+                                    <i class="fas fa-search-dollar"></i>
+                                    <p>Tipo de Gastos</p>
                                 </a>
                             </li>
                         </ul>

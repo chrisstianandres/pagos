@@ -1,15 +1,4 @@
 var logotipo;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
-
-toDataURL('/media/imagen.png').then(dataUrl => {
-    logotipo = dataUrl;
-});
 $(function () {
     var datatable = $("#datatable").DataTable({
         responsive: true,
@@ -82,10 +71,15 @@ $(function () {
                         doc.pageMargins = [25, 120, 25, 50];
                         doc.defaultStyle.fontSize = 12;
                         doc.styles.tableHeader.fontSize = 14;
-                        doc['header'] = (function () {
+                               doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logotipo, width: 300}],
-                                margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
                             }
                         });
                         doc['footer'] = (function (page, pages) {
@@ -129,7 +123,7 @@ $(function () {
                     }
                 },
                 {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel', className: "btn btn-success btn-space",
+                    text: '<i class="fa fa-file-excel"></i> Excel', className: "btn btn-success btn-space",
                     extend: 'excel'
                 }
             ],

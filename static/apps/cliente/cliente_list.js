@@ -1,8 +1,8 @@
-
+var datatable;
 $(function () {
     var action = '';
     var pk = '';
-    var datatable = $("#datatable").DataTable({
+    datatable = $("#datatable").DataTable({
         responsive: true,
         autoWidth: false,
         ajax: {
@@ -26,7 +26,7 @@ $(function () {
         },
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
-            "<'row'<'col-sm-12 col-md-12'f>>"+
+            "<'row'<'col-sm-12 col-md-12'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         buttons: {
@@ -148,7 +148,7 @@ $(function () {
                 targets: [3],
                 class: 'text-center',
                 orderable: false,
-               "width": "20%",
+                "width": "20%",
             },
             {
                 targets: [-1],
@@ -179,21 +179,23 @@ $(function () {
                     menssaje_ok('Exito!', 'Exito al eliminar este cliente!', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false)
                     })
-                })})
+                })
+        })
         .on('click', 'a[rel="edit"]', function () {
             $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            $('input[name="nombres"]').val(data.nombres);
-            $('input[name="apellidos"]').val(data.apellidos);
+            $('input[name="first_name"]').val(data.first_name);
+            $('input[name="last_name"]').val(data.last_name);
             $('input[name="cedula"]').val(data.cedula).attr('readonly', true);
-            $('input[name="correo"]').val(data.correo);
+            $('input[name="email"]').val(data.email);
             $('input[name="sexo"]').val(data.sexo);
             $('input[name="telefono"]').val(data.telefono);
+            $('input[name="celular"]').val(data.celular);
             $('input[name="direccion"]').val(data.direccion);
             $('#Modal').modal('show');
             action = 'edit';
-            pk= data.id;
+            pk = data.id;
         });
     //boton agregar cliente
     $('#nuevo').on('click', function () {
@@ -201,7 +203,7 @@ $(function () {
         $('input[name="cedula"]').attr('readonly', false);
         $('#Modal').modal('show');
         action = 'add';
-        pk= '';
+        pk = '';
     });
 
     //enviar formulario de nuevo cliente
@@ -217,10 +219,12 @@ $(function () {
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
-                        reset();
                         datatable.ajax.reload(null, false);
                     });
                 });
         }
+    });
+    $('#Modal').on('hidden.bs.modal', function () {
+        reset_form('form');
     });
 });

@@ -60,12 +60,12 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa el nombre del producto",
+                required: "Por favor ingresa el nombre del producto",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             descripcion: {
-                required: "Porfavor ingresa una descripcion del producto",
+                required: "Por favor ingresa una descripcion del producto",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
@@ -78,7 +78,7 @@ $(document).ready(function () {
 
             },
             ud_medida: {
-                required: "Porfavor ingresa una unidad de medida",
+                required: "Por favor ingresa una unidad de medida",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
@@ -133,24 +133,6 @@ $(document).ready(function () {
                 });
         }
     });
-    $('#form_pre').on('submit', function (e) {
-        e.preventDefault();
-        var parametros = new FormData(this);
-        parametros.append('action', action);
-        parametros.append('id', pk);
-        var isvalid = $(this).valid();
-        if (isvalid) {
-            save_with_ajax2('Alerta',
-                '/presentacion/nuevo', 'Esta seguro que desea guardar esta presentacion?', parametros,
-                function (response) {
-                    menssaje_ok('Exito!', 'Exito al guardar esta presentacion!', 'far fa-smile-wink', function () {
-                        $('#Modal2').modal('hide');
-                        var newOption = new Option(response.presentacion['full'], response.presentacion['id'], false, true);
-                        $('#id_presentacion').append(newOption).trigger('change');
-                    });
-                });
-        }
-    });
     $('#form_tipo').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
@@ -184,6 +166,22 @@ $(document).ready(function () {
                     });
                 });
         }
+    });
+
+
+    $('#Modal').on('hidden.bs.modal', function () {
+        reset_form('#form_cat');
+    });
+
+     $('#Modal_color').on('hidden.bs.modal', function () {
+        reset_form('#form_color');
+    });
+
+     $('#Modal_talla').on('hidden.bs.modal', function () {
+        reset_form('#form_talla');
+    });
+     $('#Modal_tipo').on('hidden.bs.modal', function () {
+        reset_form('#form_tipo');
     });
 
     $('#id_new_color').on('click', function () {

@@ -84,7 +84,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 ids = json.loads(request.POST['ids'])
                 query = Producto.objects.all()
                 for a in query.exclude(id__in=ids):
-                    data.append(a.toJSON())
+                    item = a.toJSON()
+                    item['cantidad_venta'] = 1
+                    data.append(item)
             elif action == 'get':
                 data = []
                 id = request.POST['id']

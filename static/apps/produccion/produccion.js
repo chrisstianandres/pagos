@@ -824,16 +824,6 @@ $(function () {
                     window.location.replace('/asignacion/lista')
                 });
         });
-        // $('#id_fecha_ingreso').daterangepicker({
-        //     locale: {
-        //         format: 'YYYY-MM-DD',
-        //         applyLabel: '<i class="fas fa-search"></i> Buscar',
-        //         cancelLabel: '<i class="fas fa-times"></i> Cancelar',
-        //     },
-        //     showDropdowns: true,
-        //     minYear: 1901,
-        //     maxYear: 2022
-        // })
 
         var start = moment();
         var end = moment();

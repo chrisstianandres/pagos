@@ -36,33 +36,15 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa el nombre de la categoria",
+                required: "Por favor ingresa el nombre de la categoria",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios",
                 maxlength: "La descripcion debe tener maximo 50 caracteres",
             },
             descripcion: {
-                required: "Porfavor ingresa una descripcion",
+                required: "Por favor ingresa una descripcion",
                 minlength: "Ingresa al menos 5 letras",
                 maxlength: "La descripcion debe tener maximo 50 caracteres",
-            },
-        },
-    });
-    $("#form_color").validate({
-        rules: {
-            nombre: {
-                required: true,
-                minlength: 3,
-                maxlength: 50,
-                lettersonly: true,
-            },
-        },
-        messages: {
-            nombre: {
-                required: "Porfavor ingresa el nombre del color",
-                minlength: "Debe ingresar al menos 3 letras",
-                lettersonly: "Debe ingresar unicamente letras y espacios",
-                maxlength: "La descripcion debe tener maximo 25 caracteres",
             },
         },
     });
@@ -82,13 +64,13 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa el nombre de la categoria",
+                required: "Por favor ingresa el nombre de la categoria",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios",
                 maxlength: "La descripcion debe tener maximo 50 caracteres",
             },
             descripcion: {
-                required: "Porfavor ingresa una descripcion",
+                required: "Por favor ingresa una descripcion",
                 minlength: "Ingresa al menos 5 letras",
                 maxlength: "La descripcion debe tener maximo 50 caracteres",
             },

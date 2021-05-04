@@ -31,14 +31,32 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa el nombre del color",
+                required: "Por favor ingresa el nombre del color",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios",
             },
         },
     });
 
-    $('#id_nombre')
+    $("#form_color").validate({
+        rules: {
+            nombre: {
+                required: true,
+                minlength: 3,
+                maxlength: 50,
+                lettersonly: true,
+            },
+        },
+        messages: {
+            nombre: {
+                required: "Por favor ingresa el nombre del color",
+                minlength: "Debe ingresar al menos 3 letras",
+                lettersonly: "Debe ingresar unicamente letras y espacios",
+            },
+        },
+    });
+
+    $('#id_nombre_color')
         .keyup(function () {
             var changue = titleCase($(this).val());
             $(this).val(changue);
@@ -50,9 +68,14 @@ $(document).ready(function () {
         });  //Para solo letras
 
 
+    //  $('#Modal').on('hidden.bs.modal', function () {
+    //     reset_form('#form');
+    // });
+
      $('#Modal').on('hidden.bs.modal', function () {
-        reset_form('form');
+        reset_form('#form');
     });
+
 
 });
 

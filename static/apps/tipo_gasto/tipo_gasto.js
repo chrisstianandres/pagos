@@ -2,7 +2,7 @@ $(document).ready(function () {
 
 
     jQuery.validator.addMethod("lettersonly", function (value, element) {
-        return this.optional(element) || /^[a-zA-z\s\ñ\Ñ," "]+$/i.test(value);
+        return this.optional(element) || /^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1]+$/i.test(value);
     }, "Letters and spaces only please");
 
 
@@ -31,7 +31,7 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa el nombre del tipo de gasto",
+                required: "Por favor ingresa el nombre del tipo de gasto",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },

@@ -1,32 +1,6 @@
 var datatable;
-var datos = {
-    fechas: {
-        'start_date': '',
-        'end_date': '',
-        'action': 'list',
-    },
-    add: function (data) {
-        if (data.key === 1) {
-            this.fechas['start_date'] = data.startDate.format('YYYY-MM-DD');
-            this.fechas['end_date'] = data.endDate.format('YYYY-MM-DD');
-        } else {
-            this.fechas['start_date'] = '';
-            this.fechas['end_date'] = '';
-        }
-        $.ajax({
-            url: window.location.pathname,
-            type: 'POST',
-            data: this.fechas,
-            success: function (data) {
-                datatable.clear();
-                datatable.rows.add(data).draw();
-            }
-        });
 
-    },
-};
 $(function () {
-    daterange();
     datatable = $("#datatable").DataTable({
         responsive: true,
         language: {
@@ -35,7 +9,7 @@ $(function () {
         ajax: {
             url: window.location.pathname,
             type: 'POST',
-            data: datos.fechas,
+            data: {'action': 'list'},
             dataSrc: ""
         },
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
@@ -54,7 +28,7 @@ $(function () {
             },
             buttons: [
                 {
-                    text: '<i class="fa fa-file-pdf"></i> Reporte PDF',
+                    text: '<i class="fa fa-file-pdf"></i> PDF',
                     className: 'btn btn-danger my_class',
                     extend: 'pdfHtml5',
                     //filename: 'dt_custom_pdf',
@@ -62,7 +36,7 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4],
+                        columns: [0, 1, 2],
                         search: 'applied',
                         order: 'applied'
                     },
@@ -136,30 +110,21 @@ $(function () {
                             return 4;
                         };
                         doc.content[0].layout = objLayout;
-                        doc.content[1].table.widths = [50, '*', '*', '*', '*'];
+                        doc.content[1].table.widths = ['*', '*', '*'];
                         doc.styles.tableBodyEven.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center';
                     }
                 },
                 {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel', className: "btn btn-success my_class",
+                    text: '<i class="fa fa-file-excel"></i> Excel', className: "btn btn-success my_class",
                     extend: 'excel'
-                },
-                {
-                    className: 'btn btn-info',
-                    text: '<i class="far fa-keyboard"></i> &nbsp;Tipo de Gasto</a>',
-                    action: function (e, dt, node, config) {
-                        window.location.href = '/tipo_gasto/lista'
-                    }
                 },
             ],
         },
         columns: [
             {"data": "id"},
-            {"data": "fecha_pago"},
-            {"data": "tipo_gasto.nombre"},
-            {"data": "valor"},
-            {"data": "detalle"},
+            {"data": "talla"},
+            {"data": "eqv_letra"},
             {"data": "id"}
         ],
         columnDefs: [
@@ -172,14 +137,7 @@ $(function () {
                     var editar = '<a type="button" rel="edit" class="btn btn-success btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Editar"><i class="fa fa-edit"></i></a>' + ' ';
                     return editar + devolver;
                 }
-            },
-            {
-                targets: [3],
-                class: 'text-center',
-                render: function (data, type, row) {
-                    return '$ ' + parseFloat(data).toFixed(2);
-                }
-            },
+            }
         ],
     });
     $('#datatable tbody')
@@ -190,9 +148,9 @@ $(function () {
             var parametros = {'id': data.id};
             parametros['action'] = action;
             save_estado('Alerta',
-                '/gasto/nuevo', 'Esta seguro que desea eliminar este gasto?', parametros,
+                '/talla/nuevo', 'Esta seguro que desea eliminar esta talla?', parametros,
                 function () {
-                    menssaje_ok('Exito!', 'Exito al eliminar este gasto!', 'far fa-smile-wink', function () {
+                    menssaje_ok('Exito!', 'Exito al eliminar esta talla!', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false)
                     })
                 })
@@ -201,24 +159,8 @@ $(function () {
             $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            $('input[name="fecha_pago"]').keypress(function (e) {
-                if (e.which >= 1) {
-                    return false;
-                }
-            }).val(data.fecha_pago).attr('readonly', false).daterangepicker({
-                singleDatePicker: true,
-                showDropdowns: true,
-                minYear: 1901,
-                maxDate: new Date(),
-                locale: {
-                    format: 'YYYY-MM-DD',
-                    applyLabel: '<i class="fas fa-search"></i> Aplicar',
-                    cancelLabel: '<i class="fas fa-times"></i> Cancelar',
-                },
-            });
-            $('input[name="valor"]').val(data.valor);
-            $('input[name="detalle"]').val(data.detalle);
-            $('select[name="tipo_gasto"]').val(data.tipo_gasto.id).trigger('change');
+            $('input[name="talla"]').val(data.talla);
+            $('input[name="eqv_letra"]').val(data.eqv_letra);
             $('#Modal').modal('show');
             action = 'edit';
             pk = data.id;
@@ -240,11 +182,10 @@ $(function () {
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
-                '/gasto/nuevo', 'Esta seguro que desea guardar este gasto?', parametros,
+                '/talla/nuevo', 'Esta seguro que desea guardar esta talla?', parametros,
                 function (response) {
-                    menssaje_ok('Exito!', 'Exito al guardar este gasto!', 'far fa-smile-wink', function () {
+                    menssaje_ok('Exito!', 'Exito al guardar esta talla!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
-                        reset();
                         datatable.ajax.reload(null, false);
                     });
                 });
@@ -252,30 +193,19 @@ $(function () {
     });
 
 
-    $('#Modal').on('hidden.bs.modal', function () {
+      $('#Modal').on('hidden.bs.modal', function () {
         reset_form('form');
-        $('input[name="fecha_pago"]').attr('readonly', true)
-
-    })
-});
-
-function daterange() {
-    $('input[name="fecha"]').daterangepicker({
-        locale: {
-            format: 'YYYY-MM-DD',
-            applyLabel: '<i class="fas fa-search"></i> Buscar',
-            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
-        },
-        maxDate: new Date(),
-    }).on('apply.daterangepicker', function (ev, picker) {
-        picker['key'] = 1;
-        datos.add(picker);
-        // filter_by_date();
-
-    }).on('cancel.daterangepicker', function (ev, picker) {
-        picker['key'] = 0;
-        datos.add(picker);
-
     });
+     $('#id_talla_num').keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    });//Para solo numeros
+    $('#id_eqv_letra').keypress(function (e) {
+        if (e.which >= 48 && e.which <= 57) {
+            return false;
+        }
+    });  //Para solo letras
 
-}
+
+});

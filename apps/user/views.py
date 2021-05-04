@@ -35,7 +35,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
-                user = User.objects.all()
+                user = User.objects.filter(tipo=1)
                 for c in user:
                     data.append(c.toJSON())
             elif action == 'estado':
@@ -218,17 +218,19 @@ class Listgroupsview(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
-                user = Group.objects.all()
+                user = self.model.objects.all()
                 for c in user:
                     data.append({'id': int(c.id), 'nombre': str(c.name),
                                  'permisos': [{'id': p.id, 'nombre': p.name} for p in c.permissions.all()]})
-                    print(data)
             elif action == 'delete':
                 try:
                     id = request.POST['id']
                     if id:
-                        ps = User.objects.get(pk=id)
-                        ps.delete()
+                        ps = self.model.objects.get(pk=id)
+                        if User.objects.filter(groups__exact=ps):
+                           data['error'] = 'Este grupo esta asignado a un/os usuarios'
+                        else:
+                            ps.delete()
                         data['resp'] = True
                     else:
                         data['error'] = 'Ha ocurrido un error'
@@ -252,6 +254,59 @@ class Listgroupsview(ValidatePermissionRequiredMixin, ListView):
         return data
 
 
+class UpdateviewGroup(ValidatePermissionRequiredMixin, UpdateView):
+    model = Group
+    form_class = GroupForm
+    success_url = 'user:groups'
+    template_name = 'front-end/group/group_form.html'
+    permission_required = 'group.change_group'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        try:
+            pk = self.kwargs.get('pk', 0)
+            user = self.model.objects.get(id=pk)
+            data = {
+                'icono': opc_icono, 'crud': '/user/editar_grupo/' + str(self.kwargs['pk']), 'entidad': opc_entidad, 'empresa': empresa,
+                'boton': 'Guardar Edicion', 'titulo': 'Edicion del Registro de un Grupo',
+                'action': 'edit'
+            }
+            if action == 'edit':
+                f = self.form_class(request.POST, request.FILES, instance=user)
+                if f.is_valid():
+                        f.save()
+                        data['resp'] = True
+                else:
+                    data['form'] = f
+                    data['error'] = f.errors
+                    return render(request, 'front-end/empleado/empleado_form.html', data)
+                return HttpResponseRedirect('/user/groups')
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        pk = self.kwargs.get('pk', 0)
+        group = self.model.objects.get(id=pk)
+        data['form'] = self.form_class(instance=group)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Guardar Edicion'
+        data['titulo'] = 'Edicion del Registro de un Grupo'
+        data['action'] = 'edit'
+        data['crud'] = '/user/editar_group/' + str(self.kwargs['pk'])
+        data['empresa'] = empresa
+        return data
+
+
 class CrudViewGroup(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Group
     template_name = 'front-end/group/group_form.html'
@@ -268,7 +323,7 @@ class CrudViewGroup(ValidatePermissionRequiredMixin, TemplateView):
                 f = GroupForm(request.POST)
                 if f.is_valid():
                     f.save()
-                    return HttpResponseRedirect('user/groups')
+                    return HttpResponseRedirect('/user/groups')
                 else:
                     data['form'] = f
                 return render(request, 'front-end/group/group_form.html', data)
@@ -289,7 +344,8 @@ class CrudViewGroup(ValidatePermissionRequiredMixin, TemplateView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Grupo'
         data['titulo'] = 'Nuevo Grupos'
-        data['nuevo'] = '/usuario/newgroup'
+        data['nuevo'] = '/user/newgroup'
+        data['crud'] = '/user/newgroup'
         data['form'] = GroupForm
         data['action'] = 'add'
         data['empresa'] = empresa

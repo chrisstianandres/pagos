@@ -1,6 +1,6 @@
 $(document).ready(function () {
     $('input[name="talla"]').TouchSpin({
-        min: 32,
+        min: 20,
         max: 56,
         step: 2,
     });
@@ -24,7 +24,7 @@ $(document).ready(function () {
                 required: true,
                 minlength: 1,
                 maxlength: 3,
-                digits:true
+                digits: true
             },
             eqv_letra: {
                 required: true,
@@ -47,5 +47,33 @@ $(document).ready(function () {
             },
         },
     });
-
+    $("#form").validate({
+        rules: {
+            talla: {
+                required: true,
+                minlength: 1,
+                maxlength: 3,
+                digits: true
+            },
+            eqv_letra: {
+                required: true,
+                minlength: 1,
+                maxlength: 4,
+                lettersonly: true
+            },
+        },
+        messages: {
+            talla: {
+                required: "Por favor ingresa una talla",
+                minlength: "Debe ingresar al menos un numero",
+                digits: "Debe ingresar unicamente numeros"
+            },
+            eqv_letra: {
+                required: "Por favor ingresa la talla equivalente en letras",
+                minlength: "Debe ingresar al menos 1 letra",
+                maxlength: "Debe ingresar maximo 4 letras",
+                lettersonly: "Debe ingresar unicamente letras y espacios"
+            },
+        },
+    });
 });

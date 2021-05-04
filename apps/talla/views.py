@@ -13,7 +13,7 @@ from apps.mixins import ValidatePermissionRequiredMixin
 from apps.talla.forms import TallaForm
 from apps.talla.models import Talla
 
-opc_icono = 'fas fa-boxes'
+opc_icono = 'fas fa-sort-numeric-down-alt'
 opc_entidad = 'Talla'
 crud = '/talla/crear'
 empresa = nombre_empresa()

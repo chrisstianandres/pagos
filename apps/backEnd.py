@@ -13,6 +13,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 
 # -----------------------------------------------PAGINA PRINCIPAL-----------------------------------------------------#
+from apps.sitioweb.models import SitioWeb
 from apps.user.forms import UserForm, UserForm_online
 from apps.user.models import User
 from apps.empresa.models import Empresa
@@ -33,6 +34,14 @@ def menu(request):
     }
     return render(request, 'front-end/index.html', data)
 
+@csrf_exempt
+def nosotros(request):
+    sitio = SitioWeb.objects.first()
+    data = {
+        'titulo': 'Nuestra empresa', 'empresa': nombre_empresa(),
+        'icono': 'fas fa-low-vision', 'entidad': 'Nosotros', 'mision': sitio.mision, 'vision': sitio.vision
+    }
+    return render(request, 'front-end/sitio/nosotros.html', data)
 
 # -----------------------------------------------LOGEO----------------------------------------------------------------#
 

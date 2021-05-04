@@ -1,7 +1,8 @@
+var datatable;
 $(function () {
     var action = '';
     var pk = '';
-    var datatable = $("#datatable").DataTable({
+    datatable = $("#datatable").DataTable({
         responsive: true,
         autoWidth: false,
         ajax: {
@@ -87,10 +88,19 @@ $(function () {
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este tipo de gasto!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
-                        reset();
                         datatable.ajax.reload(null, false);
                     });
                 });
         }
+    });
+
+    $('#id_nombre').keypress(function (e) {
+        if (e.which >= 48 && e.which <= 57) {
+            return false;
+        }
+    });  //Para solo letras
+
+    $('#Modal').on('hidden.bs.modal', function () {
+        reset_form('#form');
     });
 });

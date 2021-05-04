@@ -88,10 +88,13 @@ $(function () {
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar esta categoria!', 'far fa-smile-wink', function () {
                         $('#Modal').modal('hide');
-                        reset();
                         datatable.ajax.reload(null, false);
                     });
                 });
         }
     });
+    $('#Modal').on('hidden.bs.modal', function () {
+        reset_form('#form');
+    });
+
 });

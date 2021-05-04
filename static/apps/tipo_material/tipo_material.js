@@ -31,7 +31,25 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa el nombre del color",
+                required: "Por favor ingresa el nombre del tipo de material",
+                minlength: "Debe ingresar al menos 3 letras",
+                lettersonly: "Debe ingresar unicamente letras y espacios",
+            },
+        },
+    });
+
+    $("#form_tipo").validate({
+        rules: {
+            nombre: {
+                required: true,
+                minlength: 3,
+                maxlength: 50,
+                lettersonly: true,
+            },
+        },
+        messages: {
+            nombre: {
+                required: "Por favor ingresa el nombre del tipo de material",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios",
             },

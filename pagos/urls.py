@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('menu', login_required(backEnd.menu), name='menu'),
     path('login/', backEnd.logeo, name='login'),
+    path('nosotros/', backEnd.nosotros, name='nosotros'),
     path('signin/', backEnd.signin.as_view(), name='signin'),
     path('accounts/login/', backEnd.logeo, name='login'),
     path('verificar/', backEnd.check_ced, name='verificar'),

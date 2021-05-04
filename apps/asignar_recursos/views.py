@@ -176,6 +176,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     with transaction.atomic():
                         c = Asig_recurso()
                         c.fecha_asig = datos['fecha_ingreso']
+                        c.fecha_fin = datos['fecha_salida']
                         c.user_id = request.user.id
                         c.save()
                         for i in datos['materiales']:

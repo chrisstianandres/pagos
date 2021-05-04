@@ -20,23 +20,23 @@ $(document).ready(function () {
     });
     $("#form").validate({
         rules: {
-            tipo_gasto: {
-                required: true
-            },
-            detalle: {
+            name: {
                 required: true,
                 minlength: 3,
                 maxlength: 50
+            },
+            permissions: {
+                required: true,
             }
         },
         messages: {
-            tipo_gasto: {
-                required: "Porfavor selecciona un tipo de gasto",
-            },
-            detalle: {
-                required: "Porfavor ingresa un detalle",
+            name: {
+                required: "Por favor escribre un nombre para el grupo",
                 minlength: "Debe ingresar al menos 3 letras",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
+            },
+            permissions: {
+                required: "Por favor selecciona al menos un permiso",
             },
         },
     });

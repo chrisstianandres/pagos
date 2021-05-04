@@ -145,7 +145,7 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
+                    <a type="button" class="btn btn-danger" data-dismiss="modal"
                        style="color: white"><i class="fas fa-times"></i> Cancelar
                     </a>
                     <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
@@ -194,7 +194,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
+                        <a type="button" class="btn btn-danger" data-dismiss="modal"
                            style="color: white"><i class="fas fa-times"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
@@ -227,7 +227,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
+                        <a type="button" class="btn btn-danger" data-dismiss="modal"
                            style="color: white"><i class="fas fa-times"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
@@ -267,7 +267,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
+                        <a type="button" class="btn btn-danger" data-dismiss="modal"
                            style="color: white"><i class="fas fa-times"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
@@ -297,38 +297,7 @@
 
                     </div>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
-                           style="color: white"><i class="fas fa-times"></i> Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
-
-    </div>
-    <div class="modal fade" id="Modal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <form method="post" id="form_pre" enctype="multipart/form-data" action=".">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-plus"></i>&nbsp;Nuevo registro
-                            de una Presentacion</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container-fluid">
-                            <div class="form-group">
-                                {{ form_pres.as_p }}
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="modal-footer">
-                        <a type="button" class="btn btn-danger" data-dismiss="modal" onclick=" reset();"
+                        <a type="button" class="btn btn-danger" data-dismiss="modal"
                            style="color: white"><i class="fas fa-times"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
@@ -352,6 +321,6 @@
 {% block extra %}
     <script src="{% static 'apps/producto/producto.js' %}"></script>
     <script src="{% static 'apps/categoria/categoria.js' %}"></script>
-    <script src="{% static 'apps/presentacion/presentacion.js' %}"></script>
+    <script src="{% static 'apps/color/color.js' %}"></script>
     <script src="{% static 'apps/talla/talla.js' %}"></script>
 {% endblock %}

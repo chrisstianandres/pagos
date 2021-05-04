@@ -12,7 +12,7 @@ class ColorForm(forms.ModelForm):
                 'class': 'form-control'
             })
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el nombre de un color', 'class': 'form-control'})
+                attrs={'placeholder': 'Ingrese el nombre de un color', 'class': 'form-control', 'id': 'id_nombre_color'})
         # habilitar, desabilitar, y mas
 
     class Meta:

@@ -39,9 +39,6 @@ class UserForm(forms.ModelForm):
             self.fields['sexo'].widget.attrs = {
                 'class': 'form-control select2'
             }
-            self.fields['tipo'].widget.attrs = {
-                'class': 'form-control select2'
-            }
             # self.fields["fecha_nacimiento"].widget = SelectDateWidget(years=years,
             #                                                         attrs={'class': 'selectpicker'})
         # habilitar, desabilitar, y mas
@@ -51,7 +48,6 @@ class UserForm(forms.ModelForm):
         fields = ['username',
                   'first_name',
                   'last_name',
-                  'tipo',
                   'cedula',
                   'email',
                   'avatar',
@@ -66,7 +62,6 @@ class UserForm(forms.ModelForm):
             'username': 'Nombre de Usuario',
             'first_name': 'Nombres',
             'last_name': 'Apellidos',
-            'tipo': 'Tipo de Usuario',
             'cedula': 'N° de cedula',
             'email': 'Correo',
             'avatar': 'Imagen',
@@ -83,7 +78,6 @@ class UserForm(forms.ModelForm):
             'last_name': forms.TextInput(),
             'cedula': forms.TextInput(),
             'sexo': forms.Select(),
-            'tipo': forms.Select(),
             'correo': forms.EmailInput(),
             'telefono': forms.TextInput(),
             'celular': forms.TextInput(),
@@ -106,6 +100,10 @@ class UserForm(forms.ModelForm):
                     if user.password != pwd:
                         u.set_password(pwd)
                 u.save()
+                if u.tipo == 1:
+                    u.groups.clear()
+                    for g in self.cleaned_data['groups']:
+                        u.groups.add(g)
             else:
                 data['error'] = form.errors
         except Exception as e:
