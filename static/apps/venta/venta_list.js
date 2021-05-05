@@ -245,7 +245,7 @@ $(function () {
             $('.tooltip').remove();
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var parametros = {'id': data.id, 'action': 'estado'};
+            var parametros = {'id': data.id, 'action': 'devolver'};
             save_estado('Alerta',
                 window.location.pathname, 'Esta seguro que desea devolver esta venta?', parametros,
                 function () {

@@ -82,7 +82,7 @@ class UserForm(forms.ModelForm):
             'telefono': forms.TextInput(),
             'celular': forms.TextInput(),
             'direccion': forms.Textarea(),
-            'groups': forms.SelectMultiple(attrs={'class': 'form-control', 'style': '100%', 'multiple': 'multiple'}),
+            'groups': forms.SelectMultiple(attrs={'class': 'form-control', 'style': "width: 75%", 'multiple': 'multiple'}),
             'password': forms.PasswordInput(attrs={'class': 'form-control'}, render_value=True)
         }
 

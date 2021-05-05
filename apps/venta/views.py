@@ -79,7 +79,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     for p in result.detalle_venta_set.all():
                         item = p.toJSON()
                         data.append(item)
-            elif action == 'estado':
+            elif action == 'devolver':
                 id = request.POST['id']
                 if id:
                     with transaction.atomic():
@@ -89,10 +89,11 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         dev.venta_id = id
                         dev.fecha = datetime.now()
                         dev.save()
-                        for i in Detalle_venta.objects.filter(venta_id=id):
-                            for a in Inventario_producto.objects.filter(id=i.inventario.id):
-                                a.estado = 1
-                                a.save()
+                        if es.estado == 1:
+                            for i in Detalle_venta.objects.filter(venta_id=id):
+                                producto = Producto.objects.get(id=i.inventario.id)
+                                producto.stock += i.cantidad
+                                producto.save()
                         es.save()
                 else:
                     data['error'] = 'Ha ocurrido un error'
