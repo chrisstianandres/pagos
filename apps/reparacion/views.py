@@ -431,22 +431,20 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'report':
                 if start_date == '' and end_date == '':
-                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__user__first_name',
+                                                    'transaccion__user__last_name') \
                         .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=1)
                 else:
-                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos',
-                                                 'transaccion__user__username').filter(
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__user__first_name',
+                                                    'transaccion__user__last_name').filter(
                         transaccion__fecha_trans__range=[start_date, end_date], estado=1). \
                         annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
                 for p in query:
                     data.append([
                         p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
-                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
-                        p['transaccion__user__username'],
+                        p['transaccion__user__first_name'] + " " + p['transaccion__user__last_name'],
                         format(p['transaccion__subtotal__sum'], '.2f'),
                         format((p['transaccion__iva__sum']), '.2f'),
                         format(p['transaccion__total__sum'], '.2f')
@@ -485,22 +483,20 @@ class report_total_alquilada(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'report':
                 if start_date == '' and end_date == '':
-                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__user__first_name',
+                                                    'transaccion__user__last_name') \
                         .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=0)
                 else:
-                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos',
-                                                 'transaccion__user__username').filter(
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__user__first_name',
+                                                    'transaccion__user__last_name').filter(
                         transaccion__fecha_trans__range=[start_date, end_date], estado=0). \
                         annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
                 for p in query:
                     data.append([
                         p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
-                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
-                        p['transaccion__user__username'],
+                        p['transaccion__user__first_name'] + " " + p['transaccion__user__last_name'],
                         format(p['transaccion__subtotal__sum'], '.2f'),
                         format((p['transaccion__iva__sum']), '.2f'),
                         format(p['transaccion__total__sum'], '.2f')
@@ -539,22 +535,20 @@ class report_total_reservada(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'report':
                 if start_date == '' and end_date == '':
-                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__user__first_name',
+                                                    'transaccion__user__last_name') \
                         .annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=3)
                 else:
-                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos',
-                                                 'transaccion__user__username').filter(
+                    query = Reparacion.objects.values('transaccion__fecha_trans', 'transaccion__user__first_name',
+                                                    'transaccion__user__last_name').filter(
                         transaccion__fecha_trans__range=[start_date, end_date], estado=3). \
                         annotate(Sum('transaccion__subtotal')). \
                         annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
                 for p in query:
                     data.append([
                         p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
-                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
-                        p['transaccion__user__username'],
+                        p['transaccion__user__first_name'] + " " + p['transaccion__user__last_name'],
                         format(p['transaccion__subtotal__sum'], '.2f'),
                         format((p['transaccion__iva__sum']), '.2f'),
                         format(p['transaccion__total__sum'], '.2f')

@@ -1,16 +1,4 @@
 var datatable;
-var logotipo;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
-
-toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
-    logotipo = dataUrl;
-});
 var datos = {
     fechas: {
         'start_date': '',
@@ -82,7 +70,7 @@ $(function () {
                 pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                 download: 'open',
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5],
+                    columns: [0, 1, 2, 3, 4],
                     search: 'applied',
                     order: 'applied'
                 },
@@ -111,11 +99,16 @@ $(function () {
                     doc.defaultStyle.fontSize = 12;
                     doc.styles.tableHeader.fontSize = 14;
                     doc['header'] = (function () {
-                        return {
-                            columns: [{alignment: 'center', image: logotipo, width: 300}],
-                            margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
-                        }
-                    });
+                            return {
+                                columns: [{
+                                    alignment: 'center',
+                                    italics: true,
+                                    text: empresa,
+                                    fontSize: 45,
+
+                                }],
+                            }
+                        });
                     doc['footer'] = (function (page, pages) {
                         return {
                             columns: [
@@ -151,7 +144,7 @@ $(function () {
                         return 4;
                     };
                     doc.content[0].layout = objLayout;
-                    doc.content[1].table.widths = ["*", "*", "*", "*", "*", "*"];
+                    doc.content[1].table.widths = ["*", "*", "*", "*", "*"];
                     doc.styles.tableBodyEven.alignment = 'center';
                     doc.styles.tableBodyOdd.alignment = 'center';
                     doc.styles.tableFooter.alignment = 'center';
@@ -205,13 +198,13 @@ $(function () {
                 }
             },
         ],
-        footerCallback: function (row, data, start, end, display) {
+        footerCallback: function (row, start, end, display) {
             var api = this.api(), data;
 
             // Remove the formatting to get integer data for summation
             var intVal = function (i) {
                 return typeof i === 'string' ?
-                    i.replace(/[\$,]/g, '') * 1 :
+                    i.replace(/[$,]/g, '') * 1 :
                     typeof i === 'number' ?
                         i : 0;
             };
@@ -240,13 +233,13 @@ $(function () {
             }, 0);
 // Total over this page
             pageTotalconiva = api
-                .column(5, {page: 'current'})
+                .column(2, {page: 'current'})
                 .data()
                 .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
             // total full table
-            totalconiva = api.column(5).data().reduce(function (a, b) {
+            totalconiva = api.column(2).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
 
@@ -260,7 +253,7 @@ $(function () {
                 '$ ' + parseFloat(pageTotaliva).toFixed(2) + ' ( $ ' + parseFloat(pageTotaliva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
-              $(api.column(5).footer()).html(
+              $(api.column(2).footer()).html(
                 '$ ' + parseFloat(pageTotalconiva).toFixed(2) + ' ( $ ' + parseFloat(pageTotalconiva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
